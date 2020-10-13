@@ -1,0 +1,15 @@
+escape ^@a
+altscreen on
+term screen-256color
+startup_message off
+vbell off
+defscrollback 10000
+termcapinfo xterm* 'hs:ts=\E]0;:fs=\007:ds=\E]0;\007'
+defhstatus "Screen ^E ^Et"
+hardstatus off
+hardstatus alwayslastline '%{= kM}[%H]  %{= kw}%?%-Lw%?%{D}%n:%{C}%f%t*%?(%u)%?%{w}%?%+Lw%?%?%=%{M} %D %d %M %{c}%c'
+bind k eval "focus up"
+bind j eval "focus down"
+bind h eval "focus left"
+bind l eval "focus right"
+defscrollback 10000
