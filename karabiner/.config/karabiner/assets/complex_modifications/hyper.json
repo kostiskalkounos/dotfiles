@@ -1,0 +1,65 @@
+{
+  "title": "Hyper",
+  "rules": [
+    {
+      "description": "Change Right Command to f19",
+      "manipulators": [
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "right_command"
+          },
+          "to": [
+            {
+              "key_code": "f19"
+            }
+          ]
+        },
+        {
+          "description": "Avoid starting sysdiagnose with the built-in macOS shortcut cmd+shift+option+ctrl+w",
+          "type": "basic",
+          "from": {
+            "key_code": "w",
+            "modifiers": {
+              "mandatory": ["command", "shift", "option", "control"]
+            }
+          },
+          "to": []
+        },
+        {
+          "description": "Avoid starting sysdiagnose with the built-in macOS shortcut cmd+shift+option+ctrl+,",
+          "type": "basic",
+          "from": {
+            "key_code": "comma",
+            "modifiers": {
+              "mandatory": ["command", "shift", "option", "control"]
+            }
+          },
+          "to": []
+        },
+        {
+          "description": "Avoid starting sysdiagnose with the built-in macOS shortcut cmd+shift+option+ctrl+.",
+          "type": "basic",
+          "from": {
+            "key_code": "period",
+            "modifiers": {
+              "mandatory": ["command", "shift", "option", "control"]
+            }
+          },
+          "to": []
+        },
+        {
+          "description": "Avoid starting sysdiagnose with the built-in macOS shortcut cmd+shift+option+ctrl+/",
+          "type": "basic",
+          "from": {
+            "key_code": "slash",
+            "modifiers": {
+              "mandatory": ["command", "shift", "option", "control"]
+            }
+          },
+          "to": []
+        }
+      ]
+    }
+  ]
+}
