@@ -1,0 +1,193 @@
+window:
+  dimensions:
+    columns: 111
+    lines: 29
+
+  padding:
+    x: 4
+    y: 2
+
+  decorations: buttonless
+
+scrolling:
+  history: 10000
+  multiplier: 3
+  scrolling_multiplier: 3
+
+font:
+  normal:
+    family: Monaco
+    style: Regular
+  bold:
+    family: SF Mono
+    style: Bold
+  italic:
+    family: SF Mono
+    style: Regular Italic
+  bold_italic:
+    family: SF Mono
+    style: Bold Italic
+
+  size: 13.0
+
+  offset:
+    x: 0
+    y: 0
+
+  glyph_offset:
+    x: 0
+    y: 0
+
+  use_thin_strokes: true
+
+draw_bold_text_with_bright_colors: true
+
+colors:
+  primary:
+    background: '#282c34'
+    foreground: '#abb2bf'
+
+  normal:
+    black:   '#282c34'
+    red:     '#e06c75'
+    green:   '#98c379'
+    yellow:  '#d19a66'
+    blue:    '#61afef'
+    magenta: '#c678dd'
+    cyan:    '#56b6c2'
+    white:   '#abb2bf'
+
+  bright:
+    black:   '#5c6370'
+    red:     '#e06c75'
+    green:   '#98c379'
+    yellow:  '#d19a66'
+    blue:    '#61afef'
+    magenta: '#c678dd'
+    cyan:    '#56b6c2'
+    white:   '#ffffff'
+
+mouse:
+  double_click: { threshold: 300 }
+  triple_click: { threshold: 300 }
+  hide_when_typing: true
+
+mouse_bindings:
+  - { mouse: Middle, action: PasteSelection }
+
+selection:
+  semantic_escape_chars: ',│`|:"'' ()[]{}<>'
+  save_to_clipboard: true
+
+window.dynamic_title: true
+cursor:
+  style: Block
+  unfocused_hollow: true
+
+live_config_reload: true
+
+key_bindings:
+  - { key: End,                               action: ScrollToBottom         }
+  - { key: Home,                              action: ScrollToTop            }
+  - { key: PageDown,                          action: ScrollPageDown         }
+  - { key: PageUp,                            action: ScrollPageUp           }
+
+  - { key: A,           mods: Alt,            chars:  "\x1ba"                }
+  - { key: A,           mods: Alt|Shift,      chars:  "\x1bA"                }
+  - { key: Apostrophe,  mods: Alt,            chars:  "\x1b'"                }
+  - { key: Apostrophe,  mods: Alt|Shift,      chars:  "\x1b\""               }
+  - { key: B,           mods: Alt,            chars:  "\x1bb"                }
+  - { key: B,           mods: Alt|Shift,      chars:  "\x1bB"                }
+  - { key: Backslash,   mods: Alt,            chars:  "\x1b\\"               }
+  - { key: Backslash,   mods: Alt|Shift,      chars:  "\x1b|"                }
+  - { key: C,           mods: Alt,            chars:  "\x1bc"                }
+  - { key: C,           mods: Alt|Shift,      chars:  "\x1bC"                }
+  - { key: Comma,       mods: Alt,            chars:  "\x1B,"                }
+  - { key: Comma,       mods: Alt|Shift,      chars:  "\x1b<"                }
+  - { key: D,           mods: Alt,            chars:  "\x1bd"                }
+  - { key: D,           mods: Alt|Shift,      chars:  "\x1bD"                }
+  - { key: E,           mods: Alt,            chars:  "\x1be"                }
+  - { key: E,           mods: Alt|Shift,      chars:  "\x1bE"                }
+  - { key: Equals,      mods: Alt,            chars:  "\x1b="                }
+  - { key: Equals,      mods: Alt|Shift,      chars:  "\x1b+"                }
+  - { key: F,           mods: Alt,            chars:  "\x1bf"                }
+  - { key: F,           mods: Alt|Shift,      chars:  "\x1bF"                }
+  - { key: G,           mods: Alt,            chars:  "\x1bg"                }
+  - { key: G,           mods: Alt|Shift,      chars:  "\x1bG"                }
+  - { key: Grave,       mods: Alt,            chars:  "\x1b`"                }
+  - { key: Grave,       mods: Alt|Shift,      chars:  "\x1b~"                }
+  - { key: H,           mods: Alt,            chars:  "\x1bh"                }
+  - { key: H,           mods: Alt|Shift,      chars:  "\x1bH"                }
+  - { key: I,           mods: Alt,            chars:  "\x1bi"                }
+  - { key: I,           mods: Alt|Shift,      chars:  "\x1bI"                }
+  - { key: J,           mods: Alt,            chars:  "\x1bj"                }
+  - { key: J,           mods: Alt|Shift,      chars:  "\x1bJ"                }
+  - { key: K,           mods: Alt,            chars:  "\x1bk"                }
+  - { key: K,           mods: Alt|Shift,      chars:  "\x1bK"                }
+  - { key: Key0,        mods: Alt,            chars:  "\x1b0"                }
+  - { key: Key0,        mods: Alt|Shift,      chars:  "\x1b)"                }
+  - { key: Key1,        mods: Alt,            chars:  "\x1b1"                }
+  - { key: Key1,        mods: Alt|Shift,      chars:  "\x1b!"                }
+  - { key: Key2,        mods: Alt,            chars:  "\x1b2"                }
+  - { key: Key2,        mods: Alt|Shift,      chars:  "\x1b#"                }
+  - { key: Key3,        mods: Alt,            chars:  "\x1b3"                }
+  - { key: Key3,        mods: Alt|Shift,      chars:  "\x1b#"                }
+  - { key: Key4,        mods: Alt,            chars:  "\x1b4"                }
+  - { key: Key4,        mods: Alt|Shift,      chars:  "\x1b$"                }
+  - { key: Key5,        mods: Alt,            chars:  "\x1b5"                }
+  - { key: Key5,        mods: Alt|Shift,      chars:  "\x1b%"                }
+  - { key: Key6,        mods: Alt,            chars:  "\x1b6"                }
+  - { key: Key6,        mods: Alt|Shift,      chars:  "\x1b^"                }
+  - { key: Key6,        mods: Control,        chars:  "\x1b6"                }
+  - { key: Key7,        mods: Alt,            chars:  "\x1b7"                }
+  - { key: Key7,        mods: Alt|Shift,      chars:  "\x1b&"                }
+  - { key: Key8,        mods: Alt,            chars:  "\x1b8"                }
+  - { key: Key8,        mods: Alt|Shift,      chars:  "\x1b*"                }
+  - { key: Key9,        mods: Alt,            chars:  "\x1b9"                }
+  - { key: Key9,        mods: Alt|Shift,      chars:  "\x1b("                }
+  - { key: L,           mods: Alt,            chars:  "\x1bl"                }
+  - { key: L,           mods: Alt|Shift,      chars:  "\x1bL"                }
+  - { key: LBracket,    mods: Alt,            chars:  "\x1b["                }
+  - { key: LBracket,    mods: Alt|Shift,      chars:  "\x1b{"                }
+  - { key: M,           mods: Alt,            chars:  "\x1bm"                }
+  - { key: M,           mods: Alt|Shift,      chars:  "\x1bM"                }
+  - { key: Minus,       mods: Alt,            chars:  "\x1b-"                }
+  - { key: Minus,       mods: Alt|Shift,      chars:  "\x1b_"                }
+  - { key: N,           mods: Alt,            chars:  "\x1bn"                }
+  - { key: N,           mods: Alt|Shift,      chars:  "\x1bN"                }
+  - { key: O,           mods: Alt,            chars:  "\x1bo"                }
+  - { key: O,           mods: Alt|Shift,      chars:  "\x1bO"                }
+  - { key: P,           mods: Alt,            chars:  "\x1bp"                }
+  - { key: P,           mods: Alt|Shift,      chars:  "\x1bP"                }
+  - { key: Period,      mods: Alt,            chars:  "\x1b."                }
+  - { key: Period,      mods: Alt|Shift,      chars:  "\x1b>"                }
+  - { key: Q,           mods: Alt,            chars:  "\x1bq"                }
+  - { key: Q,           mods: Alt|Shift,      chars:  "\x1bQ"                }
+  - { key: R,           mods: Alt,            chars:  "\x1br"                }
+  - { key: R,           mods: Alt|Shift,      chars:  "\x1bR"                }
+  - { key: RBracket,    mods: Alt,            chars:  "\x1b]"                }
+  - { key: RBracket,    mods: Alt|Shift,      chars:  "\x1b}"                }
+  - { key: S,           mods: Alt,            chars:  "\x1bs"                }
+  - { key: S,           mods: Alt|Shift,      chars:  "\x1bS"                }
+  - { key: Semicolon,   mods: Alt,            chars:  "\x1b;"                }
+  - { key: Semicolon,   mods: Alt|Shift,      chars:  "\x1b:"                }
+  - { key: Slash,       mods: Alt,            chars:  "\x1b/"                }
+  - { key: Slash,       mods: Alt|Shift,      chars:  "\x1b?"                }
+  - { key: Space,       mods: Alt,            chars:  "\x00"                 }
+  - { key: Space,       mods: Control,        chars:  "\x00"                 }
+  - { key: T,           mods: Alt,            chars:  "\x1bt"                }
+  - { key: T,           mods: Alt|Shift,      chars:  "\x1bT"                }
+  - { key: Tab,         mods: Alt,            chars:  "\x1b\t"               }
+  - { key: Tab,         mods: Alt|Shift,      chars:  "\x1b\x1b[Z"           }
+  - { key: U,           mods: Alt,            chars:  "\x1bu"                }
+  - { key: U,           mods: Alt|Shift,      chars:  "\x1bU"                }
+  - { key: V,           mods: Alt,            chars:  "\x1bv"                }
+  - { key: V,           mods: Alt|Shift,      chars:  "\x1bV"                }
+  - { key: W,           mods: Alt,            chars:  "\x1bw"                }
+  - { key: W,           mods: Alt|Shift,      chars:  "\x1bW"                }
+  - { key: X,           mods: Alt,            chars:  "\x1bx"                }
+  - { key: X,           mods: Alt|Shift,      chars:  "\x1bX"                }
+  - { key: Y,           mods: Alt,            chars:  "\x1by"                }
+  - { key: Y,           mods: Alt|Shift,      chars:  "\x1bY"                }
+  - { key: Z,           mods: Alt,            chars:  "\x1bz"                }
+  - { key: Z,           mods: Alt|Shift,      chars:  "\x1bZ"                }
