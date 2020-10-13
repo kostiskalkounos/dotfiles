@@ -1,0 +1,8 @@
+--colors=column:none
+--colors=line:none
+--colors=line:style:nobold
+--colors=match:fg:magenta
+--colors=match:style:nobold
+--colors=path:fg:blue
+--hidden
+--smart-case
