@@ -1,0 +1,19 @@
+{
+  "coc.preferences.formatOnSaveFiletypes": [
+    "c",
+    "cpp",
+    "css",
+    "html",
+    "javascript",
+    "javascriptreact",
+    "json",
+    "objc",
+    "objcpp",
+    "python",
+    "typescript",
+    "typescriptreact"
+  ],
+  "coc.preferences.semanticTokensHighlights": false,
+  "suggest.autoTrigger": "none",
+  "suggest.noselect": false
+}
