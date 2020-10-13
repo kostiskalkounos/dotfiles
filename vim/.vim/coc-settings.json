@@ -1,0 +1,6 @@
+{
+  "coc.preferences.formatOnSaveFiletypes": ["*"],
+  "suggest.autoTrigger": "none",
+  "suggest.noselect": false
+}
+
