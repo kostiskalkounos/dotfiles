@@ -1,0 +1,13 @@
+.DS_Store
+.luarc.json
+.netrwhist
+Spoons
+autoload/
+build
+node_modules
+package-lock.json
+packer_compiled.lua
+plugged/
+undodir/
+vendor
+yarn.lock
