@@ -1,0 +1,30 @@
+[include]
+  path = ~/.gitcredentials
+
+[init]
+  defaultBranch = main
+
+[core]
+  excludesfile = ~/.gitignore
+
+[color]
+  ui = auto
+
+[color "diff"]
+  meta = yellow
+
+[grep]
+  lineNumber = true
+
+[pull]
+  rebase = true
+
+[push]
+  default = simple
+
+[branch]
+  autosetupmerge = true
+  autosetuprebase = always
+
+[merge]
+  conflictstyle = diff3
