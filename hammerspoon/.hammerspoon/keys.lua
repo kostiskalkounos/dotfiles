@@ -17,8 +17,8 @@ hyper:bind({"cmd"}, "g", function() hs.application.launchOrFocus("App Store") en
 hyper:bind({"cmd"}, "r", function() hs.application.launchOrFocus("Reminders") end)
 hyper:bind({"cmd"}, "s", function() hs.application.launchOrFocus("Brave Browser") end)
 
-hyper:bind({"cmd"}, "1", function() hs.osascript.applescriptFromFile("monitor1.applescript") end)
-hyper:bind({"cmd"}, "2", function() hs.osascript.applescriptFromFile("monitor2.applescript") end)
-hyper:bind({"cmd"}, "3", function() hs.osascript.applescriptFromFile("monitor3.applescript") end)
+hyper:bind({"cmd", "ctrl"}, "1", function() hs.osascript.applescriptFromFile("monitor1.applescript") end)
+hyper:bind({"cmd", "ctrl"}, "2", function() hs.osascript.applescriptFromFile("monitor2.applescript") end)
+hyper:bind({"cmd", "ctrl"}, "3", function() hs.osascript.applescriptFromFile("monitor3.applescript") end)
 
 hyper:bind({"cmd", "shift"}, "r", function() hs.reload() end)
