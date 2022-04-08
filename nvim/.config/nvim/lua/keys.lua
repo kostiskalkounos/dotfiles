@@ -131,7 +131,7 @@ map("n", "<leader>C", [[gg"+yG]], default)
 map("n", "<leader>c", [["+y]], default)
 map("n", "<leader>v", [["+p]], default)
 map("v", "<leader>c", [["+y]], default)
-map("v", "<leader>p", [["_dP]], default)
+map("v", "<leader>p", "p", default)
 map("v", "<leader>v", [["+p]], default)
 
 vim.cmd([[
