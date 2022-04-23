@@ -17,7 +17,7 @@ local function plugins(use)
   use({
     "kostiskalkounos/onedark",
     config = function()
-      require("config.colors")
+      vim.api.nvim_command("colorscheme onedark")
     end,
   })
 
