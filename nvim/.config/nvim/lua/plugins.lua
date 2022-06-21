@@ -133,7 +133,6 @@ local function plugins(use)
 
   use({
     "neovim/nvim-lspconfig",
-    opt = true,
     event = "BufReadPre",
     wants = {
       "null-ls.nvim",
