@@ -1,11 +1,9 @@
 local actions = require("telescope.actions")
-local trouble = require("trouble.providers.telescope")
 
 require("telescope").setup({
   defaults = {
     mappings = {
       i = {
-        ["<c-e>"] = trouble.open_with_trouble,
         ["<c-j>"] = actions.move_selection_next,
         ["<c-k>"] = actions.move_selection_previous,
         ["<esc>"] = actions.close,
