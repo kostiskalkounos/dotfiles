@@ -37,19 +37,6 @@ local function plugins(use)
   })
 
   use({
-    "folke/trouble.nvim",
-    event = "BufReadPre",
-    wants = "nvim-web-devicons",
-    cmd = { "TroubleToggle", "Trouble" },
-    config = function()
-      require("trouble").setup({
-        auto_open = false,
-        use_diagnostic_signs = true,
-      })
-    end,
-  })
-
-  use({
     "TimUntersberger/neogit",
     cmd = "Neogit",
     config = function()
@@ -177,7 +164,6 @@ local function plugins(use)
       "plenary.nvim",
       "popup.nvim",
       "telescope-fzy-native.nvim",
-      "trouble.nvim",
     },
     requires = {
       "nvim-lua/popup.nvim",
