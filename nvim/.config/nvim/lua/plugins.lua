@@ -88,34 +88,26 @@ local function plugins(use)
 
   use({
     "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
-    opt = true,
     config = function()
       require("config.cmp")
     end,
-    wants = { "LuaSnip" },
-    requires = {
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-path",
-      "onsails/lspkind-nvim",
-      "saadparwaiz1/cmp_luasnip",
-      {
-        "L3MON4D3/LuaSnip",
-        wants = "friendly-snippets",
-        config = function()
-          require("config.snippets")
-        end,
-      },
-      "rafamadriz/friendly-snippets",
-      {
-        module = "nvim-autopairs",
-        "windwp/nvim-autopairs",
-        config = function()
-          require("config.autopairs")
-        end,
-      },
-    },
+  })
+  use({ "hrsh7th/cmp-buffer" })
+  use({ "hrsh7th/cmp-nvim-lsp" })
+  use({ "hrsh7th/cmp-path" })
+  use({ "onsails/lspkind-nvim" })
+  use({ "saadparwaiz1/cmp_luasnip" })
+  use({ "L3MON4D3/LuaSnip" })
+  use({
+    "rafamadriz/friendly-snippets",
+    config = function()
+      require("config.snippets")
+    end,
+    module = "nvim-autopairs",
+    "windwp/nvim-autopairs",
+    config = function()
+      require("config.autopairs")
+    end,
   })
 
   use({
