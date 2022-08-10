@@ -7,6 +7,7 @@ function M.setup(options)
     save_after_format = false,
     sources = {
       nls.builtins.formatting.fixjson.with({ filetypes = { "jsonc" } }),
+      nls.builtins.formatting.google_java_format,
       nls.builtins.formatting.prettierd,
       nls.builtins.formatting.stylua,
       -- nls.builtins.formatting.eslint_d,

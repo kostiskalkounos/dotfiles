@@ -4,7 +4,7 @@ M.autoformat = true
 
 function M.format()
   if M.autoformat then
-    vim.lsp.buf.formatting_sync(nil, 1000)
+    vim.lsp.buf.formatting_seq_sync(nil, 1000)
   end
 end
 
