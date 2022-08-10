@@ -128,6 +128,8 @@ local function plugins(use)
     },
   })
 
+  use("mfussenegger/nvim-jdtls")
+
   use({
     "windwp/nvim-spectre",
     opt = true,
