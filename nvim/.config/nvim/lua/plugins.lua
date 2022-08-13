@@ -9,10 +9,17 @@ local config = {
 }
 
 local function plugins(use)
+  use({ "JoosepAlviste/nvim-ts-context-commentstring", module = "ts_context_commentstring" })
   use({ "mbbill/undotree", cmd = "UndotreeToggle" })
   use({ "nvim-lua/plenary.nvim", module = "plenary" })
   use({ "nvim-lua/popup.nvim", module = "popup" })
   use({ "wbthomason/packer.nvim", opt = true })
+
+  use("mfussenegger/nvim-dap")
+  use("mfussenegger/nvim-jdtls")
+  use("nvim-telescope/telescope-dap.nvim")
+  use("rcarriga/nvim-dap-ui")
+  use("theHamsta/nvim-dap-virtual-text")
 
   use({
     "kostiskalkounos/onedark",
@@ -71,8 +78,6 @@ local function plugins(use)
     end,
   })
 
-  use({ "JoosepAlviste/nvim-ts-context-commentstring", module = "ts_context_commentstring" })
-
   use({
     "nvim-treesitter/nvim-treesitter",
     run = ":TSUpdate",
@@ -127,8 +132,6 @@ local function plugins(use)
       "williamboman/nvim-lsp-installer",
     },
   })
-
-  use("mfussenegger/nvim-jdtls")
 
   use({
     "windwp/nvim-spectre",

@@ -117,6 +117,15 @@ map("n", "<leader>x", "<cmd>x<CR>", unique)
 map("n", "<leader>z", "za", default)
 map("v", "<leader>b", "<cmd>lua require('spectre').open_visual()<CR>", unique)
 
+--[[ map("n", "<leader>", ":lua require'dap'.continue()<CR>") ]]
+--[[ map("n", "<leader>", ":lua require'dap'.step_over()<CR>") ]]
+--[[ map("n", "<leader>", ":lua require'dap'.step_into()<CR>") ]]
+--[[ map("n", "<leader>", ":lua require'dap'.step_out()<CR>") ]]
+--[[ map("n", "<leader>b", ":lua require'dap'.toggle_breakpoint()<CR>") ]]
+--[[ map("n", "<leader>B", ":lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>") ]]
+--[[ map("n", "<leader>lp", ":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>") ]]
+--[[ map("n", "<leader>dr", ":lua require'dap'.repl.open()<CR>") ]]
+
 map("n", "<leader>E", "vip:sort iu<CR>", default)
 map("n", "<leader>e", "vip:sort u<CR>", default)
 map("v", "<leader>E", ":sort iu<CR>", default)
