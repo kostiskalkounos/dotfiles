@@ -12,9 +12,6 @@ local function on_attach(client, bufnr)
   if vim.o.filetype == "java" then
     require("jdtls").setup_dap({ hotcodereplace = "auto" })
     require("jdtls").setup.add_commands()
-    local opts = { noremap = true, unique = true, silent = true }
-    vim.keymap.set("n", "<F9>", ":lua require'jdtls'.test_class()<CR>", opts)
-    vim.keymap.set("n", "<F10>", ":lua require'jdtls'.test_nearest_method()<CR>", opts)
 
     local opts = { noremap = true, unique = true, silent = true }
     vim.keymap.set("n", "<F9>", ":lua require'jdtls'.test_class()<CR>", opts)
