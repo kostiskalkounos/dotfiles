@@ -18,15 +18,6 @@ vim.list_extend(
     "\n"
   )
 )
-vim.list_extend(
-  bundles,
-  vim.split(
-    vim.fn.glob(
-      home .. "Projects/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar"
-    ),
-    "\n"
-  )
-)
 
 local config = {
   cmd = {
