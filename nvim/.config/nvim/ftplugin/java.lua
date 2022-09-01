@@ -1,6 +1,5 @@
 local home = os.getenv("HOME")
 WORKSPACE_PATH = home .. "/Projects/"
-CONFIG = "mac"
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
 local workspace_dir = WORKSPACE_PATH .. project_name
 
@@ -9,11 +8,12 @@ extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 
 local bundles = {}
 
+vim.list_extend(bundles, vim.split(vim.fn.glob(WORKSPACE_PATH .. "vscode-java-test/server/*.jar"), "\n"))
 vim.list_extend(
   bundles,
   vim.split(
     vim.fn.glob(
-      home .. "Projects/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar"
+      WORKSPACE_PATH .. "java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar"
     ),
     "\n"
   )
