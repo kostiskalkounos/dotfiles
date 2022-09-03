@@ -125,6 +125,8 @@ map("n", "<F5>", ":lua require'dap'.step_over()<CR>", default)
 map("n", "<F6>", ":lua require'dap'.repl.open()<CR>", default)
 map("n", "<F7>", ":lua require'dap'.toggle_breakpoint()<CR>", default)
 map("n", "<F8>", ":lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>", default)
+map("n", "<F9>", ":lua require'jdtls'.test_class()<CR>", default)
+map("n", "<F10>", ":lua require'jdtls'.test_nearest_method()<CR>", default)
 
 map("n", "<leader>E", "vip:sort iu<CR>", default)
 map("n", "<leader>e", "vip:sort u<CR>", default)
