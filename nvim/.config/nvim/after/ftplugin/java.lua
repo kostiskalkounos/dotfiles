@@ -34,9 +34,9 @@ local config = {
     "--add-opens",
     "java.base/java.lang=ALL-UNNAMED",
     "-jar",
-    vim.fn.glob("/usr/local/Cellar/jdtls/1.14.0/libexec/plugins/org.eclipse.equinox.launcher_*.jar"),
+    vim.fn.glob("/usr/local/Cellar/jdtls/*/libexec/plugins/org.eclipse.equinox.launcher_*.jar"),
     "-configuration",
-    "/usr/local/Cellar/jdtls/1.14.0/libexec/config_mac",
+    vim.fn.glob("/usr/local/Cellar/jdtls/*/libexec/config_mac"),
     "-data",
     workspace_dir,
   },
@@ -104,14 +104,3 @@ local config = {
 }
 
 require("jdtls").start_or_attach(config)
-
-vim.cmd(
-  "command! -buffer -nargs=? -complete=custom,v:lua.require'jdtls'._complete_compile JdtCompile lua require('jdtls').compile(<f-args>)"
-)
-vim.cmd(
-  "command! -buffer -nargs=? -complete=custom,v:lua.require'jdtls'._complete_set_runtime JdtSetRuntime lua require('jdtls').set_runtime(<f-args>)"
-)
-vim.cmd("command! -buffer JdtUpdateConfig lua require('jdtls').update_project_config()")
-vim.cmd("command! -buffer JdtJol lua require('jdtls').jol()")
-vim.cmd("command! -buffer JdtBytecode lua require('jdtls').javap()")
-vim.cmd("command! -buffer JdtJshell lua require('jdtls').jshell()")
