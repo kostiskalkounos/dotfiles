@@ -89,7 +89,7 @@ hyper:bind({},        "/", function() hs.execute("yabai -m space --toggle paddin
 hyper:bind({"alt"},   "/", function() hs.execute("yabai -m space --padding rel:5:5:5:5; yabai -m space --gap rel:5", true) end)
 hyper:bind({"cmd"},   "/", function() hs.execute("yabai -m space --padding abs:10:10:10:10; yabai -m space --gap abs:10", true) end)
 hyper:bind({"ctrl"},  "/", function() hs.execute("yabai -m space --padding rel:-5:-5:-5:-5; yabai -m space --gap rel:-5", true) end)
-hyper:bind({"shift"}, "/", function() hs.execute("yabai -m space --padding rel:-5:-5:-5:-5; yabai -m space --gap rel:-5", true) end)
+hyper:bind({"shift"}, "/", function() hs.execute("yabai -m space --padding abs:10:10:10:10; yabai -m space --gap abs:10", true) end)
 
 -- Focus monitor
 hyper:bind({}, "1", function() hs.execute("yabai -m display --focus 1", true) end)
