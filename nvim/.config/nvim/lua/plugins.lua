@@ -92,6 +92,19 @@ local function plugins(use)
   })
 
   use({
+    "nvim-treesitter/nvim-treesitter-context",
+    opt = true,
+    cmd = { "TSContextEnable", "TSContextDisable", "TSContextToggle" },
+    event = "BufRead",
+    config = function()
+      require("config.context")
+    end,
+    requires = {
+      "nvim-treesitter/nvim-treesitter",
+    },
+  })
+
+  use({
     "hrsh7th/nvim-cmp",
     config = function()
       require("config.cmp")
@@ -105,12 +118,10 @@ local function plugins(use)
   use({ "L3MON4D3/LuaSnip" })
   use({
     "rafamadriz/friendly-snippets",
-    config = function()
-      require("config.snippets")
-    end,
     module = "nvim-autopairs",
     "windwp/nvim-autopairs",
     config = function()
+      require("config.snippets")
       require("config.autopairs")
     end,
   })
