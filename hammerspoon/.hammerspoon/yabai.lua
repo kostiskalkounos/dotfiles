@@ -14,8 +14,8 @@ hyper:bind({"cmd"}, "k", function() hs.execute("yabai -m window --swap north", t
 hyper:bind({"cmd"}, "l", function() hs.execute("yabai -m window --swap east", true) end)
 
 -- Cycle windows
-hyper:bind({"alt"}, "p", function() hs.execute("$HOME/.config/yabai/cycle_counterclockwise.sh", true) end)
-hyper:bind({"alt"}, "n", function() hs.execute("$HOME/.config/yabai/cycle_clockwise.sh", true) end)
+hyper:bind({"alt"}, "n", function() hs.execute("$HOME/.config/yabai/cycleClockwise.sh", true) end)
+hyper:bind({"alt"}, "p", function() hs.execute("$HOME/.config/yabai/cycleCounterclockwise.sh", true) end)
 
 -- Move managed window
 hyper:bind({}, "left",  function() hs.execute("yabai -m window --warp west", true) end)
