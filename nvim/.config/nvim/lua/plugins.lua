@@ -81,27 +81,15 @@ local function plugins(use)
   use({
     "nvim-treesitter/nvim-treesitter",
     run = ":TSUpdate",
-    opt = true,
-    event = "BufRead",
     requires = {
+      "nvim-treesitter/nvim-treesitter-context",
+      { "nvim-treesitter/nvim-treesitter-textobjects", opt = true },
       { "nvim-treesitter/playground", opt = true, cmd = "TSHighlightCapturesUnderCursor" },
     },
     config = function()
       require("config.treesitter")
-    end,
-  })
-
-  use({
-    "nvim-treesitter/nvim-treesitter-context",
-    opt = true,
-    cmd = { "TSContextEnable", "TSContextDisable", "TSContextToggle" },
-    event = "BufRead",
-    config = function()
       require("config.context")
     end,
-    requires = {
-      "nvim-treesitter/nvim-treesitter",
-    },
   })
 
   use({
