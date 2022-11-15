@@ -46,6 +46,7 @@ vim.opt.shiftround = true
 vim.opt.shiftwidth = 2
 vim.opt.shortmess:append("c")
 vim.opt.showmatch = true
+vim.opt.showmode = false
 vim.opt.sidescroll = 0
 vim.opt.sidescrolloff = 0
 vim.opt.signcolumn = "yes"
