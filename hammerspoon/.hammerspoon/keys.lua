@@ -13,9 +13,10 @@ hyper:bind({}, "w", function() hs.application.launchOrFocus("WhatsApp") end)
 hyper:bind({}, "x", function() hs.application.launchOrFocus("Launchpad") end)
 hyper:bind({}, "z", function() hs.application.launchOrFocus("Activity Monitor") end)
 
-hyper:bind({"cmd"}, "f", function() hs.application.launchOrFocus("Brave Browser") end)
+hyper:bind({"cmd"}, "f", function() hs.application.launchOrFocus("Visual Studio Code") end)
 hyper:bind({"cmd"}, "g", function() hs.application.launchOrFocus("App Store") end)
 hyper:bind({"cmd"}, "r", function() hs.application.launchOrFocus("Reminders") end)
+hyper:bind({"cmd"}, "s", function() hs.application.launchOrFocus("Brave Browser") end)
 hyper:bind({"cmd"}, "w", function() hs.application.launchOrFocus("Signal") end)
 
 hyper:bind({"cmd", "ctrl"}, "1", function() hs.osascript.applescriptFromFile("monitor1.applescript") end)
