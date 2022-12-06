@@ -1,23 +1,44 @@
+local jdtls = require("jdtls")
+local root_markers = { ".git", "gradlew", ".git" }
+local root_dir = require("jdtls.setup").find_root(root_markers)
 local home = os.getenv("HOME")
-WORKSPACE_PATH = home .. "/Projects/"
-local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
-local workspace_dir = WORKSPACE_PATH .. project_name
+local workspace_dir = home .. "/.local/share/eclipse/" .. vim.fn.fnamemodify(root_dir, ":p:h:t")
 
-local extendedClientCapabilities = require("jdtls").extendedClientCapabilities
-extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
+local jar_patterns = {
+  "~/Projects/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar",
+  "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.plugin/target/*.jar",
+  "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.runner/target/*.jar",
+  "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.runner/lib/*.jar",
+}
 
+local plugin_path = "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.plugin.site/target/repository/plugins/"
+local bundle_list = vim.tbl_map(function(x)
+  return require("jdtls.path").join(plugin_path, x)
+end, {
+  "junit-jupiter-*.jar",
+  "junit-platform-*.jar",
+  "junit-vintage-engine_*.jar",
+  "org.opentest4j*.jar",
+  "org.apiguardian.api_*.jar",
+  "org.eclipse.jdt.junit4.runtime_*.jar",
+  "org.eclipse.jdt.junit5.runtime_*.jar",
+  "org.opentest4j_*.jar",
+})
+
+vim.list_extend(jar_patterns, bundle_list)
 local bundles = {}
+for _, jar_pattern in ipairs(jar_patterns) do
+  for _, bundle in ipairs(vim.split(vim.fn.glob(home .. jar_pattern), "\n")) do
+    if not vim.endswith(bundle, "com.microsoft.java.test.runner-jar-with-dependencies.jar")
+        and not vim.endswith(bundle, "com.microsoft.java.test.runner.jar")
+    then
+      table.insert(bundles, bundle)
+    end
+  end
+end
 
-vim.list_extend(bundles, vim.split(vim.fn.glob(WORKSPACE_PATH .. "vscode-java-test/server/*.jar"), "\n"))
-vim.list_extend(
-  bundles,
-  vim.split(
-    vim.fn.glob(
-      WORKSPACE_PATH .. "java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar"
-    ),
-    "\n"
-  )
-)
+local extendedClientCapabilities = jdtls.extendedClientCapabilities
+extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 
 local config = {
   cmd = {
@@ -35,12 +56,9 @@ local config = {
     "java.base/java.lang=ALL-UNNAMED",
     "-jar",
     vim.fn.glob("/usr/local/Cellar/jdtls/*/libexec/plugins/org.eclipse.equinox.launcher_*.jar"),
-    "-configuration",
-    vim.fn.glob("/usr/local/Cellar/jdtls/*/libexec/config_mac"),
-    "-data",
-    workspace_dir,
+    "-configuration", vim.fn.glob("/usr/local/Cellar/jdtls/*/libexec/config_mac"),
+    "-data", workspace_dir,
   },
-  root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew" }),
   java = {
     eclipse = {
       downloadSources = true,
@@ -103,4 +121,4 @@ local config = {
   },
 }
 
-require("jdtls").start_or_attach(config)
+jdtls.start_or_attach(config)
