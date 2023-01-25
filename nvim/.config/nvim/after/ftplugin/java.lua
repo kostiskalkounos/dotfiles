@@ -11,7 +11,8 @@ local jar_patterns = {
   "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.runner/lib/*.jar",
 }
 
-local plugin_path = "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.plugin.site/target/repository/plugins/"
+local plugin_path =
+  "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.plugin.site/target/repository/plugins/"
 local bundle_list = vim.tbl_map(function(x)
   return require("jdtls.path").join(plugin_path, x)
 end, {
@@ -29,8 +30,9 @@ vim.list_extend(jar_patterns, bundle_list)
 local bundles = {}
 for _, jar_pattern in ipairs(jar_patterns) do
   for _, bundle in ipairs(vim.split(vim.fn.glob(home .. jar_pattern), "\n")) do
-    if not vim.endswith(bundle, "com.microsoft.java.test.runner-jar-with-dependencies.jar")
-        and not vim.endswith(bundle, "com.microsoft.java.test.runner.jar")
+    if
+      not vim.endswith(bundle, "com.microsoft.java.test.runner-jar-with-dependencies.jar")
+      and not vim.endswith(bundle, "com.microsoft.java.test.runner.jar")
     then
       table.insert(bundles, bundle)
     end
@@ -56,8 +58,10 @@ local config = {
     "java.base/java.lang=ALL-UNNAMED",
     "-jar",
     vim.fn.glob("/usr/local/Cellar/jdtls/*/libexec/plugins/org.eclipse.equinox.launcher_*.jar"),
-    "-configuration", vim.fn.glob("/usr/local/Cellar/jdtls/*/libexec/config_mac"),
-    "-data", workspace_dir,
+    "-configuration",
+    vim.fn.glob("/usr/local/Cellar/jdtls/*/libexec/config_mac"),
+    "-data",
+    workspace_dir,
   },
   java = {
     eclipse = {
@@ -119,6 +123,6 @@ local config = {
   init_options = {
     bundles = bundles,
   },
+  handlers = { ["language/status"] = function() end },
 }
-
 jdtls.start_or_attach(config)

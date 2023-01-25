@@ -4,13 +4,14 @@ M.autoformat = true
 
 function M.format()
   if M.autoformat then
-    vim.lsp.buf.formatting_seq_sync(nil, 1000)
+    vim.lsp.buf.format({ async = false })
   end
 end
 
 function M.setup(client, buf)
   local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-  local nls = require("config.lsp.null-ls")
+
+  local nls = require("plugins.lsp.null-ls")
 
   local enable = false
   if nls.has_formatter(ft) then
@@ -24,7 +25,7 @@ function M.setup(client, buf)
     vim.cmd([[
       augroup LspFormat
         autocmd! * <buffer>
-        autocmd BufWritePre <buffer> lua require("config.lsp.formatting").format()
+        autocmd BufWritePre <buffer> lua require("plugins.lsp.formatting").format()
       augroup END
     ]])
   end

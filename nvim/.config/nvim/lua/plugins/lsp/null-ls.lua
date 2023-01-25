@@ -1,7 +1,11 @@
 local M = {}
 
 function M.setup(options)
-  local nls = require("null-ls")
+  local status_ok, nls = pcall(require, "null-ls")
+  if not status_ok then
+    return
+  end
+
   nls.setup({
     debounce = 150,
     save_after_format = false,
