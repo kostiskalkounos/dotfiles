@@ -1,6 +1,9 @@
 return {
   setup = function(client)
-    local ts = require("nvim-lsp-ts-utils")
+    local status_ok, ts = pcall(require, "nvim-lsp-ts-utils")
+    if not status_ok then
+      return
+    end
     -- vim.lsp.handlers["textDocument/codeAction"] = ts.code_action_handler
     ts.setup({
       disable_commands = false,

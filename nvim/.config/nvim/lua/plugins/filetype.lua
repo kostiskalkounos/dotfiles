@@ -1,6 +1,12 @@
-require("filetype").setup({
+local status_ok, filetype = pcall(require, "filetype")
+if not status_ok then
+  return
+end
+
+filetype.setup({
   overrides = {
     literal = {
+      __assert = "cpp",
       __availability = "cpp",
       __bit_reference = "cpp",
       __bits = "cpp",
@@ -23,6 +29,7 @@ require("filetype").setup({
       __tree = "cpp",
       __tuple = "cpp",
       __undef_macros = "cpp",
+      __verbose_abort = "cpp",
       algorithm = "cpp",
       any = "cpp",
       array = "cpp",
