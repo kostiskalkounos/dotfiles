@@ -6,6 +6,7 @@
 
 [core]
   excludesfile = ~/.gitignore
+  pager = delta
 
 [color]
   ui = auto
@@ -25,6 +26,17 @@
 [branch]
   autosetupmerge = true
   autosetuprebase = always
+
+[delta]
+  line-numbers = true
+  side-by-side = true
+  syntax-theme = Onedark
+
+  file-modified-label = modified:
+
+[interactive]
+  diffFilter = delta --color-only
+
 
 [merge]
   conflictstyle = diff3
