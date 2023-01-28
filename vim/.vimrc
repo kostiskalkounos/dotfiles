@@ -12,7 +12,6 @@ call plug#begin('~/.vim/plugged')
   Plug 'junegunn/fzf.vim'
   Plug 'mbbill/undotree'
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
-  Plug 'puremourning/vimspector'
   Plug 'sheerun/vim-polyglot'
   Plug 'tpope/vim-fugitive'
 call plug#end()
