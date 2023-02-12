@@ -26,7 +26,6 @@ require("lazy").setup({
   { "nvim-treesitter/playground", lazy = true, cmd = "TSHighlightCapturesUnderCursor" },
   { "rcarriga/nvim-dap-ui", lazy = true },
   { "theHamsta/nvim-dap-virtual-text", lazy = true },
-
   {
     "williamboman/mason.nvim",
     dependencies = {
@@ -46,7 +45,6 @@ require("lazy").setup({
       },
     },
   },
-
   {
     "simrat39/inlay-hints.nvim",
     lazy = true,
@@ -54,7 +52,6 @@ require("lazy").setup({
       require("plugins.inlay")
     end,
   },
-
   {
     "folke/neodev.nvim",
     lazy = true,
@@ -62,14 +59,12 @@ require("lazy").setup({
       require("neodev").setup()
     end,
   },
-
   {
     "kostiskalkounos/onedark",
     config = function()
       vim.api.nvim_command("colorscheme onedark")
     end,
   },
-
   {
     "nathom/filetype.nvim",
     lazy = true,
@@ -77,7 +72,6 @@ require("lazy").setup({
       require("plugins.filetype")
     end,
   },
-
   {
     "nvim-tree/nvim-web-devicons",
     lazy = true,
@@ -86,7 +80,6 @@ require("lazy").setup({
       require("nvim-web-devicons").setup()
     end,
   },
-
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -94,7 +87,6 @@ require("lazy").setup({
       require("plugins.lualine")
     end,
   },
-
   {
     "TimUntersberger/neogit",
     lazy = true,
@@ -103,7 +95,6 @@ require("lazy").setup({
       require("plugins.neogit")
     end,
   },
-
   {
     "sindrets/diffview.nvim",
     lazy = true,
@@ -114,7 +105,6 @@ require("lazy").setup({
     end,
     dependencies = "nvim-lua/plenary.nvim",
   },
-
   {
     "norcalli/nvim-colorizer.lua",
     lazy = true,
@@ -123,7 +113,6 @@ require("lazy").setup({
       require("plugins.colorizer")
     end,
   },
-
   {
     "numToStr/Comment.nvim",
     lazy = true,
@@ -132,7 +121,6 @@ require("lazy").setup({
       require("plugins.comment")
     end,
   },
-
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
@@ -141,7 +129,6 @@ require("lazy").setup({
       require("plugins.context")
     end,
   },
-
   {
     "hrsh7th/nvim-cmp",
     lazy = true,
@@ -166,14 +153,12 @@ require("lazy").setup({
       },
     },
   },
-
   {
     "windwp/nvim-spectre",
     lazy = true,
     module = "spectre",
     dependencies = { "nvim-lua/popup.nvim", "nvim-lua/plenary.nvim" },
   },
-
   {
     "nvim-tree/nvim-tree.lua",
     lazy = true,
@@ -188,7 +173,6 @@ require("lazy").setup({
       },
     },
   },
-
   {
     "nvim-telescope/telescope.nvim",
     lazy = true,
