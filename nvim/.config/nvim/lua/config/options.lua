@@ -40,6 +40,7 @@ vim.opt.mouse = "a"
 vim.opt.number = true
 vim.opt.path = "$PWD/**"
 vim.opt.relativenumber = true
+vim.opt.ruler = false
 vim.opt.scrolloff = 0
 vim.opt.shiftround = true
 vim.opt.shiftwidth = 2
