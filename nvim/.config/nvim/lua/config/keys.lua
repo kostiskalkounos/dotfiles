@@ -19,6 +19,7 @@ vim.keymap.set("c", "<M-b>", "<S-Left>", unique)
 vim.keymap.set("c", "<M-f>", "<S-Right>", unique)
 vim.keymap.set("c", "<M-n>", "<Down>", unique)
 vim.keymap.set("c", "<M-p>", "<Up>", unique)
+vim.keymap.set("c", "Q", "q", unique)
 
 vim.keymap.set("i", "<C-h>", "<Left>", default)
 vim.keymap.set("i", "<C-j>", "<Down>", default)
