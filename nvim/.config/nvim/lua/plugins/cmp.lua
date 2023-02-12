@@ -130,7 +130,6 @@ npairs.setup({
     javascript = { "string", "template_string" },
     java = true,
   },
-
   fast_wrap = {
     map = "<M-e>",
     chars = { "{", "[", "(", '"', "'" },
