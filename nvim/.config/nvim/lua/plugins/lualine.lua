@@ -1,4 +1,9 @@
-require("lualine").setup({
+local status_ok, lualine = pcall(require, "lualine")
+if not status_ok then
+  return
+end
+
+lualine.setup({
   options = {
     icons_enabled = true,
     theme = "onedark",
@@ -18,34 +23,48 @@ require("lualine").setup({
     },
   },
   sections = {
-    lualine_a = { "hostname" },
-    lualine_b = {
+    lualine_a = {
+      {
+        "branch", --[[icon = "",]]
+        padding = { left = 1 },
+      },
+    },
+    lualine_b = {},
+    lualine_c = {
+      "%=",
+      { "filetype", icon_only = true },
       { "filename", path = 1, padding = { left = 0 } },
     },
-    lualine_c = { { "branch", icon = "", padding = { left = 0 } }, "diff" },
     lualine_x = {
-      {
-        "diagnostics",
-        sources = { "nvim_diagnostic", "nvim_lsp" },
-        sections = { "error", "warn", "info", "hint" },
-        diagnostics_color = {
-          error = "DiagnosticError",
-          warn = "DiagnosticWarn",
-          info = "DiagnosticInfo",
-          hint = "DiagnosticHint",
-        },
-        update_in_insert = false,
-      },
+      --      {
+      --        "diagnostics",
+      --        sources = { "nvim_diagnostic", "nvim_lsp" },
+      --        sections = { "error", "warn", "info", "hint" },
+      --        diagnostics_color = {
+      --          error = "DiagnosticError",
+      --          warn = "DiagnosticWarn",
+      --          info = "DiagnosticInfo",
+      --          hint = "DiagnosticHint",
+      --        },
+      --        update_in_insert = false,
+      --      },
     },
     lualine_y = { "location" },
     lualine_z = { "progress" },
   },
   inactive_sections = {
-    lualine_a = { "hostname" },
-    lualine_b = {
+    lualine_a = {
+      {
+        "branch", --[[icon = "",]]
+        padding = { left = 1 },
+      },
+    },
+    lualine_b = {},
+    lualine_c = {
+      "%=",
+      { "filetype", icon_only = true },
       { "filename", path = 1, padding = { left = 0 } },
     },
-    lualine_c = { { "branch", icon = "", padding = { left = 0 } } },
     lualine_x = {},
     lualine_y = { "location" },
     lualine_z = { "progress" },
