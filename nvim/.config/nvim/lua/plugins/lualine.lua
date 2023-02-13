@@ -22,7 +22,7 @@ require("lualine").setup({
     lualine_b = {
       { "filename", path = 1, padding = { left = 0 } },
     },
-    lualine_c = { { "branch", icon = "", padding = { left = 0 } } },
+    lualine_c = { { "branch", icon = "", padding = { left = 0 } }, "diff" },
     lualine_x = {
       {
         "diagnostics",
@@ -36,7 +36,6 @@ require("lualine").setup({
         },
         update_in_insert = false,
       },
-      "diff",
     },
     lualine_y = { "location" },
     lualine_z = { "progress" },
