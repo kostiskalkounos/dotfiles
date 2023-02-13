@@ -183,4 +183,21 @@ vim.cmd([[
 
   command! -nargs=* Term split | terminal <args>
   command! -nargs=* Vterm vsplit | terminal <args>
+
+"  function Gitbranch()
+"    return trim(system("git -C " . expand("%:h") . " branch --show-current 2>/dev/null"))
+"  endfunction
+"
+"  augroup Gitget
+"    autocmd!
+"    autocmd BufEnter * let b:git_branch = Gitbranch()
+"  augroup END
+"
+"  set statusline+=%f
+"  set statusline+=\ %*%h%w%m%r
+"  set statusline+=%#Branch#
+"  set statusline+=\ %{b:git_branch}
+"  set statusline+=%*
+"  set statusline+=%=%-14.(%l,%c%V%)\ %P
+"  set statusline=%f\ %*%h%w%m%r\ %#Branch#%{b:git_branch}%*%=%-14.(%l,%c%V%)\ %P
 ]])

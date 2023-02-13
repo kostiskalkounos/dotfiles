@@ -5,7 +5,6 @@ local servers = {
   "html",
   "jsonls",
   "pyright",
-  "sumneko_lua",
   "tsserver",
   "vimls",
 }
