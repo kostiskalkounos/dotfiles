@@ -4,6 +4,7 @@ local servers = {
   "eslint",
   "html",
   "jsonls",
+  "lua_ls",
   "pyright",
   "tsserver",
   "vimls",
