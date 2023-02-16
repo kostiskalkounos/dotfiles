@@ -116,7 +116,7 @@ require("lazy").setup({
   {
     "numToStr/Comment.nvim",
     lazy = true,
-    keys = { "gc", "gb", "gcc", "gbc" },
+    keys = { "gc", "gb", "gcc", "gbc", "v", "V", "<C-v>" },
     config = function()
       require("plugins.comment")
     end,
