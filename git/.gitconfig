@@ -29,14 +29,13 @@
 
 [delta]
   line-numbers = true
-  side-by-side = true
+  side-by-side = false
   syntax-theme = Onedark
 
   file-modified-label = modified:
 
 [interactive]
   diffFilter = delta --color-only
-
 
 [merge]
   conflictstyle = diff3
