@@ -25,6 +25,7 @@ vim.opt.makeprg = "make -j4 -w"
 vim.opt.mouse = "a"
 vim.opt.number = true
 vim.opt.path = "$PWD/**"
+vim.opt.pumheight = 15
 vim.opt.relativenumber = true
 vim.opt.ruler = false
 vim.opt.scrolloff = 0
