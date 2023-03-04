@@ -69,13 +69,6 @@ require("lazy").setup({
     end,
   },
   {
-    "nathom/filetype.nvim",
-    lazy = true,
-    config = function()
-      require("plugins.filetype")
-    end,
-  },
-  {
     "nvim-tree/nvim-web-devicons",
     lazy = true,
     config = function()
