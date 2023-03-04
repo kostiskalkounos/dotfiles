@@ -12,14 +12,14 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-  { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, module = "ts_context_commentstring" },
+  { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true },
   { "jose-elias-alvarez/null-ls.nvim", lazy = true },
   { "jose-elias-alvarez/nvim-lsp-ts-utils", lazy = true },
   { "mbbill/undotree", cmd = "UndotreeToggle", lazy = true },
   { "mfussenegger/nvim-dap", lazy = true },
   { "mfussenegger/nvim-jdtls", lazy = true },
-  { "nvim-lua/plenary.nvim", lazy = true, module = "plenary" },
-  { "nvim-lua/popup.nvim", lazy = true, module = "popup" },
+  { "nvim-lua/plenary.nvim", lazy = true },
+  { "nvim-lua/popup.nvim", lazy = true },
   { "nvim-telescope/telescope-dap.nvim", lazy = true },
   { "nvim-treesitter/nvim-treesitter-context", lazy = true },
   { "nvim-treesitter/nvim-treesitter-textobjects", lazy = true },
@@ -28,11 +28,13 @@ require("lazy").setup({
   { "theHamsta/nvim-dap-virtual-text", lazy = true },
   {
     "williamboman/mason.nvim",
+    lazy = true,
+    cmd = "Mason",
     dependencies = {
       "williamboman/mason-lspconfig.nvim",
       {
         "neovim/nvim-lspconfig",
-        lazy = true,
+        event = "BufReadPre",
         config = function()
           require("plugins.lsp")
         end,
@@ -55,6 +57,7 @@ require("lazy").setup({
   {
     "folke/neodev.nvim",
     lazy = true,
+    ft = "lua",
     config = function()
       require("neodev").setup()
     end,
@@ -62,7 +65,7 @@ require("lazy").setup({
   {
     "kostiskalkounos/onedark",
     config = function()
-      vim.api.nvim_command("colorscheme onedark")
+      vim.cmd("colorscheme onedark")
     end,
   },
   {
@@ -75,7 +78,6 @@ require("lazy").setup({
   {
     "nvim-tree/nvim-web-devicons",
     lazy = true,
-    module = "nvim-web-devicons",
     config = function()
       require("nvim-web-devicons").setup()
     end,
@@ -99,11 +101,10 @@ require("lazy").setup({
     "sindrets/diffview.nvim",
     lazy = true,
     cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles", "DiffviewRefresh" },
-    module = "diffview",
+    dependencies = "nvim-lua/plenary.nvim",
     config = function()
       require("diffview").init()
     end,
-    dependencies = "nvim-lua/plenary.nvim",
   },
   {
     "norcalli/nvim-colorizer.lua",
@@ -116,6 +117,7 @@ require("lazy").setup({
   {
     "numToStr/Comment.nvim",
     lazy = true,
+    event = "InsertEnter",
     keys = { "gc", "gb", "gcc", "gbc", "v", "V", "<C-v>" },
     config = function()
       require("plugins.comment")
@@ -123,6 +125,8 @@ require("lazy").setup({
   },
   {
     "nvim-treesitter/nvim-treesitter",
+    lazy = true,
+    event = "BufReadPre",
     build = ":TSUpdate",
     config = function()
       require("plugins.treesitter")
@@ -132,59 +136,44 @@ require("lazy").setup({
   {
     "hrsh7th/nvim-cmp",
     lazy = true,
-    keys = { "a", "c", "d", "i", "o", "v", "A", "C", "D", "I", "O", "V", "<C-v>" },
+    event = "InsertEnter",
+    dependencies = {
+      { "hrsh7th/cmp-buffer" },
+      { "hrsh7th/cmp-nvim-lsp" },
+      { "hrsh7th/cmp-path" },
+      { "saadparwaiz1/cmp_luasnip" },
+      { "L3MON4D3/LuaSnip" },
+      { "rafamadriz/friendly-snippets" },
+      { "windwp/nvim-autopairs" },
+    },
     config = function()
       require("plugins.cmp")
     end,
-    dependencies = {
-      { "hrsh7th/cmp-buffer", lazy = true },
-      { "hrsh7th/cmp-nvim-lsp", lazy = true },
-      { "hrsh7th/cmp-path", lazy = true },
-      { "saadparwaiz1/cmp_luasnip", lazy = true },
-      { "L3MON4D3/LuaSnip", lazy = true },
-      {
-        "rafamadriz/friendly-snippets",
-        lazy = true,
-        module = "nvim-autopairs",
-        "windwp/nvim-autopairs",
-        config = function()
-          require("plugins.autopairs")
-        end,
-      },
-    },
   },
   {
     "windwp/nvim-spectre",
     lazy = true,
-    module = "spectre",
     dependencies = { "nvim-lua/popup.nvim", "nvim-lua/plenary.nvim" },
   },
   {
     "nvim-tree/nvim-tree.lua",
     lazy = true,
     cmd = { "NvimTreeToggle", "NvimTreeClose", "NvimTreeRefresh" },
-    config = {
-      update_focused_file = {
-        enable = true,
-        update_cwd = true,
-      },
-      filters = {
-        custom = { ".git", "node_modules" },
-      },
-    },
+    config = function()
+      require("plugins.tree")
+    end,
   },
   {
     "nvim-telescope/telescope.nvim",
     lazy = true,
+    cmd = { "Telescope" },
+    dependencies = {
+      { "nvim-lua/popup.nvim" },
+      { "nvim-lua/plenary.nvim" },
+      { "nvim-telescope/telescope-fzy-native.nvim" },
+    },
     config = function()
       require("plugins.telescope")
     end,
-    cmd = { "Telescope" },
-    module = "telescope",
-    dependencies = {
-      { "nvim-lua/popup.nvim", lazy = true },
-      { "nvim-lua/plenary.nvim", lazy = true },
-      { "nvim-telescope/telescope-fzy-native.nvim", lazy = true },
-    },
   },
 })
