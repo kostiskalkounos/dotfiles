@@ -8,7 +8,6 @@
   "diffview.nvim": { "branch": "main", "commit": "009beb8054e510e7e2df122ee3ddb2b46bef542b" },
   "fidget.nvim": { "branch": "main", "commit": "688b4fec4517650e29c3e63cfbb6e498b3112ba1" },
   "friendly-snippets": { "branch": "main", "commit": "009887b76f15d16f69ae1341f86a7862f61cf2a1" },
-  "inlay-hints.nvim": { "branch": "main", "commit": "006b0898f5d3874e8e528352103733142e705834" },
   "lazy.nvim": { "branch": "main", "commit": "14075657131b9a19883a8845c47f1ab65461cd6f" },
   "lualine.nvim": { "branch": "master", "commit": "e99d733e0213ceb8f548ae6551b04ae32e590c80" },
   "mason-lspconfig.nvim": { "branch": "main", "commit": "e4badf7984f7a5f0ac7dc10657dbedbd99a82f94" },

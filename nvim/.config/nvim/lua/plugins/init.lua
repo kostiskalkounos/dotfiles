@@ -48,13 +48,6 @@ require("lazy").setup({
     },
   },
   {
-    "simrat39/inlay-hints.nvim",
-    lazy = true,
-    config = function()
-      require("plugins.inlay")
-    end,
-  },
-  {
     "folke/neodev.nvim",
     lazy = true,
     ft = "lua",
