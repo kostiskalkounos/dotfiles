@@ -38,14 +38,6 @@ lualine.setup({
     lualine_x = {
       {
         "diagnostics",
-        sources = { "nvim_diagnostic", "nvim_lsp" },
-        sections = { "error", "warn", "info", "hint" },
-        diagnostics_color = {
-          error = "DiagnosticError",
-          warn = "DiagnosticWarn",
-          info = "DiagnosticInfo",
-          hint = "DiagnosticHint",
-        },
         update_in_insert = false,
       },
     },
