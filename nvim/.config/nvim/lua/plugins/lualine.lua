@@ -29,18 +29,19 @@ lualine.setup({
         padding = { left = 1 },
       },
     },
-    lualine_b = {},
+    lualine_b = {
+      {
+        "diagnostics",
+        padding = { left = 1 },
+        update_in_insert = false,
+      },
+    },
     lualine_c = {
       "%=",
       { "filetype", icon_only = true },
       { "filename", path = 1, padding = { left = 0 } },
     },
-    lualine_x = {
-      {
-        "diagnostics",
-        update_in_insert = false,
-      },
-    },
+    lualine_x = {},
     lualine_y = { "location" },
     lualine_z = { "progress" },
   },
