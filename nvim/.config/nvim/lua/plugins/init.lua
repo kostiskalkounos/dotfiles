@@ -128,6 +128,9 @@ local plugins = {
   {
     "nvim-tree/nvim-tree.lua",
     cmd = { "NvimTreeToggle", "NvimTreeClose", "NvimTreeRefresh" },
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
     config = function()
       require("plugins.tree")
     end,
