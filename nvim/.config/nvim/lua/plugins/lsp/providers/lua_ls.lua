@@ -2,7 +2,7 @@ return {
   settings = {
     Lua = {
       diagnostics = {
-        globals = { "hs", "vim" },
+        globals = { "hs", "vim", "jit" },
       },
       telemetry = {
         enable = false,
