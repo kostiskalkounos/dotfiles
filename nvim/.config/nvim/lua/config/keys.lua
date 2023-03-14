@@ -21,10 +21,6 @@ vim.keymap.set("c", "<M-n>", "<Down>", unique)
 vim.keymap.set("c", "<M-p>", "<Up>", unique)
 vim.keymap.set("c", "Q", "q", unique)
 
-vim.keymap.set("i", "<C-h>", "<Left>", default)
-vim.keymap.set("i", "<C-j>", "<Down>", default)
-vim.keymap.set("i", "<C-k>", "<Up>", default)
-vim.keymap.set("i", "<C-l>", "<Right>", default)
 vim.keymap.set("i", "<space>", "<space><c-g>u", default)
 
 vim.keymap.set(
@@ -34,15 +30,6 @@ vim.keymap.set(
   expr
 )
 vim.keymap.set("t", "<M-r>", [['<C-\><C-N>"'.nr2char(getchar()).'pi']], default)
-
-vim.keymap.set("n", "<C-h>", "<Left>", default)
-vim.keymap.set("n", "<C-j>", "<Down>", default)
-vim.keymap.set("n", "<C-k>", "<Up>", default)
-vim.keymap.set("n", "<C-l>", "<Right>", special)
-vim.keymap.set("v", "<C-h>", "<Left>", default)
-vim.keymap.set("v", "<C-j>", "<Down>", default)
-vim.keymap.set("v", "<C-k>", "<Up>", default)
-vim.keymap.set("v", "<C-l>", "<Right>", default)
 
 vim.keymap.set("n", "<M-h>", "<cmd>vertical resize -2<CR>", unique)
 vim.keymap.set("n", "<M-j>", "<cmd>resize -2<CR>", unique)
@@ -54,14 +41,15 @@ vim.keymap.set("i", "<M-k>", "<Esc><cmd>m .-2<CR>==gi", unique)
 vim.keymap.set("v", "<M-j>", ":m '>+1<CR>gv=gv", default)
 vim.keymap.set("v", "<M-k>", ":m '<-2<CR>gv=gv", default)
 
-vim.keymap.set("n", "[b", "<cmd>bp<CR>", unique)
-vim.keymap.set("n", "[c", "<cmd>cp<CR>", unique)
-vim.keymap.set("n", "[l", "<cmd>lp<CR>", unique)
-vim.keymap.set("n", "[t", "<cmd>tabp<CR>", unique)
-vim.keymap.set("n", "]b", "<cmd>bn<CR>", unique)
-vim.keymap.set("n", "]c", "<cmd>cn<CR>", unique)
-vim.keymap.set("n", "]l", "<cmd>ln<CR>", unique)
-vim.keymap.set("n", "]t", "<cmd>tabn<CR>", unique)
+vim.keymap.set("n", "<C-j>", "<cmd>cnext<CR>", unique)
+vim.keymap.set("n", "<C-k>", "<cmd>cprev<CR>", unique)
+vim.keymap.set("n", "<C-h>", "<cmd>lprev<CR>", unique)
+vim.keymap.set("n", "<C-l>", "<cmd>lnext<CR>", special)
+
+vim.keymap.set("v", "<C-j>", "<cmd>cnext<CR>", unique)
+vim.keymap.set("v", "<C-k>", "<cmd>cprev<CR>", unique)
+vim.keymap.set("v", "<C-h>", "<cmd>lprev<CR>", unique)
+vim.keymap.set("v", "<C-l>", "<cmd>lnext<CR>", special)
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<cr>", unique)
 vim.keymap.set("n", "j", [[v:count == 0 ? "gj" : "j"]], expr)
