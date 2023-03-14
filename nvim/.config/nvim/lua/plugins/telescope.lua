@@ -7,8 +7,9 @@ require("telescope").setup({
   defaults = {
     mappings = {
       i = {
-        ["<c-j>"] = actions.move_selection_next,
-        ["<c-k>"] = actions.move_selection_previous,
+        ["<C-e>"] = actions.send_to_qflist + actions.open_qflist,
+        ["<c-j>"] = actions.results_scrolling_down,
+        ["<c-k>"] = actions.results_scrolling_up,
         ["<esc>"] = actions.close,
       },
     },
