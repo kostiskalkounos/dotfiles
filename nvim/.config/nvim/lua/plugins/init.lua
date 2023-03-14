@@ -151,6 +151,24 @@ local plugins = {
 
 local options = {
   defaults = { lazy = true },
+  checker = { enabled = true },
+  performance = {
+    cache = {
+      enabled = true,
+    },
+    rtp = {
+      disabled_plugins = {
+        "gzip",
+        "netrwPlugin",
+        "rplugin",
+        "tarPlugin",
+        "tohtml",
+        "tutor",
+        "zipPlugin",
+      },
+    },
+  },
+  debug = false,
 }
 
 require("lazy").setup(plugins, options)
