@@ -151,7 +151,7 @@ local plugins = {
 
 local options = {
   defaults = { lazy = true },
-  checker = { enabled = true },
+  checker = { enabled = false },
   performance = {
     cache = {
       enabled = true,
