@@ -141,7 +141,7 @@ local plugins = {
     dependencies = {
       { "nvim-lua/popup.nvim" },
       { "nvim-lua/plenary.nvim" },
-      { "nvim-telescope/telescope-fzy-native.nvim" },
+      { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     },
     config = function()
       require("plugins.telescope")
