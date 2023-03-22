@@ -20,13 +20,23 @@ function M.setup(client, buf)
     enable = not (client.name == "null-ls")
   end
 
+  vim.api.nvim_create_user_command("FormatToggle", function()
+    M.autoformat = not M.autoformat
+    print("Setting autoformatting to: " .. tostring(M.autoformat))
+  end, {})
+
   client.server_capabilities.document_formatting = enable
-  if client.server_capabilities.document_formatting then
+  if client.server_capabilities.document_formatting and M.autoformat then
     vim.cmd([[
       augroup LspFormat
         autocmd! * <buffer>
         autocmd BufWritePre <buffer> lua require("plugins.lsp.formatting").format()
       augroup END
+
+      augroup TrimWhiteSpace
+        au!
+        autocmd BufWritePre * :%s/\s\+$//e
+      augroup end
     ]])
   end
 end

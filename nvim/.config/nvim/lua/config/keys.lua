@@ -159,11 +159,6 @@ vim.cmd([[
     au TextYankPost * silent! lua vim.highlight.on_yank {higroup="Visual", timeout=150, on_macro=true}
   augroup end
 
-  augroup TrimWhiteSpace
-    au!
-    autocmd BufWritePre * :%s/\s\+$//e
-  augroup end
-
   augroup Jenkinsfile
   au!
   autocmd BufRead,BufNewFile Jenkinsfile set filetype=groovy
