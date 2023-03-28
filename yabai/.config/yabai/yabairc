@@ -15,6 +15,7 @@ yabai -m config                           \
   window_border_radius        11          \
   window_border_blur          off         \
   window_border_hidpi         off         \
+  window_zoom_persist         true        \
   active_window_border_color  0xff888fce  \
   normal_window_border_color  0x7f353535  \
   insert_feedback_color       0xff888fce
