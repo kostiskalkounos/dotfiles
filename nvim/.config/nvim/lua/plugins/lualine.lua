@@ -29,19 +29,20 @@ lualine.setup({
         padding = { left = 1 },
       },
     },
-    lualine_b = {
-      {
-        "diagnostics",
-        padding = { left = 1 },
-        update_in_insert = false,
-      },
-    },
+    lualine_b = {},
     lualine_c = {
       "%=",
       { "filetype", icon_only = true },
       { "filename", path = 1, padding = { left = 0 } },
     },
-    lualine_x = {},
+    lualine_x = {
+      {
+        "diagnostics",
+        symbols = { error = "E", warn = "W", info = "I", hint = "H" },
+        padding = { left = 1 },
+        update_in_insert = false,
+      },
+    },
     lualine_y = { "location" },
     lualine_z = { "progress" },
   },
