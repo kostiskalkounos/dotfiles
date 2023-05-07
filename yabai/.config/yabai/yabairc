@@ -16,9 +16,9 @@ yabai -m config                           \
   window_border_blur          off         \
   window_border_hidpi         off         \
   window_zoom_persist         true        \
-  active_window_border_color  0xff9388ce  \
+  active_window_border_color  0xff9697d4  \
   normal_window_border_color  0x7f353535  \
-  insert_feedback_color       0xff9388ce
+  insert_feedback_color       0xff9697d4
 
 yabai -m rule --add app!="^(Code|Brave Browser|Firefox|kitty|Safari)$" manage=off
 yabai -m rule --add app="^Firefox$" title="^Library$" manage=off
