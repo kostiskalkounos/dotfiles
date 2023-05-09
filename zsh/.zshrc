@@ -69,6 +69,13 @@ man() {
   command man "$@"
 }
 
+jdk() {
+  version=$1
+  unset JAVA_HOME;
+  export JAVA_HOME=$(/usr/libexec/java_home);
+  java -version
+}
+
 if command -v nvim &> /dev/null; then
   alias vim=nvim
   alias vimdiff="nvim -d"
@@ -88,7 +95,6 @@ export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.
 export FZF_DEFAULT_COMMAND=$FZF_CTRL_T_COMMAND
 export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:#c678dd,fg+:#ffffff,bg+:-1,hl+:#d658fe --color=info:#61afef,prompt:#61afef,pointer:#c678dd,marker:#61afef,spinner:#61afef,header:#61afef'
 export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow=33"
-export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/.ripgreprc"
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
@@ -98,31 +104,7 @@ zstyle ':completion:*' use-cache yes
 zstyle ':completion:*:complete:(cd|pushd):*' tag-order 'local-directories named-directories'
 zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)'
 
-export CPPFLAGS="-I/usr/local/opt/llvm/include"
-export CPPFLAGS="-I/usr/local/opt/openjdk/include"
-export CPPFLAGS="-I/usr/local/opt/openssl@1.1/include"
-export CPPFLAGS="-I/usr/local/opt/ruby/include"
-export CPPFLAGS="-I/usr/local/opt/sqlite/include"
-
-
-export LDFLAGS="-L/usr/local/opt/llvm/lib"
-export LDFLAGS="-L/usr/local/opt/openssl@1.1/lib"
-export LDFLAGS="-L/usr/local/opt/python@3.9/lib"
-export LDFLAGS="-L/usr/local/opt/ruby/lib"
-export LDFLAGS="-L/usr/local/opt/sqlite/lib"
-
 export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
-
-export PATH="/usr/local/opt/llvm/bin:$PATH"
-export PATH="/usr/local/opt/openjdk/bin:$PATH"
-export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
-export PATH="/usr/local/opt/python@3.9/bin:$PATH"
-export PATH="/usr/local/opt/ruby/bin:$PATH"
-export PATH="/usr/local/opt/sqlite/bin:$PATH"
-
-export PKG_CONFIG_PATH="/usr/local/opt/python@3.9/lib/pkgconfig"
-export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
-export PKG_CONFIG_PATH="/usr/local/opt/sqlite/lib/pkgconfig"
 
 if [[ ! "$PATH" == */usr/local/opt/fzf/bin* ]]; then
   export PATH="${PATH:+${PATH}:}/usr/local/opt/fzf/bin"
