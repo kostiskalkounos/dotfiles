@@ -69,10 +69,16 @@ man() {
   command man "$@"
 }
 
+javal() {
+  unset JAVA_HOME;
+  export JAVA_HOME=$(/usr/libexec/java_home);
+  java -version
+}
+
 jdk() {
   version=$1
   unset JAVA_HOME;
-  export JAVA_HOME=$(/usr/libexec/java_home);
+  export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
   java -version
 }
 
