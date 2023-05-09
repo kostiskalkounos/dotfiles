@@ -4,9 +4,13 @@ set cursorline
 set ignorecase
 set laststatus=0
 set mouse=a
+set noruler
 set scrollback=100000
 set termguicolors
 set virtualedit=all
+
+let mapleader = " "
+map <silent> <leader>U :set nu! rnu!<cr>
 
 map <silent> <esc> :nohlsearch<cr>
 map <silent> q :qa!<CR>
