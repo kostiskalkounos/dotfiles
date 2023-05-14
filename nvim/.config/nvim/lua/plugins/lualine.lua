@@ -38,7 +38,6 @@ lualine.setup({
     lualine_x = {
       {
         "diagnostics",
-        symbols = { error = "E", warn = "W", info = "I", hint = "H" },
         padding = { left = 1 },
         update_in_insert = false,
       },
