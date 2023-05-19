@@ -17,7 +17,7 @@ map <silent> q :qa!<CR>
 
 augroup highlight_yank
   autocmd!
-  autocmd  TextYankPost * silent! lua vim.highlight.on_yank {higroup="Visual", timeout=150, on_macro=true}
+  autocmd TextYankPost * silent! lua vim.highlight.on_yank { higroup="Visual", timeout=150, on_macro=true }
 augroup END
 
 augroup start_at_bottom
@@ -30,11 +30,11 @@ augroup prevent_insert
     autocmd TermEnter * stopinsert
 augroup END
 
-hi CursorLine guifg=NONE ctermfg=NONE guibg=#242931 ctermbg=235 gui=NONE cterm=NONE
+hi CursorLine guifg=NONE ctermfg=NONE guibg=#2c323c ctermbg=236 gui=NONE cterm=NONE
 hi CursorLineNr guifg=#abb2bf ctermfg=249 guibg=NONE ctermbg=NONE gui=NONE cterm=NONE
-hi ErrorMsg guifg=#d9737b ctermfg=174 guibg=NONE ctermbg=NONE gui=NONE cterm=NONE
-hi IncSearch guifg=#1f2329 ctermfg=235 guibg=#c27fd7 ctermbg=140 gui=NONE cterm=NONE
+hi ErrorMsg guifg=#e06c75 ctermfg=168 guibg=NONE ctermbg=NONE gui=NONE cterm=NONE
+hi IncSearch guifg=#282c34 ctermfg=236 guibg=#c678dd ctermbg=176 gui=NONE cterm=NONE
 hi LineNr guifg=#4b5263 ctermfg=240 guibg=NONE ctermbg=NONE gui=NONE cterm=NONE
 hi NonText guifg=#3b4048 ctermfg=238 guibg=NONE ctermbg=NONE gui=NONE cterm=NONE
-hi Search guifg=#1f2329 ctermfg=235 guibg=#68aee8 ctermbg=74 gui=NONE cterm=NONE
+hi Search guifg=#282c34 ctermfg=236 guibg=#61afef ctermbg=75 gui=NONE cterm=NONE
 hi Visual guifg=NONE ctermfg=NONE guibg=#3e4452 ctermbg=238 gui=NONE cterm=NONE
