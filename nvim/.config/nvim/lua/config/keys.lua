@@ -23,12 +23,6 @@ vim.keymap.set("c", "Q", "q", unique)
 
 vim.keymap.set("i", "<space>", "<space><c-g>u", default)
 
-vim.keymap.set(
-  "t",
-  "<Esc>",
-  [[Find_proc_in_tree(b:terminal_job_pid, ["nvim", "fzf"], 0) ? "<Esc>" : "<c-\><c-n>"]],
-  expr
-)
 vim.keymap.set("t", "<M-r>", [['<C-\><C-N>"'.nr2char(getchar()).'pi']], default)
 
 vim.keymap.set("n", "<M-h>", "<cmd>vertical resize -2<CR>", unique)
@@ -140,22 +134,6 @@ vim.keymap.set("v", "<leader>p", "p", default)
 vim.keymap.set("v", "<leader>v", [["+p]], default)
 
 vim.cmd([[
-  function! Find_proc_in_tree(rootpid, names, accum) abort
-    if a:accum > 9 || !exists("*nvim_get_proc")
-      return v:false
-    endif
-    let p = nvim_get_proc(a:rootpid)
-    if !empty(p) && index(a:names, p.name) >= 0
-      return v:true
-    endif
-    for c in nvim_get_proc_children(a:rootpid)[:9]
-      if s:find_proc_in_tree(c, a:names, 1 + a:accum)
-        return v:true
-      endif
-    endfor
-    return v:false
-  endfunction
-
   augroup HighlightYank
     autocmd!
     au TextYankPost * silent! lua vim.highlight.on_yank {higroup="Visual", timeout=150, on_macro=true}
