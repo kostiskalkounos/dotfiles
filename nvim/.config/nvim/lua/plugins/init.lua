@@ -43,6 +43,7 @@ local plugins = {
         config = function()
           require("plugins.fidget")
         end,
+        tag = "legacy",
       },
     },
   },
