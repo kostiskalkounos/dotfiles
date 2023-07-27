@@ -15,7 +15,7 @@ lualine.setup({
     },
     ignore_focus = {},
     always_divide_middle = true,
-    globalstatus = true,
+    globalstatus = false,
     refresh = {
       statusline = 1000,
       --[[ tabline = 1000, ]]
@@ -25,8 +25,8 @@ lualine.setup({
   sections = {
     lualine_a = {
       {
-        "branch", --[[icon = "",]]
-        padding = { left = 1 },
+        "branch",
+        --[[ icon = "", ]]
       },
     },
     lualine_b = {},
@@ -38,7 +38,6 @@ lualine.setup({
     lualine_x = {
       {
         "diagnostics",
-        padding = { left = 1 },
         update_in_insert = false,
       },
     },
@@ -48,8 +47,7 @@ lualine.setup({
   inactive_sections = {
     lualine_a = {
       {
-        "branch", --[[icon = "",]]
-        padding = { left = 1 },
+        "branch",
       },
     },
     lualine_b = {},
