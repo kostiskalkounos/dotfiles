@@ -17,7 +17,7 @@ function M.setup(options)
       -- nls.builtins.formatting.eslint_d,
     },
     on_attach = options.on_attach,
-    root_dir = require("null-ls.utils").root_pattern(".null-ls-root", ".nvim.settings.json", ".git"),
+    root_dir = require("null-ls.utils").root_pattern(vim.fn.getcwd()),
   })
 end
 
