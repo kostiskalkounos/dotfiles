@@ -56,7 +56,8 @@ local plugins = {
   },
   {
     "kostiskalkounos/onedark",
-    event = "BufEnter",
+    lazy = false,
+    priority = 1000,
     dependencies = {
       "nvim-lualine/lualine.nvim",
       "nvim-tree/nvim-web-devicons",
