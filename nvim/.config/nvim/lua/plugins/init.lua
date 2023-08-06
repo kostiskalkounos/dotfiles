@@ -72,7 +72,15 @@ local plugins = {
     "TimUntersberger/neogit",
     cmd = "Neogit",
     config = function()
-      require("plugins.neogit")
+      require("neogit").setup({
+        kind = "split",
+        signs = {
+          section = { "", "" },
+          item = { "", "" },
+          hunk = { "", "" },
+        },
+        integrations = { diffview = true },
+      })
     end,
   },
   {
