@@ -13,6 +13,7 @@ vim.opt.rtp:prepend(lazypath)
 
 local plugins = {
   { "JoosepAlviste/nvim-ts-context-commentstring" },
+  { "folke/neodev.nvim", ft = "lua" },
   { "jose-elias-alvarez/null-ls.nvim" },
   { "jose-elias-alvarez/nvim-lsp-ts-utils" },
   { "mbbill/undotree", cmd = "UndotreeToggle" },
@@ -48,24 +49,15 @@ local plugins = {
     },
   },
   {
-    "folke/neodev.nvim",
-    ft = "lua",
-    config = function()
-      require("neodev").setup()
-    end,
-  },
-  {
     "kostiskalkounos/onedark",
     lazy = false,
     priority = 1000,
     dependencies = {
       "nvim-lualine/lualine.nvim",
-      "nvim-tree/nvim-web-devicons",
     },
     config = function()
       vim.cmd("colorscheme onedark")
       require("plugins.lualine")
-      require("nvim-web-devicons").setup()
     end,
   },
   {
@@ -87,9 +79,6 @@ local plugins = {
     "sindrets/diffview.nvim",
     cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles", "DiffviewRefresh" },
     dependencies = "nvim-lua/plenary.nvim",
-    config = function()
-      require("diffview").init()
-    end,
   },
   {
     "NvChad/nvim-colorizer.lua",
