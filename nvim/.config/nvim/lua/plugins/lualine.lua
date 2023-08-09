@@ -26,14 +26,15 @@ lualine.setup({
     lualine_a = {
       {
         "branch",
-        --[[ icon = "", ]]
+        icon = "",
+        padding = { left = 0 },
       },
     },
     lualine_b = {},
     lualine_c = {
       "%=",
-      { "filetype", icon_only = true },
-      { "filename", path = 1, padding = { left = 0 } },
+      --[[ { "filetype", icon_only = true, padding = { right = 0 } }, ]]
+      { "filename", path = 1 },
     },
     lualine_x = {
       {
@@ -48,12 +49,14 @@ lualine.setup({
     lualine_a = {
       {
         "branch",
+        icon = "",
+        padding = { left = 0 },
       },
     },
     lualine_b = {},
     lualine_c = {
       "%=",
-      { "filetype", icon_only = true },
+      --[[ { "filetype", icon_only = true, padding = { right = 0 } }, ]]
       { "filename", path = 1, padding = { left = 0 } },
     },
     lualine_x = {},
