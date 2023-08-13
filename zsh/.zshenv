@@ -25,3 +25,4 @@ export PKG_CONFIG_PATH="/usr/local/opt/python@3.9/lib/pkgconfig"
 export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
 export PKG_CONFIG_PATH="/usr/local/opt/sqlite/lib/pkgconfig"
 
+. "$HOME/.cargo/env"
