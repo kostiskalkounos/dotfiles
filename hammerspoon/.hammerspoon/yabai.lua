@@ -1,125 +1,135 @@
+local function execute(args)
+  hs.task.new("/usr/local/bin/yabai", nil, function(_, ...)
+    print("stream", hs.inspect(table.pack(...)))
+    return true
+  end, args):start()
+end
+
 -- Restart Yabai
-hyper:bind({"cmd", "ctrl"}, "r", function() hs.execute("launchctl kickstart -k 'gui/${UID}/homebrew.mxcl.yabai'", true) end)
+Hyper:bind({ "cmd", "ctrl" }, "r", function() execute({ "--restart-service" }) end)
 
 -- Focus window
-hyper:bind({},"h", function() hs.execute("yabai -m window --focus west", true) end)
-hyper:bind({},"j", function() hs.execute("yabai -m window --focus south", true) end)
-hyper:bind({},"k", function() hs.execute("yabai -m window --focus north", true) end)
-hyper:bind({},"l", function() hs.execute("yabai -m window --focus east", true) end)
+Hyper:bind({}, "h", function() execute({ "-m", "window", "--focus", "west" }) end)
+Hyper:bind({}, "j", function() execute({ "-m", "window", "--focus", "south" }) end)
+Hyper:bind({}, "k", function() execute({ "-m", "window", "--focus", "north" }) end)
+Hyper:bind({}, "l", function() execute({ "-m", "window", "--focus", "east" }) end)
 
 -- Swap window
-hyper:bind({"cmd"}, "h", function() hs.execute("yabai -m window --swap west", true) end)
-hyper:bind({"cmd"}, "j", function() hs.execute("yabai -m window --swap south", true) end)
-hyper:bind({"cmd"}, "k", function() hs.execute("yabai -m window --swap north", true) end)
-hyper:bind({"cmd"}, "l", function() hs.execute("yabai -m window --swap east", true) end)
+Hyper:bind({ "cmd" }, "h", function() execute({ "-m", "window", "--swap", "west" }) end)
+Hyper:bind({ "cmd" }, "j", function() execute({ "-m", "window", "--swap", "south" }) end)
+Hyper:bind({ "cmd" }, "k", function() execute({ "-m", "window", "--swap", "north" }) end)
+Hyper:bind({ "cmd" }, "l", function() execute({ "-m", "window", "--swap", "east" }) end)
 
 -- Cycle windows
-hyper:bind({"alt"}, "n", function() hs.execute("$HOME/.config/yabai/cycleClockwise.sh", true) end)
-hyper:bind({"alt"}, "p", function() hs.execute("$HOME/.config/yabai/cycleCounterclockwise.sh", true) end)
+Hyper:bind({ "alt" }, "n", function() hs.execute("$HOME/.hammerspoon/scripts/cycle_clockwise.sh", true) end)
+Hyper:bind({ "alt" }, "p", function() hs.execute("$HOME/.hammerspoon/scripts/cycle_counterclockwise.sh", true) end)
 
 -- Move managed window
-hyper:bind({}, "left",  function() hs.execute("yabai -m window --warp west", true) end)
-hyper:bind({}, "down",  function() hs.execute("yabai -m window --warp south", true) end)
-hyper:bind({}, "up",    function() hs.execute("yabai -m window --warp north", true) end)
-hyper:bind({}, "right", function() hs.execute("yabai -m window --warp east", true) end)
+Hyper:bind({}, "left", function() execute({ "-m", "window", "--warp", "west" }) end)
+Hyper:bind({}, "down", function() execute({ "-m", "window", "--warp", "south" }) end)
+Hyper:bind({}, "up", function() execute({ "-m", "window", "--warp", "north" }) end)
+Hyper:bind({}, "right", function() execute({ "-m", "window", "--warp", "east" }) end)
 
 -- Add the active window to the window or stack to the direction
-hyper:bind({"ctrl"}, "h", function() hs.execute("yabai -m window --stack west", true) end)
-hyper:bind({"ctrl"}, "j", function() hs.execute("yabai -m window --stack south", true) end)
-hyper:bind({"ctrl"}, "k", function() hs.execute("yabai -m window --stack north", true) end)
-hyper:bind({"ctrl"}, "l", function() hs.execute("yabai -m window --stack east", true) end)
-hyper:bind({"ctrl"}, "m", function() hs.execute("yabai -m window --insert stack", true) end)
+Hyper:bind({ "ctrl" }, "h", function() execute({ "-m", "window", "--stack", "west" }) end)
+Hyper:bind({ "ctrl" }, "j", function() execute({ "-m", "window", "--stack", "south" }) end)
+Hyper:bind({ "ctrl" }, "k", function() execute({ "-m", "window", "--stack", "north" }) end)
+Hyper:bind({ "ctrl" }, "l", function() execute({ "-m", "window", "--stack", "east" }) end)
+Hyper:bind({ "ctrl" }, "m", function() execute({ "-m", "window", "--insert", "stack" }) end)
 
--- Focus window up/down in stack
-hyper:bind({"ctrl"}, "n", function() hs.execute("yabai -m window --focus stack.next || yabai -m window --focus stack.first", true) end)
-hyper:bind({"ctrl"}, "p", function() hs.execute("yabai -m window --focus stack.prev || yabai -m window --focus stack.last", true) end)
+Hyper:bind({ "ctrl" }, "n", function() execute({ "-m", "window", "--focus", "stack.next" }) end)
+Hyper:bind({ "ctrl" }, "p", function() execute({ "-m", "window", "--focus", "stack.prev" }) end)
+
+-- Hyper:bind({ "ctrl" }, "n", function() hs.execute("yabai -m window --focus stack.next || yabai -m window --focus stack.first", true) end)
+-- Hyper:bind({ "ctrl" }, "p", function() hs.execute("yabai -m window --focus stack.prev || yabai -m window --focus stack.last", true) end)
 
 -- Move floating window
-hyper:bind({"shift"}, "h", function() hs.execute("yabai -m window --move rel:-25:0", true) end)
-hyper:bind({"shift"}, "j", function() hs.execute("yabai -m window --move rel:0:25", true) end)
-hyper:bind({"shift"}, "k", function() hs.execute("yabai -m window --move rel:0:-25", true) end)
-hyper:bind({"shift"}, "l", function() hs.execute("yabai -m window --move rel:25:0", true) end)
+Hyper:bind({ "shift" }, "h", function() execute({ "-m", "window", "--move", "rel:-25:0" }) end)
+Hyper:bind({ "shift" }, "j", function() execute({ "-m", "window", "--move", "rel:0:25" }) end)
+Hyper:bind({ "shift" }, "k", function() execute({ "-m", "window", "--move", "rel:0:-25" }) end)
+Hyper:bind({ "shift" }, "l", function() execute({ "-m", "window", "--move", "rel:25:0" }) end)
 
 -- Increase window size
-hyper:bind({}, "y", function() hs.execute("yabai -m window --resize left:-25:0", true) end)
-hyper:bind({}, "u", function() hs.execute("yabai -m window --resize bottom:0:25", true) end)
-hyper:bind({}, "i", function() hs.execute("yabai -m window --resize top:0:-25", true) end)
-hyper:bind({}, "o", function() hs.execute("yabai -m window --resize right:25:0", true) end)
+Hyper:bind({}, "y", function() execute({ "-m", "window", "--resize", "left:-25:0" }) end)
+Hyper:bind({}, "u", function() execute({ "-m", "window", "--resize", "bottom:0:25" }) end)
+Hyper:bind({}, "i", function() execute({ "-m", "window", "--resize", "top:0:-25" }) end)
+Hyper:bind({}, "o", function() execute({ "-m", "window", "--resize", "right:25:0" }) end)
 
 -- Decrease window size
-hyper:bind({"cmd"}, "y", function() hs.execute("yabai -m window --resize left:25:0", true) end)
-hyper:bind({"cmd"}, "u", function() hs.execute("yabai -m window --resize bottom:0:-25", true) end)
-hyper:bind({"cmd"}, "i", function() hs.execute("yabai -m window --resize top:0:25", true) end)
-hyper:bind({"cmd"}, "o", function() hs.execute("yabai -m window --resize right:-25:0", true) end)
+Hyper:bind({ "cmd" }, "y", function() execute({ "-m", "window", "--resize", "left:25:0" }) end)
+Hyper:bind({ "cmd" }, "u", function() execute({ "-m", "window", "--resize", "bottom:0:-25" }) end)
+Hyper:bind({ "cmd" }, "i", function() execute({ "-m", "window", "--resize", "top:0:25" }) end)
+Hyper:bind({ "cmd" }, "o", function() execute({ "-m", "window", "--resize", "right:-25:0" }) end)
 
 -- Set insertion point in focused container
-hyper:bind({"alt"}, "y", function() hs.execute("yabai -m window --insert west", true) end)
-hyper:bind({"alt"}, "u", function() hs.execute("yabai -m window --insert south", true) end)
-hyper:bind({"alt"}, "i", function() hs.execute("yabai -m window --insert north", true) end)
-hyper:bind({"alt"}, "o", function() hs.execute("yabai -m window --insert east", true) end)
+Hyper:bind({ "alt" }, "y", function() execute({ "-m", "window", "--insert", "west" }) end)
+Hyper:bind({ "alt" }, "u", function() execute({ "-m", "window", "--insert", "south" }) end)
+Hyper:bind({ "alt" }, "i", function() execute({ "-m", "window", "--insert", "north" }) end)
+Hyper:bind({ "alt" }, "o", function() execute({ "-m", "window", "--insert", "east" }) end)
 
 -- Toggle window zoom
-hyper:bind({}, "'", function() hs.execute("yabai -m window --toggle zoom-parent", true) end)
-hyper:bind({}, ";", function() hs.execute("yabai -m window --toggle zoom-fullscreen", true) end)
+Hyper:bind({}, "'", function() execute({ "-m", "window", "--toggle", "zoom-parent" }) end)
+Hyper:bind({}, ";", function() execute({ "-m", "window", "--toggle", "zoom-fullscreen" }) end)
 
 -- Float / unfloat window and center on screen
-hyper:bind({}, "p", function() hs.execute("yabai -m window --toggle float; yabai -m window --grid 8:8:1:1:6:6", true) end)
+Hyper:bind({}, "p", function() execute({ "-m", "window", "--toggle", "float", "-m", "window", "--grid", "8:8:1:1:6:6" }) end)
 
 -- Change layout
-hyper:bind({"cmd"}, "'", function() hs.execute("yabai -m space --layout stack", true) end)
-hyper:bind({"cmd"}, ";", function() hs.execute("yabai -m space --layout bsp", true) end)
-hyper:bind({"cmd"}, "p", function() hs.execute("yabai -m space --layout float", true) end)
+Hyper:bind({ "cmd" }, "'", function() execute({ "-m", "space", "--layout", "stack" }) end)
+Hyper:bind({ "cmd" }, ";", function() execute({ "-m", "space", "--layout", "bsp" }) end)
+Hyper:bind({ "cmd" }, "p", function() execute({ "-m", "space", "--layout", "float" }) end)
 
 -- Toggle window split type
-hyper:bind({}, "m", function() hs.execute("yabai -m window --toggle split", true) end)
+Hyper:bind({}, "m", function() execute({ "-m", "window", "--toggle", "split" }) end)
 
 -- Rotate the tree
-hyper:bind({},      "n", function() hs.execute("yabai -m space --rotate 270", true) end)
-hyper:bind({"shift"}, "n", function() hs.execute("yabai -m space --rotate 90", true) end)
+Hyper:bind({}, "n", function() execute({ "-m", "space", "--rotate", "270" }) end)
+Hyper:bind({ "shift" }, "n", function() execute({ "-m", "space", "--rotate", "90" }) end)
 
 -- Flip the tree
-hyper:bind({}, ",", function() hs.execute("yabai -m space --mirror x-axis", true) end)
-hyper:bind({}, ".", function() hs.execute("yabai -m space --mirror y-axis", true) end)
+Hyper:bind({}, ",", function() execute({ "-m", "space", "--mirror", "x-axis" }) end)
+Hyper:bind({}, ".", function() execute({ "-m", "space", "--mirror", "y-axis" }) end)
 
 -- Balance window size
-hyper:bind({}, "b", function() hs.execute("yabai -m space --balance", true) end)
+Hyper:bind({}, "b", function() execute({ "-m", "space", "--balance" }) end)
 
 -- Toggle and resize padding and gaps
-hyper:bind({},        "/", function() hs.execute("yabai -m space --toggle padding; yabai -m space --toggle gap", true) end)
-hyper:bind({"alt"},   "/", function() hs.execute("yabai -m space --padding rel:5:5:5:5; yabai -m space --gap rel:5", true) end)
-hyper:bind({"cmd"},   "/", function() hs.execute("yabai -m space --padding abs:10:10:10:10; yabai -m space --gap abs:10", true) end)
-hyper:bind({"ctrl"},  "/", function() hs.execute("yabai -m space --padding rel:-5:-5:-5:-5; yabai -m space --gap rel:-5", true) end)
-hyper:bind({"shift"}, "/", function() hs.execute("yabai -m space --padding abs:10:10:10:10; yabai -m space --gap abs:10", true) end)
+Hyper:bind({}, "/", function() execute({ "-m", "space", "--toggle", "padding", "-m", "space", "--toggle", "gap" }) end)
+Hyper:bind({ "alt" }, "/", function() execute({ "-m", "space", "--padding", "rel:5:5:5:5", "-m", "space", "--gap", "rel:5" }) end)
+Hyper:bind({ "cmd" }, "/", function() execute({ "-m", "space", "--padding", "abs:10:10:10:10", "-m", "space", "--gap", "abs:10" }) end)
+Hyper:bind({ "ctrl" }, "/", function() execute({ "-m", "space", "--padding", "rel:-5:-5:-5:-5", "-m", "space", "--gap", "rel:-5" }) end)
+Hyper:bind({ "shift" }, "/", function() execute({ "-m", "space", "--padding", "abs:10:10:10:10", "-m", "space", "--gap", "abs:10" }) end)
 
 -- Focus monitor
-hyper:bind({}, "1", function() hs.execute("yabai -m display --focus 1", true) end)
-hyper:bind({}, "2", function() hs.execute("yabai -m display --focus 2", true) end)
-hyper:bind({}, "3", function() hs.execute("yabai -m display --focus 3", true) end)
-hyper:bind({}, "[", function() hs.execute("yabai -m display --focus prev || yabai -m display --focus last", true) end)
-hyper:bind({}, "]", function() hs.execute("yabai -m display --focus next || yabai -m display --focus first", true) end)
+Hyper:bind({}, "1", function() execute({ "-m", "display", "--focus", "1" }) end)
+Hyper:bind({}, "2", function() execute({ "-m", "display", "--focus", "2" }) end)
+Hyper:bind({}, "3", function() execute({ "-m", "display", "--focus", "3" }) end)
 
--- Move window to monitor and keep focus
-hyper:bind({"alt"}, "1", function() hs.execute("yabai -m window --display 1 && yabai -m display --focus 1", true) end)
-hyper:bind({"alt"}, "2", function() hs.execute("yabai -m window --display 2 && yabai -m display --focus 2", true) end)
-hyper:bind({"alt"}, "3", function() hs.execute("yabai -m window --display 3 && yabai -m display --focus 3", true) end)
-hyper:bind({"alt"}, "[", function() hs.execute("$HOME/.config/yabai/moveWinPrev.sh", true) end)
-hyper:bind({"alt"}, "]", function() hs.execute("$HOME/.config/yabai/moveWinNext.sh", true) end)
+-- Hyper:bind({}, "[", function() hs.execute("yabai -m display --focus prev || yabai -m display --focus last", true) end)
+-- Hyper:bind({}, "]", function() hs.execute("yabai -m display --focus next || yabai -m display --focus first", true) end)
 
--- Move window to monitor without keeping focus
-hyper:bind({"shift"}, "1", function() hs.execute("yabai -m window --display 1 || yabai -m window --display 1", true) end)
-hyper:bind({"shift"}, "2", function() hs.execute("yabai -m window --display 2 || yabai -m window --display 2", true) end)
-hyper:bind({"shift"}, "3", function() hs.execute("yabai -m window --display 3 || yabai -m window --display 3", true) end)
-hyper:bind({"shift"}, "[", function() hs.execute("yabai -m window --display prev || yabai -m window --display last", true) end)
-hyper:bind({"shift"}, "]", function() hs.execute("yabai -m window --display next || yabai -m window --display first", true) end)
+-- -- Move window to monitor and keep focus
+-- Hyper:bind({ "alt" }, "1", function() hs.execute("yabai -m window --display 1 && yabai -m display --focus 1", true) end)
+-- Hyper:bind({ "alt" }, "2", function() hs.execute("yabai -m window --display 2 && yabai -m display --focus 2", true) end)
+-- Hyper:bind({ "alt" }, "3", function() hs.execute("yabai -m window --display 3 && yabai -m display --focus 3", true) end)
+-- Hyper:bind({ "alt" }, "[", function() hs.execute("$HOME/.hammerspoon/scripts/moveWinPrev.sh", true) end)
+-- Hyper:bind({ "alt" }, "]", function() hs.execute("$HOME/.hammerspoon/scripts/moveWinNext.sh", true) end)
+
+-- -- Move window to monitor without keeping focus
+-- Hyper:bind({ "shift" }, "1", function() hs.execute("yabai -m window --display 1 || yabai -m window --display 1", true) end)
+-- Hyper:bind({ "shift" }, "2", function() hs.execute("yabai -m window --display 2 || yabai -m window --display 2", true) end)
+-- Hyper:bind({ "shift" }, "3", function() hs.execute("yabai -m window --display 3 || yabai -m window --display 3", true) end)
+-- Hyper:bind({ "shift" }, "[", function() hs.execute("yabai -m window --display prev || yabai -m window --display last", true) end)
+-- Hyper:bind({ "shift" }, "]", function() hs.execute("yabai -m window --display next || yabai -m window --display first", true) end)
 
 -- Move window to workspace
-hyper:bind({"cmd"}, "1", function() hs.execute("yabai -m window --space 1", true) end)
-hyper:bind({"cmd"}, "2", function() hs.execute("yabai -m window --space 2", true) end)
-hyper:bind({"cmd"}, "3", function() hs.execute("yabai -m window --space 3", true) end)
-hyper:bind({"cmd"}, "4", function() hs.execute("yabai -m window --space 4", true) end)
-hyper:bind({"cmd"}, "5", function() hs.execute("yabai -m window --space 5", true) end)
-hyper:bind({"cmd"}, "6", function() hs.execute("yabai -m window --space 6", true) end)
-hyper:bind({"cmd"}, "7", function() hs.execute("yabai -m window --space 7", true) end)
-hyper:bind({"cmd"}, "8", function() hs.execute("yabai -m window --space 8", true) end)
-hyper:bind({"cmd"}, "9", function() hs.execute("yabai -m window --space 9", true) end)
-hyper:bind({"cmd"}, "0", function() hs.execute("yabai -m window --space 10", true) end)
+Hyper:bind({ "cmd" }, "1", function() execute({ "-m", "window", "--space", "1" }) end)
+Hyper:bind({ "cmd" }, "2", function() execute({ "-m", "window", "--space", "2" }) end)
+Hyper:bind({ "cmd" }, "3", function() execute({ "-m", "window", "--space", "3" }) end)
+Hyper:bind({ "cmd" }, "4", function() execute({ "-m", "window", "--space", "4" }) end)
+Hyper:bind({ "cmd" }, "5", function() execute({ "-m", "window", "--space", "5" }) end)
+Hyper:bind({ "cmd" }, "6", function() execute({ "-m", "window", "--space", "6" }) end)
+Hyper:bind({ "cmd" }, "7", function() execute({ "-m", "window", "--space", "7" }) end)
+Hyper:bind({ "cmd" }, "8", function() execute({ "-m", "window", "--space", "8" }) end)
+Hyper:bind({ "cmd" }, "9", function() execute({ "-m", "window", "--space", "9" }) end)
+Hyper:bind({ "cmd" }, "0", function() execute({ "-m", "window", "--space", "10" }) end)
