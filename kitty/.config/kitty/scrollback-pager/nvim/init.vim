@@ -1,10 +1,10 @@
+"set noruler
 set background=dark
 set clipboard+=unnamedplus
 set cursorline
 set ignorecase
 set laststatus=0
 set mouse=a
-set noruler
 set scrollback=100000
 set termguicolors
 set virtualedit=all
