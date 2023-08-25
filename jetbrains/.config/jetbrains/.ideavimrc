@@ -1,0 +1,129 @@
+let mapleader =" "
+
+set NERDTree
+set commentary
+set highlightedyank
+set hlsearch
+set ideajoin
+set ignorecase
+set incsearch
+set noshowmode
+set notimeout
+set number relativenumber
+set showcmd
+set smartcase
+set visualbell
+
+let g:highlightedyank_highlight_color = "rgba(50, 56, 68, 255)"
+let g:highlightedyank_highlight_duration = "150"
+
+nnoremap <unique> <silent> [b :bp<CR>
+nnoremap <unique> <silent> [c :cp<CR>
+nnoremap <unique> <silent> [l :lp<CR>
+nnoremap <unique> <silent> [t :tabp<CR>
+nnoremap <unique> <silent> ]b :bn<CR>
+nnoremap <unique> <silent> ]c :cn<CR>
+nnoremap <unique> <silent> ]l :ln<CR>
+nnoremap <unique> <silent> ]t :tabn<CR>
+
+nnoremap <unique> <silent> <Esc> :nohlsearch<cr>
+nnoremap <unique> <silent> Y y$
+nnoremap <unique> <silent> j gj
+nnoremap <unique> <silent> k gk
+vnoremap <unique> <silent> < <gv
+vnoremap <unique> <silent> > >gv
+vnoremap <unique> <silent> j gj
+vnoremap <unique> <silent> k gk
+vnoremap <unique> <silent> p "_dP
+
+nnoremap <unique> <silent> <leader>1 1gt
+nnoremap <unique> <silent> <leader>2 2gt
+nnoremap <unique> <silent> <leader>3 3gt
+nnoremap <unique> <silent> <leader>4 4gt
+nnoremap <unique> <silent> <leader>5 5gt
+nnoremap <unique> <silent> <leader>6 6gt
+nnoremap <unique> <silent> <leader>7 7gt
+nnoremap <unique> <silent> <leader>8 8gt
+nnoremap <unique> <silent> <leader>9 9gt
+
+nnoremap <unique> <silent> <leader>H <C-w>H
+nnoremap <unique> <silent> <leader>J <C-w>J
+nnoremap <unique> <silent> <leader>K <C-w>K
+nnoremap <unique> <silent> <leader>L <C-w>L
+nnoremap <unique> <silent> <leader>h <C-w>h
+nnoremap <unique> <silent> <leader>j <C-w>j
+nnoremap <unique> <silent> <leader>k <C-w>k
+nnoremap <unique> <silent> <leader>l <C-w>l
+
+nnoremap <unique> <leader>I :buffers<CR>
+nnoremap <unique> <silent> <leader>n gt<CR>
+nnoremap <unique> <silent> <leader>p gT<CR>
+nnoremap <unique> <silent> <leader>z za
+vnoremap <unique> <silent> <leader>p p
+
+nmap <M-k> <Action>(MoveLineUp)
+nmap <M-j> <Action>(MoveLineDown)
+nmap <M-h> <Action>(MoveStatementUp)
+nmap <M-l> <Action>(MoveStatementDown)
+
+" map <unique> <silent> <leader>f <Action>(ActivateProjectToolWindow)
+map <unique> <silent> <leader>; <Action>(HideAllWindows)
+map <unique> <silent> <leader><Tab> <Action>(GotoTest)
+map <unique> <silent> <leader><leader> :b#<CR>
+map <unique> <silent> <leader>D <Action>(ToggleLineBreakpoint)
+map <unique> <silent> <leader>G <Action>(Annotate)
+map <unique> <silent> <leader>M <Action>(MainMenu)
+map <unique> <silent> <leader>O <Action>(ViewToolButtons)
+map <unique> <silent> <leader>U :set nu! rnu!<cr>
+map <unique> <silent> <leader>a <Action>(FindInPath)
+map <unique> <silent> <leader>b <Action>(ViewStatusBar)
+map <unique> <silent> <leader>d <Action>(RecentFiles)
+map <unique> <silent> <leader>f :NERDTree<CR>
+map <unique> <silent> <leader>g <Action>(ShowIntentionActions)
+map <unique> <silent> <leader>i <Action>(Switcher)
+map <unique> <silent> <leader>m <Action>(ViewMenu)
+map <unique> <silent> <leader>o <Action>(ShowErrorDescription)
+map <unique> <silent> <leader>q <Action>(CloseEditor)
+map <unique> <silent> <leader>r <Action>(RenameElement)
+map <unique> <silent> <leader>s <Action>(SearchEverywhere)
+map <unique> <silent> <leader>t <Action>(ActivateTerminalToolWindow)
+map <unique> <silent> <leader>u <Action>(ToggleDistractionFreeMode)
+map <unique> <silent> <leader>w <Action>(SaveAll)
+map <unique> <silent> <leader>y <Action>(ActivateProblemsViewToolWindow)
+map <unique> <silent> <leader>z <Action>(ExpandRegionRecursively)
+
+map <unique> <silent> g, <Action>(JumpToNextChange)
+map <unique> <silent> g; <Action>(JumpToLastChange)
+map <unique> <silent> gd <Action>(GotoDeclaration)
+map <unique> <silent> gi <Action>(GotoImplementation)
+map <unique> <silent> gr <Action>(ShowUsages)
+
+map <unique> <silent> <C-i> <Action>(Forward)
+map <unique> <silent> <C-o> <Action>(Back)
+
+map <unique> <silent> <C-j> <Action>(GotoNextError)
+map <unique> <silent> <C-k> <Action>(GotoPreviousError)
+
+nnoremap <unique> <silent> <leader>E vip:sort iu<CR>
+nnoremap <unique> <silent> <leader>e vip:sort u<CR>
+vnoremap <unique> <silent> <leader>E :sort iu<CR>
+vnoremap <unique> <silent> <leader>e :sort u<CR>
+
+nnoremap <unique> <silent> <leader>' :vsp<CR>
+nnoremap <unique> <silent> <leader>- :sp<CR>
+nnoremap <unique> <silent> <leader>= :sp<CR>
+nnoremap <unique> <silent> <leader>\ :vsp<CR>
+
+nnoremap <unique> <silent> <leader>C gg"+yG
+nnoremap <unique> <silent> <leader>c "+y
+nnoremap <unique> <silent> <leader>v "+p
+vnoremap <unique> <silent> <leader>c "+y
+vnoremap <unique> <silent> <leader>v "+p
+
+" :actionlist -- list all commands
+" -- Map IDE actions to IdeaVim -- https://jb.gg/abva4t
+" Find more examples here: https://jb.gg/share-ideavimrc
+"
+" defaults delete -g ApplePressAndHoldEnabled
+" defaults write com.jetbrains.intellij ApplePressAndHoldEnabled -bool false
+
