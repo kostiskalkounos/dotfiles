@@ -1,0 +1,17 @@
+{
+  "ccls.cache.directory": "/data/kkalkounos/ccls-cache",
+  "ccls.codeLens.enabled": false,
+  "ccls.completion.caseSensitivity": 0,
+  "ccls.completion.detailedLabel": true,
+  "ccls.completion.duplicateOptional": true,
+  "ccls.completion.enableSnippetInsertion": true,
+  "ccls.launch.command": "/opt/1A/toolchain/x86_64-2.6.32-v4/build-pack/default/bin/ccls",
+  "ccls.misc.showInactiveRegions": false,
+  "ccls.index.initialBlacklist": [
+      "."
+  ],
+  "clang-format.executable": "/opt/1A/toolchain/x86_64-2.6.32-v4/bin/clang-format",
+  "clangd.path": "/opt/1A/toolchain/x86_64-2.6.32-v4/bin/clangd",
+  "remote.autoForwardPortsSource": "output",
+  "http.proxyStrictSSL": false
+}
