@@ -7,9 +7,14 @@ require("telescope").setup({
   defaults = {
     mappings = {
       i = {
-        ["<C-e>"] = actions.send_to_qflist + actions.open_qflist,
-        ["<c-j>"] = actions.results_scrolling_down,
-        ["<c-k>"] = actions.results_scrolling_up,
+        ["<c-a>"] = { "<home>", type = "command" },
+        ["<c-e>"] = { "<end>", type = "command" },
+        ["<c-j>"] = actions.cycle_history_next,
+        ["<c-k>"] = actions.cycle_history_prev,
+        ["<c-b>"] = actions.preview_scrolling_up,
+        ["<c-f>"] = actions.preview_scrolling_down,
+        ["<c-u>"] = actions.results_scrolling_up,
+        ["<c-d>"] = actions.results_scrolling_down,
         ["<esc>"] = actions.close,
       },
     },
