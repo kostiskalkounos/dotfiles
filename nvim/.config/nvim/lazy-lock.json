@@ -32,7 +32,7 @@
   "nvim-treesitter-textobjects": { "branch": "master", "commit": "e3e2b6de4ccf781fb653a3a1d397aeb4a0095609" },
   "nvim-ts-context-commentstring": { "branch": "main", "commit": "9bff161dfece6ecf3459e6e46ca42e49f9ed939f" },
   "nvim-web-devicons": { "branch": "master", "commit": "cfc8824cc1db316a276b36517f093baccb8e799a" },
-  "onedark": { "branch": "main", "commit": "ffdab587f35f64ae8d60eeb35b95fef67eb02a66" },
+  "onedark": { "branch": "main", "commit": "bdd0b35beaf5b87e90981110cc1c073cb322494c" },
   "playground": { "branch": "master", "commit": "429f3e76cbb1c59fe000b690f7a5bea617b890c0" },
   "plenary.nvim": { "branch": "master", "commit": "0dbe561ae023f02c2fb772b879e905055b939ce3" },
   "popup.nvim": { "branch": "master", "commit": "b7404d35d5d3548a82149238289fa71f7f6de4ac" },
