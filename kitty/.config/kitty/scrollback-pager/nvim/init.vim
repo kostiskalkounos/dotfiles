@@ -5,6 +5,7 @@ set cursorline
 set ignorecase
 set laststatus=0
 set mouse=a
+set noswapfile
 set scrollback=100000
 set termguicolors
 set virtualedit=all
