@@ -14,6 +14,8 @@ let mapleader = " "
 map <silent> <leader>U :set nu! rnu!<cr>
 
 map <silent> <esc> :nohlsearch<cr>
+map <silent> <leader>c y
+map <silent> <leader>q :qa!<CR>
 map <silent> q :qa!<CR>
 
 augroup highlight_yank
