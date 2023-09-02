@@ -4,14 +4,10 @@
       "id": "lineNumbers",
       "values": [
         {
-          "editor.lineNumbers": "relative",
-          "editor.folding": true,
-          "editor.glyphMargin": true
+          "editor.lineNumbers": "relative"
         },
         {
-          "editor.lineNumbers": "off",
-          "editor.folding": true,
-          "editor.glyphMargin": true
+          "editor.lineNumbers": "off"
         }
       ]
     }
@@ -19,7 +15,7 @@
   "breadcrumbs.enabled": false,
   "editor.bracketPairColorization.enabled": false,
   "editor.cursorBlinking": "solid",
-  "editor.folding": true,
+  "editor.folding": false,
   "editor.formatOnSave": true,
   "editor.glyphMargin": true,
   "editor.guides.indentation": false,
@@ -56,18 +52,20 @@
   "vscode-neovim.neovimExecutablePaths.darwin": "/usr/local/bin/nvim",
   "vscode-neovim.neovimInitVimPaths.darwin": "~/.config/vscode/code.vim",
   "window.menuBarVisibility": "compact",
-  "workbench.colorTheme": "Onedark",
   "workbench.editor.tabCloseButton": "off",
   "workbench.editor.untitled.hint": "hidden",
-  "workbench.layoutControl.enabled": false,
   "workbench.list.automaticKeyboardNavigation": false,
   "workbench.preferredDarkColorTheme": "Onedark",
   "workbench.startupEditor": "none",
   "workbench.tree.renderIndentGuides": "none",
-  "workbench.editor.showTabs": false,
-  "workbench.activityBar.visible": false,
   "editor.fontSize": 13,
   "debug.console.fontSize": 13,
   "terminal.integrated.fontSize": 13,
-  "chat.editor.fontSize": 13
+  "chat.editor.fontSize": 13,
+  "workbench.colorTheme": "Onedark",
+  "security.workspace.trust.enabled": false,
+  "workbench.editor.showTabs": false,
+  "workbench.activityBar.visible": false,
+  "workbench.layoutControl.enabled": false,
+  "window.commandCenter": false
 }

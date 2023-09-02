@@ -67,6 +67,7 @@ nnoremap <unique> <silent> <Space>q <Cmd>call VSCodeNotify('workbench.action.clo
 nnoremap <unique> <silent> <Space>s <Cmd>call VSCodeNotify('workbench.action.quickOpen')<CR>
 nnoremap <unique> <silent> <Space>w <Cmd>call VSCodeNotify('workbench.action.files.save')<CR>
 nnoremap <unique> <silent> <Space>x <Cmd>call VSCodeNotify('workbench.action.files.saveFiles')<CR>
+vnoremap <unique> <silent> <Space>a <Cmd>call VSCodeNotify('workbench.action.findInFiles', { 'query': expand('<cword>')})<CR>
 
 nnoremap <unique> <silent> <Space>; <Cmd>call VSCodeNotify('workbench.action.toggleSidebarVisibility')<CR>
 nnoremap <unique> <silent> <Space>U <Cmd>call VSCodeNotify('settings.cycle.lineNumbers')<CR>
@@ -99,11 +100,13 @@ nnoremap <unique> <silent>gi <Cmd>call VSCodeNotify('editor.action.goToImplement
 nnoremap <unique> <silent>gr <Cmd>call VSCodeNotify('editor.action.goToReferences')<CR>
 vnoremap <unique> <silent>gc <ESC><Cmd>call VSCodeNotifyVisual('editor.action.blockComment', 1)<CR><ESC>
 
+nnoremap <unique> <silent> <Space>C gg"+yG
+vnoremap <unique> <silent> <Space>p p
+
 nnoremap <unique> <silent> <Esc> :nohlsearch<cr>
 nnoremap <unique> <silent> j gj
 nnoremap <unique> <silent> k gk
 vnoremap <unique> <silent> < <gv
-vnoremap <unique> <silent> <leader>p p
 vnoremap <unique> <silent> > >gv
 vnoremap <unique> <silent> j gj
 vnoremap <unique> <silent> k gk

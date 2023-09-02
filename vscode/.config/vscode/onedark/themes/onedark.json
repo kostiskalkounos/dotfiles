@@ -535,7 +535,7 @@
     "dropdown.listBackground": "#2c323c",
     "editor.background": "#282c34",
     "editor.findMatchBackground": "#c9a0c260",
-    "editor.findMatchBorder": "#c9a0c2",
+    "editor.findMatchBorder": "#c9a0c200",
     "editor.findMatchHighlightBackground": "#61afef60",
     "editor.foreground": "#abb2bf",
     "editor.lineHighlightBackground": "#2c323c",
