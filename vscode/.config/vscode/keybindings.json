@@ -119,5 +119,35 @@
   {
     "key": "cmd+0",
     "command": "editor.action.fontZoomReset"
+  },
+  {
+    "key": "alt+space",
+    "command": "editor.action.triggerSuggest",
+    "when": "editorHasCompletionItemProvider && textInputFocus && !editorReadonly && !suggestWidgetVisible"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "search.focus.nextInputBox",
+    "when": "inSearchEditor && inputBoxFocus || inputBoxFocus && searchViewletVisible"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "search.action.focusSearchFromResults",
+    "when": "accessibilityModeEnabled && searchViewletVisible || firstMatchFocus && searchViewletVisible"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "list.collapse",
+    "when": "listFocus && treeElementCanCollapse && !inputFocus || listFocus && treeElementHasParent && !inputFocus"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "list.scrollUp",
+    "when": "listFocus && !inputFocus && listScrollAtBoundary != 'both' && listScrollAtBoundary != 'top'"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "list.select",
+    "when": "listFocus && !inputFocus"
   }
 ]
