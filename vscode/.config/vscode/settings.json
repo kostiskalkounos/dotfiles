@@ -64,8 +64,8 @@
   "chat.editor.fontSize": 13,
   "workbench.colorTheme": "Onedark",
   "security.workspace.trust.enabled": false,
-  "workbench.editor.showTabs": false,
-  "workbench.activityBar.visible": false,
   "workbench.layoutControl.enabled": false,
-  "window.commandCenter": false
+  "window.commandCenter": false,
+  "workbench.editor.showTabs": false,
+  "workbench.activityBar.visible": false
 }
