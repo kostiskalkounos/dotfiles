@@ -20,6 +20,7 @@
   "editor.glyphMargin": true,
   "editor.guides.indentation": false,
   "editor.hideCursorInOverviewRuler": true,
+  "editor.inlayHints.enabled": "off",
   "editor.lineNumbers": "relative",
   "editor.links": false,
   "editor.matchBrackets": "near",
@@ -62,10 +63,10 @@
   "debug.console.fontSize": 13,
   "terminal.integrated.fontSize": 13,
   "chat.editor.fontSize": 13,
-  "workbench.colorTheme": "Onedark",
   "security.workspace.trust.enabled": false,
   "workbench.layoutControl.enabled": false,
   "window.commandCenter": false,
   "workbench.editor.showTabs": false,
-  "workbench.activityBar.visible": false
+  "workbench.activityBar.visible": false,
+  "workbench.colorTheme": "Onedark"
 }

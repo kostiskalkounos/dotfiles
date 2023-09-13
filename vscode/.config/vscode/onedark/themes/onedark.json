@@ -461,7 +461,7 @@
         "string",
         "string.quoted.docstring.multi.python",
         "string.quoted.single.python",
-        "string.unquited.plain.out.yaml"
+        "string.unquoted.plain.out.yaml"
       ],
       "settings": {
         "foreground": "#98c379"
@@ -591,7 +591,7 @@
     "list.focusBackground": "#323842",
     "list.focusForeground": "#f0f0f0",
     "list.highlightForeground": "#c5c5c5",
-    "list.hoverBackground": "#3e4452",
+    "list.hoverBackground": "#2c323c",
     "list.hoverForeground": "#cccccc",
     "list.inactiveSelectionBackground": "#3e4452",
     "list.inactiveSelectionForeground": "#9da5b4",
@@ -631,8 +631,8 @@
     "sideBarSectionHeader.foreground": "#abb2bf",
     "sideBarTitle.foreground": "#abb2bf",
     "statusBar.background": "#282c34",
-    "statusBar.debuggingBackground": "#171c22",
-    "statusBar.debuggingBorder": "#171c22",
+    "statusBar.debuggingBackground": "#2c323c",
+    "statusBar.debuggingBorder": "#2c323c",
     "statusBar.debuggingForeground": "#f0f0f0",
     "statusBar.foreground": "#9da5b4",
     "statusBar.noFolderBackground": "#282c34",
