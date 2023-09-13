@@ -1,7 +1,7 @@
 {
   "name": "Onedark",
   "displayName": "Onedark",
-  "icon": "images/256.png",
+  "icon": "images/green.png",
   "version": "1.0.0",
   "engines": {
     "vscode": ">=0.9.0-pre.1"
