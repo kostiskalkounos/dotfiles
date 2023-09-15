@@ -1,6 +1,7 @@
 vim.opt.autoindent = true
 vim.opt.backup = false
 vim.opt.belloff = "all"
+vim.opt.breakindent = true
 vim.opt.cindent = true
 vim.opt.complete:append("kspell")
 vim.opt.completeopt = { "menuone", "noinsert", "preview" }
