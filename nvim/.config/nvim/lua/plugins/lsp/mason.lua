@@ -1,43 +1,48 @@
+require("mason").setup()
+local mason_lspconfig = require("mason-lspconfig")
+
+local capabilities = require("plugins.lsp.handlers").capabilities
+local on_attach = require("plugins.lsp.handlers").on_attach
+
 local servers = {
-  "clangd",
-  "cssls",
-  "eslint",
-  "html",
-  "jsonls",
-  "lemminx",
-  "lua_ls",
-  "pyright",
-  "tsserver",
-  "vimls",
+  bashls = {},
+  clangd = {},
+  cssls = {},
+  dockerls = {},
+  eslint = {},
+  gopls = {},
+  helm_ls = {},
+  html = {},
+  jsonls = {},
+  lemminx = {},
+  lua_ls = {
+    Lua = {
+      diagnostics = {
+        globals = { "hs", "vim", "jit" },
+      },
+      telemetry = { enable = false },
+      workspace = { checkThirdParty = false },
+    },
+  },
+  pyright = {},
+  tsserver = {},
+  vimls = {},
 }
 
-require("mason").setup()
-require("mason-lspconfig").setup({
-  ensure_installed = servers,
+mason_lspconfig.setup({
+  ensure_installed = vim.tbl_keys(servers),
   automatic_installation = true,
 })
 
-local lspconfig_status_ok, lspconfig = pcall(require, "lspconfig")
-if not lspconfig_status_ok then
-  return
-end
+mason_lspconfig.setup_handlers({
+  function(server_name)
+    require("lspconfig")[server_name].setup({
+      capabilities = capabilities,
+      on_attach = on_attach,
+      settings = servers[server_name],
+      filetypes = (servers[server_name] or {}).filetypes,
+    })
+  end,
+})
 
-local options = {}
-
-for _, server in pairs(servers) do
-  options = {
-    on_attach = require("plugins.lsp.handlers").on_attach,
-    capabilities = require("plugins.lsp.handlers").capabilities,
-  }
-
-  server = vim.split(server, "@")[1]
-
-  local require_ok, conf_opts = pcall(require, "plugins.lsp.providers." .. server)
-  if require_ok then
-    options = vim.tbl_deep_extend("force", conf_opts, options)
-  end
-
-  lspconfig[server].setup(options)
-end
-
-require("plugins.lsp.null-ls").setup(options)
+require("plugins.lsp.null-ls").setup(on_attach)

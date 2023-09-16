@@ -2,8 +2,6 @@ local M = {}
 
 function M.setup()
   local opts = { noremap = true, silent = true }
-  vim.keymap.set("n", "<leader>R", "<cmd>:TSLspRenameFile<CR>", opts)
-  vim.keymap.set("n", "<leader>W", "<cmd>:TSLspOrganize<CR>", opts)
   vim.keymap.set("n", "<leader>Y", "<cmd>lua vim.diagnostic.setqflist()<CR>", opts)
   vim.keymap.set("n", "<leader>g", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
   vim.keymap.set("n", "<leader>o", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
