@@ -43,15 +43,6 @@ end
 M.on_attach = function(client, bufnr)
   require("plugins.lsp.formatting").setup(client, bufnr)
   require("plugins.lsp.keys").setup()
-
-  if client.name == "typescript" or client.name == "tsserver" then
-    require("plugins.lsp.ts-utils").setup(client)
-  end
-
-  if vim.o.filetype == "java" then
-    require("jdtls").setup_dap({ hotcodereplace = "auto" })
-    require("jdtls").setup.add_commands()
-  end
 end
 
 return M

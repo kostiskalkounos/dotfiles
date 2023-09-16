@@ -15,7 +15,6 @@ local plugins = {
   { "JoosepAlviste/nvim-ts-context-commentstring" },
   { "folke/neodev.nvim", ft = "lua" },
   { "jose-elias-alvarez/null-ls.nvim" },
-  { "jose-elias-alvarez/nvim-lsp-ts-utils" },
   { "mbbill/undotree", cmd = "UndotreeToggle" },
   { "mfussenegger/nvim-dap" },
   { "mfussenegger/nvim-jdtls" },
@@ -27,6 +26,7 @@ local plugins = {
   { "nvim-treesitter/playground", cmd = "TSHighlightCapturesUnderCursor" },
   { "rcarriga/nvim-dap-ui" },
   { "theHamsta/nvim-dap-virtual-text" },
+  { "towolf/vim-helm", ft = "helm" },
   {
     "williamboman/mason.nvim",
     cmd = "Mason",

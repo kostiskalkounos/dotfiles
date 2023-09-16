@@ -4,7 +4,18 @@ if not status_ok then
 end
 
 treesitter.setup({
-  ensure_installed = "all",
+  ensure_installed = {
+    "c",
+    "cpp",
+    "go",
+    "java",
+    "javascript",
+    "lua",
+    "python",
+    "tsx",
+    "typescript",
+    "vim",
+  },
   highlight = { enable = not vim.g.vscode },
   context_commentstring = { enable = true, enable_autocmd = false },
   autopairs = {

@@ -125,4 +125,12 @@ local config = {
   },
   handlers = { ["language/status"] = function() end },
 }
+
+local default = { noremap = true, silent = true }
+vim.keymap.set("n", "<F9>", ":lua require'jdtls'.test_class()<CR>", default)
+vim.keymap.set("n", "<F10>", ":lua require'jdtls'.test_nearest_method()<CR>", default)
+
+require("jdtls").setup_dap({ hotcodereplace = "auto" })
+require("jdtls").setup.add_commands()
+
 jdtls.start_or_attach(config)
