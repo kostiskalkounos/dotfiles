@@ -77,6 +77,7 @@ vim.keymap.set("n", "<leader>l", "<C-w>l", default)
 vim.keymap.set("", "<leader>X", "<cmd>!open %<cr><cr>", unique)
 vim.keymap.set("n", "<Leader>n", "<cmd>bn<CR>", unique)
 vim.keymap.set("n", "<Leader>p", "<cmd>bp<CR>", unique)
+vim.keymap.set("n", "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<CR>", unique)
 vim.keymap.set("n", "<leader>;", "<cmd>NvimTreeToggle<CR>", unique)
 vim.keymap.set("n", "<leader><leader>", "<C-^>", default)
 vim.keymap.set("n", "<leader>A", "<cmd>DiffviewOpen<CR>", unique)
@@ -104,6 +105,7 @@ vim.keymap.set("n", "<leader>x", "<cmd>x<CR>", unique)
 vim.keymap.set("n", "<leader>z", "za", default)
 vim.keymap.set("v", "<leader>a", "<cmd>Telescope grep_string<CR>", unique)
 vim.keymap.set("v", "<leader>b", "<cmd>lua require('spectre').open_visual()<CR>", unique)
+vim.keymap.set("n", "<leader>?", "<cmd>Telescope oldfiles<CR>", unique)
 
 vim.keymap.set("n", "<F1>", ":lua require'dap'.continue()<CR>", default)
 vim.keymap.set("n", "<F2>", ":lua require'dap'.step_back()<CR>", default)
@@ -139,7 +141,7 @@ vim.cmd([[
 
   augroup Jenkinsfile
   au!
-  autocmd BufRead,BufNewFile Jenkinsfile set filetype=groovy
+  autocmd BufRead,BufNewFile Jenkinsfile* set filetype=groovy
   augroup end
 
   augroup Terminal
