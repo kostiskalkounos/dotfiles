@@ -25,8 +25,10 @@ local servers = {
     },
   },
   pyright = {},
+  taplo = {},
   tsserver = {},
   vimls = {},
+  yamlls = {},
 }
 
 mason_lspconfig.setup({

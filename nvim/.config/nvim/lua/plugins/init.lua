@@ -22,7 +22,6 @@ local plugins = {
   { "nvim-lua/popup.nvim" },
   { "nvim-telescope/telescope-dap.nvim" },
   { "nvim-treesitter/nvim-treesitter-context" },
-  { "nvim-treesitter/nvim-treesitter-textobjects" },
   { "nvim-treesitter/playground", cmd = "TSHighlightCapturesUnderCursor" },
   { "rcarriga/nvim-dap-ui" },
   { "theHamsta/nvim-dap-virtual-text" },
@@ -105,6 +104,10 @@ local plugins = {
     "nvim-treesitter/nvim-treesitter",
     event = "BufReadPre",
     build = ":TSUpdate",
+    dependencies = {
+      { "nvim-treesitter/nvim-treesitter-textobjects" },
+    },
+
     config = function()
       require("plugins.treesitter")
       require("plugins.context")
