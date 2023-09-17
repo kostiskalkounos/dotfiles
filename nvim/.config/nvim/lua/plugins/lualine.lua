@@ -24,22 +24,22 @@ lualine.setup({
   },
   sections = {
     lualine_a = {
-      {
-        "branch",
-        icon = "",
-        padding = { left = 0 },
-      },
+      { "filename", path = 1 },
     },
     lualine_b = {},
     lualine_c = {
-      "%=",
+      --[[ "%=", ]]
       --[[ { "filetype", icon_only = true, padding = { right = 0 } }, ]]
-      { "filename", path = 1 },
     },
     lualine_x = {
       {
         "diagnostics",
         update_in_insert = false,
+      },
+      {
+        "branch",
+        --[[ icon = "", ]]
+        padding = { left = 2 },
       },
     },
     lualine_y = { "location" },
@@ -47,19 +47,17 @@ lualine.setup({
   },
   inactive_sections = {
     lualine_a = {
-      {
-        "branch",
-        icon = "",
-        padding = { left = 0 },
-      },
+      { "filename", path = 1 },
     },
     lualine_b = {},
-    lualine_c = {
-      "%=",
-      --[[ { "filetype", icon_only = true, padding = { right = 0 } }, ]]
-      { "filename", path = 1, padding = { left = 0 } },
+    lualine_c = {},
+    lualine_x = {
+      {
+        "branch",
+        --[[ icon = "", ]]
+        padding = { left = 2 },
+      },
     },
-    lualine_x = {},
     lualine_y = { "location" },
     lualine_z = { "progress" },
   },
