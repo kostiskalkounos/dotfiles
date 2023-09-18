@@ -21,12 +21,6 @@ M.setup = function()
     vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = "" })
   end
   local config = {
-    signs = {
-      active = signs,
-    },
-    update_in_insert = false,
-    underline = true,
-    severity_sort = true,
     float = {
       focusable = true,
       style = "minimal",
@@ -35,6 +29,17 @@ M.setup = function()
       header = "",
       prefix = "",
     },
+    signs = {
+      active = signs,
+    },
+    severity_sort = true,
+    underline = true,
+    update_in_insert = false,
+    virtual_text = false, -- {
+    --   severity = nil,
+    --   source = "if_many",
+    --   format = nil,
+    -- },
   }
 
   vim.diagnostic.config(config)
