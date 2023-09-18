@@ -16,16 +16,26 @@ local plugins = {
   { "folke/neodev.nvim", ft = "lua" },
   { "jose-elias-alvarez/null-ls.nvim" },
   { "mbbill/undotree", cmd = "UndotreeToggle" },
-  { "mfussenegger/nvim-dap" },
   { "mfussenegger/nvim-jdtls" },
   { "nvim-lua/plenary.nvim" },
   { "nvim-lua/popup.nvim" },
-  { "nvim-telescope/telescope-dap.nvim" },
   { "nvim-treesitter/nvim-treesitter-context" },
   { "nvim-treesitter/playground", cmd = "TSHighlightCapturesUnderCursor" },
-  { "rcarriga/nvim-dap-ui" },
-  { "theHamsta/nvim-dap-virtual-text" },
   { "towolf/vim-helm", ft = "helm" },
+  {
+    "mfussenegger/nvim-dap",
+    cmd = "DapContinue",
+    dependencies = {
+      { "rcarriga/nvim-dap-ui" },
+      { "theHamsta/nvim-dap-virtual-text" },
+      { "nvim-telescope/telescope-dap.nvim" },
+    },
+    config = function()
+      require("plugins.dap")
+    end,
+  },
+  { "leoluz/nvim-dap-go" },
+  { "mfussenegger/nvim-dap-python" },
   {
     "williamboman/mason.nvim",
     cmd = "Mason",
