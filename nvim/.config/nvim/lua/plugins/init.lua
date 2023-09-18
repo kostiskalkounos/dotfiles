@@ -76,7 +76,7 @@ local plugins = {
     end,
   },
   {
-    "TimUntersberger/neogit",
+    "NeogitOrg/neogit",
     cmd = "Neogit",
     config = function()
       require("neogit").setup({
@@ -127,12 +127,12 @@ local plugins = {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
     dependencies = {
+      { "L3MON4D3/LuaSnip" },
       { "hrsh7th/cmp-buffer" },
       { "hrsh7th/cmp-nvim-lsp" },
       { "hrsh7th/cmp-path" },
-      { "saadparwaiz1/cmp_luasnip" },
-      { "L3MON4D3/LuaSnip" },
       { "rafamadriz/friendly-snippets" },
+      { "saadparwaiz1/cmp_luasnip" },
       { "windwp/nvim-autopairs" },
     },
     config = function()
