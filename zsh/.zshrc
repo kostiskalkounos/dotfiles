@@ -116,7 +116,6 @@ export JAVA_HOME=$(/usr/libexec/java_home)
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/.ripgreprc"
 
 export CPPFLAGS="-I/usr/local/opt/llvm/include"
-export CPPFLAGS="-I/usr/local/opt/openjdk/include"
 export CPPFLAGS="-I/usr/local/opt/openssl/include"
 export CPPFLAGS="-I/usr/local/opt/ruby/include"
 export CPPFLAGS="-I/usr/local/opt/sqlite/include"
@@ -128,7 +127,6 @@ export LDFLAGS="-L/usr/local/opt/ruby/lib"
 export LDFLAGS="-L/usr/local/opt/sqlite/lib"
 
 export PATH="/usr/local/opt/llvm/bin:$PATH"
-export PATH="/usr/local/opt/openjdk/bin:$PATH"
 export PATH="/usr/local/opt/openssl/bin:$PATH"
 export PATH="/usr/local/opt/python/bin:$PATH"
 export PATH="/usr/local/opt/ruby/bin:$PATH"
@@ -139,7 +137,6 @@ export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
 export PKG_CONFIG_PATH="/usr/local/opt/sqlite/lib/pkgconfig"
 
 . "$HOME/.cargo/env"
-
 
 if [[ ! "$PATH" == */usr/local/opt/fzf/bin* ]]; then
   export PATH="${PATH:+${PATH}:}/usr/local/opt/fzf/bin"
