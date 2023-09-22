@@ -18,6 +18,7 @@ treesitter.setup({
     "json",
     "lua",
     "python",
+    "terraform",
     "toml",
     "tsx",
     "typescript",
