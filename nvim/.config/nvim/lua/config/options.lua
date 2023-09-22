@@ -21,7 +21,7 @@ vim.opt.laststatus = 2
 vim.opt.lazyredraw = true
 vim.opt.linebreak = true
 vim.opt.list = true
-vim.opt.listchars:append("tab:➝ ,extends:>,precedes:<,trail:·,nbsp:⎵")
+vim.opt.listchars:append("tab:  ,extends:>,precedes:<,trail:·,nbsp:⎵")
 vim.opt.makeprg = "make -j4 -w"
 vim.opt.mouse = "a"
 vim.opt.number = true
