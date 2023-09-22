@@ -26,6 +26,7 @@ local servers = {
   },
   pyright = {},
   taplo = {},
+  terraformls = {},
   tsserver = {},
   vimls = {},
   yamlls = {},
