@@ -12,7 +12,6 @@ function M.setup(on_attach)
     sources = {
       nls.builtins.formatting.black,
       nls.builtins.formatting.fixjson.with({ filetypes = { "jsonc" } }),
-      nls.builtins.formatting.google_java_format,
       nls.builtins.formatting.prettier,
       nls.builtins.formatting.stylua,
     },
