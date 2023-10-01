@@ -50,7 +50,7 @@ local config = {
     "-Declipse.product=org.eclipse.jdt.ls.core.product",
     "-Dlog.protocol=true",
     "-Dlog.level=ALL",
-    "-Xms1g",
+    "-Xms4g",
     "--add-modules=ALL-SYSTEM",
     "--add-opens",
     "java.base/java.util=ALL-UNNAMED",
@@ -64,6 +64,12 @@ local config = {
     workspace_dir,
   },
   java = {
+    autobuild = { enabled = false },
+    signatureHelp = { enabled = true },
+    contentProvider = { preferred = "fernflower" },
+    saveActions = {
+      organizeImports = true,
+    },
     eclipse = {
       downloadSources = true,
     },
@@ -82,16 +88,7 @@ local config = {
     references = {
       includeDecompiledSources = true,
     },
-    inlayHints = {
-      parameterNames = {
-        enabled = "all", -- literals, all, none
-      },
-    },
-    format = {
-      enabled = false,
-    },
   },
-  signatureHelp = { enabled = true },
   completion = {
     favoriteStaticMembers = {
       "org.hamcrest.MatcherAssert.assertThat",
@@ -103,7 +100,6 @@ local config = {
       "org.mockito.Mockito.*",
     },
   },
-  contentProvider = { preferred = "fernflower" },
   extendedClientCapabilities = extendedClientCapabilities,
   sources = {
     organizeImports = {
@@ -115,6 +111,9 @@ local config = {
     toString = {
       template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
     },
+    hashCodeEquals = {
+      useJava7Objects = true,
+    },
     useBlocks = true,
   },
   flags = {
@@ -125,12 +124,16 @@ local config = {
   },
   handlers = { ["language/status"] = function() end },
 }
+config["on_attach"] = function(client, bufnr)
+  require("plugins.lsp.formatting").setup(client, bufnr)
+  require("plugins.lsp.keys").setup()
 
-local default = { noremap = true, silent = true }
-vim.keymap.set("n", "<F9>", ":lua require'jdtls'.test_class()<CR>", default)
-vim.keymap.set("n", "<F10>", ":lua require'jdtls'.test_nearest_method()<CR>", default)
+  local default = { noremap = true, silent = true }
+  vim.keymap.set("n", "<F9>", ":lua require'jdtls'.test_class()<CR>", default)
+  vim.keymap.set("n", "<F10>", ":lua require'jdtls'.test_nearest_method()<CR>", default)
 
-require("jdtls").setup_dap({ hotcodereplace = "auto" })
-require("jdtls").setup.add_commands()
+  require("jdtls").setup_dap({ hotcodereplace = "auto" })
+  require("jdtls").setup.add_commands()
+end
 
 jdtls.start_or_attach(config)
