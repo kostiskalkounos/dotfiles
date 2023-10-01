@@ -4,5 +4,6 @@
 --colors=match:fg:magenta
 --colors=match:style:nobold
 --colors=path:fg:blue
+--follow
 --hidden
 --smart-case
