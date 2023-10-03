@@ -97,7 +97,7 @@
                         ]
                     },
                     {
-                        "description": "CTRL-BACKSPACE to delete-backward-word",
+                        "description": "Ctrl-Backspace to delete-backward-word",
                         "manipulators": [
                             {
                                 "from": {
@@ -198,6 +198,27 @@
                                 "to": [
                                     {
                                         "key_code": "right_arrow"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Shift-Backspace to delete_forward",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "delete_or_backspace",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "left_shift"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "delete_forward"
                                     }
                                 ],
                                 "type": "basic"

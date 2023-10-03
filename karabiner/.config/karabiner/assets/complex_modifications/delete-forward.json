@@ -1,22 +1,20 @@
 {
-  "title": "Delete Word",
+  "title": "Delete Forward",
   "rules": [
     {
-      "description": "Ctrl-Backspace to delete-backward-word",
+      "description": "Shift-Backspace to delete_forward",
       "manipulators": [
         {
           "type": "basic",
           "from": {
             "key_code": "delete_or_backspace",
             "modifiers": {
-              "mandatory": ["left_control"],
-              "optional": ["any"]
+              "mandatory": ["left_shift"]
             }
           },
           "to": [
             {
-              "key_code": "delete_or_backspace",
-              "modifiers": ["left_option"]
+              "key_code": "delete_forward"
             }
           ]
         }
