@@ -140,7 +140,7 @@ local plugins = {
     end,
   },
   {
-    "windwp/nvim-spectre",
+    "nvim-pack/nvim-spectre",
     dependencies = { "nvim-lua/popup.nvim", "nvim-lua/plenary.nvim" },
   },
   {
