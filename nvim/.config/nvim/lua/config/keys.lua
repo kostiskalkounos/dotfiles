@@ -121,7 +121,6 @@ vim.keymap.set("n", "<leader>=", "<cmd>sp<CR>", unique)
 vim.keymap.set("n", "<leader>\\", "<cmd>vsp<CR>", unique)
 
 vim.keymap.set("n", "<leader>C", [[gg"+yG]], default)
-vim.keymap.set("n", "<leader>c", [["+y]], default)
 vim.keymap.set("n", "<leader>v", [["+p]], default)
 vim.keymap.set("v", "<leader>c", [["+y]], default)
 vim.keymap.set("v", "<leader>p", "p", default)
