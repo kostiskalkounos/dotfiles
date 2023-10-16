@@ -45,7 +45,8 @@ local plugins = {
         "neovim/nvim-lspconfig",
         event = "BufReadPre",
         config = function()
-          require("plugins.lsp")
+          require("plugins.lsp.handlers").setup()
+          require("plugins.lsp.mason")
         end,
       },
       {
