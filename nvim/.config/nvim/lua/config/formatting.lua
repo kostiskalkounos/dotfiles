@@ -11,7 +11,7 @@ end
 function M.setup(client, buf)
   local ft = vim.api.nvim_buf_get_option(buf, "filetype")
 
-  local nls = require("plugins.lsp.null-ls")
+  local nls = require("config.null-ls")
 
   local enable = false
   if nls.has_formatter(ft) then
@@ -29,13 +29,13 @@ function M.setup(client, buf)
   if client.server_capabilities.document_formatting and M.autoformat then
     vim.cmd([[
       augroup LspFormat
-        autocmd! * <buffer>
-        autocmd BufWritePre <buffer> lua require("plugins.lsp.formatting").format()
+        au! * <buffer>
+        au BufWritePre <buffer> lua require("config.formatting").format()
       augroup END
 
       augroup TrimWhiteSpace
         au!
-        autocmd BufWritePre * :%s/\s\+$//e
+        au BufWritePre * :%s/\s\+$//e
       augroup end
     ]])
   end

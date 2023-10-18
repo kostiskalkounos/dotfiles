@@ -127,19 +127,9 @@ vim.keymap.set("v", "<leader>p", "p", default)
 vim.keymap.set("v", "<leader>v", [["+p]], default)
 
 vim.cmd([[
-  augroup HighlightYank
-    autocmd!
-    au TextYankPost * silent! lua vim.highlight.on_yank {higroup="Visual", timeout=150, on_macro=true}
-  augroup end
-
-  augroup Jenkinsfile
-  au!
-  autocmd BufRead,BufNewFile Jenkinsfile* set filetype=groovy
-  augroup end
-
   augroup Terminal
-    autocmd!
-    autocmd TermOpen * setlocal nonumber norelativenumber
+    au!
+    au TermOpen * setlocal nonumber norelativenumber
   augroup end
 
   command! -nargs=* Term split | terminal <args>

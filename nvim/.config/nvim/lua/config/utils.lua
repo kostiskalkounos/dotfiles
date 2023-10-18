@@ -2,6 +2,7 @@ local M = {}
 
 local count_bufs_by_type = function(loaded_only)
   loaded_only = (loaded_only == nil and true or loaded_only)
+
   local count = {
     acwrite = 0,
     help = 0,
@@ -12,7 +13,9 @@ local count_bufs_by_type = function(loaded_only)
     quickfix = 0,
     terminal = 0,
   }
+
   local buftypes = vim.api.nvim_list_bufs()
+
   for _, bufname in pairs(buftypes) do
     if (not loaded_only) or vim.api.nvim_buf_is_loaded(bufname) then
       local buftype = vim.api.nvim_buf_get_option(bufname, "buftype")
@@ -20,11 +23,13 @@ local count_bufs_by_type = function(loaded_only)
       count[buftype] = count[buftype] + 1
     end
   end
+
   return count
 end
 
 function M.close_buffer()
   local bufTable = count_bufs_by_type()
+
   if bufTable.normal <= 1 then
     vim.api.nvim_exec([[:q]], true)
   else
