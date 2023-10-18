@@ -125,15 +125,14 @@ local config = {
   handlers = { ["language/status"] = function() end },
 }
 config["on_attach"] = function(client, bufnr)
-  require("plugins.lsp.formatting").setup(client, bufnr)
-  require("plugins.lsp.keys").setup()
+  require("config.handlers").on_attach(client, bufnr)
+
+  jdtls.setup.add_commands()
+  jdtls.setup_dap({ hotcodereplace = "auto" })
 
   local default = { noremap = true, silent = true }
-  vim.keymap.set("n", "<F9>", ":lua require'jdtls'.test_class()<CR>", default)
-  vim.keymap.set("n", "<F10>", ":lua require'jdtls'.test_nearest_method()<CR>", default)
-
-  require("jdtls").setup_dap({ hotcodereplace = "auto" })
-  require("jdtls").setup.add_commands()
+  vim.keymap.set("n", "<F9>", "<cmd>lua require('jdtls').test_class()<CR>", default)
+  vim.keymap.set("n", "<F10>", "<cmd>lua require('jdtls').test_nearest_method()<CR>", default)
 end
 
 jdtls.start_or_attach(config)

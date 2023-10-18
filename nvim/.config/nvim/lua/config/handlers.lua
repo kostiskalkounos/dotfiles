@@ -1,6 +1,45 @@
 local M = {}
 
-function M.setup()
+M.capabilities = vim.lsp.protocol.make_client_capabilities()
+M.capabilities.textDocument.completion.completionItem.snippetSupport = true
+M.capabilities = require("cmp_nvim_lsp").default_capabilities(M.capabilities)
+
+M.setup = function()
+  local signs = {
+    { name = "DiagnosticSignError", text = "" },
+    { name = "DiagnosticSignWarn", text = "" },
+    { name = "DiagnosticSignHint", text = "󰌶" },
+    { name = "DiagnosticSignInfo", text = "" },
+  }
+
+  for _, sign in ipairs(signs) do
+    vim.fn.sign_define(sign.name, { texthl = sign.name, text = sign.text, numhl = "" })
+  end
+
+  local config = {
+    float = {
+      focusable = true,
+      style = "minimal",
+      border = "none",
+      source = "always",
+      header = "",
+      prefix = "",
+    },
+    signs = {
+      active = signs,
+    },
+    severity_sort = true,
+    underline = true,
+    update_in_insert = false,
+    virtual_text = false,
+  }
+
+  vim.diagnostic.config(config)
+end
+
+M.on_attach = function(client, bufnr)
+  require("config.formatting").setup(client, bufnr)
+
   local opts = { noremap = true, silent = true }
   vim.keymap.set("n", "<leader>Y", "<cmd>lua vim.diagnostic.setqflist()<CR>", opts)
   vim.keymap.set("n", "<leader>g", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
