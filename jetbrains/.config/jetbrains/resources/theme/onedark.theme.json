@@ -299,10 +299,11 @@
       }
     },
     "Tree": {
-      "rowHeight": 24,
       "background": "bg",
       "modifiedItemForeground": "accentColor",
-      "selectionBackground": "visual"
+      "rowHeight": 24,
+      "selectionBackground": "visual",
+      "selectionInactiveBackground": "visual"
     },
     "ValidationTooltip": {
       "errorBackground": "pink",
