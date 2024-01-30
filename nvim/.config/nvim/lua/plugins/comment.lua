@@ -1,5 +1,12 @@
 return {
-  { "JoosepAlviste/nvim-ts-context-commentstring" },
+  {
+    "JoosepAlviste/nvim-ts-context-commentstring",
+    config = function()
+      require("ts_context_commentstring").setuo({
+        enable_autocmd = false,
+      })
+    end,
+  },
   {
     "numToStr/Comment.nvim",
     event = "InsertEnter",
