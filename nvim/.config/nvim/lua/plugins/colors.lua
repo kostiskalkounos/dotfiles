@@ -1,17 +1,73 @@
 return {
-  "kostiskalkounos/onedark",
+  --[[ "kostiskalkounos/onedark", ]]
+  "catppuccin/nvim",
   lazy = false,
   priority = 1000,
   dependencies = {
     "nvim-lualine/lualine.nvim",
   },
   config = function()
-    vim.cmd("colorscheme onedark")
+    require("catppuccin").setup({
+      flavour = "macchiato", -- latte, frappe, macchiato, mocha
+      background = { -- :h background
+        light = "latte",
+        dark = "mocha",
+      },
+    })
+    vim.cmd.colorscheme("catppuccin")
+    local M = {}
+    M.theme = function()
+      local colors = {
+        bg = "#24273a",
+        fg = "#cad3f5",
+        inactive = "#6e738d",
+      }
+
+      return {
+        normal = {
+          a = { fg = colors.fg, bg = colors.bg },
+          b = { fg = colors.fg, bg = colors.bg },
+          c = { fg = colors.fg, bg = colors.bg },
+        },
+        command = {
+          a = { fg = colors.fg, bg = colors.bg },
+          b = { fg = colors.fg, bg = colors.bg },
+          c = { fg = colors.fg, bg = colors.bg },
+        },
+        insert = {
+          a = { fg = colors.fg, bg = colors.bg },
+          b = { fg = colors.fg, bg = colors.bg },
+          c = { fg = colors.fg, bg = colors.bg },
+        },
+        visual = {
+          a = { fg = colors.fg, bg = colors.bg },
+          b = { fg = colors.fg, bg = colors.bg },
+          c = { fg = colors.fg, bg = colors.bg },
+        },
+        terminal = {
+          a = { fg = colors.fg, bg = colors.bg },
+          b = { fg = colors.fg, bg = colors.bg },
+          c = { fg = colors.fg, bg = colors.bg },
+        },
+        replace = {
+          a = { fg = colors.fg, bg = colors.bg },
+          b = { fg = colors.fg, bg = colors.bg },
+          c = { fg = colors.fg, bg = colors.bg },
+        },
+        inactive = {
+          a = { fg = colors.inactive, bg = colors.bg },
+          b = { fg = colors.inactive, bg = colors.bg },
+          c = { fg = colors.inactive, bg = colors.bg },
+        },
+      }
+    end
 
     require("lualine").setup({
       options = {
         icons_enabled = true,
-        theme = "onedark",
+        -- theme = "onedark",
+        -- theme = "catppuccin",
+        theme = M.theme(),
         component_separators = { left = "", right = "" },
         section_separators = { left = "", right = "" },
         disabled_filetypes = {
@@ -51,7 +107,7 @@ return {
           end,
           --     { "filename", path = 1 },
         },
-        lualine_b = {},
+        lualine_b = { "diff" },
         lualine_c = {
           --[[ "%=", ]]
           --[[ { "filetype", icon_only = true, padding = { right = 0 } }, ]]
