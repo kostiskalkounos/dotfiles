@@ -146,6 +146,9 @@ source "/usr/local/opt/fzf/shell/key-bindings.zsh"
 
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 typeset -A ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_HIGHLIGHTERS+=(brackets pattern)
 ZSH_HIGHLIGHT_STYLES[autodirectory]='none'
 ZSH_HIGHLIGHT_STYLES[path]='none'
 ZSH_HIGHLIGHT_STYLES[precommand]='fg=green'
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument-unclosed]='fg=red'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument-unclosed]='fg=red'
