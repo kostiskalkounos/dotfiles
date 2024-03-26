@@ -1,7 +1,7 @@
 return {
   { "folke/neodev.nvim", ft = "lua" },
-  { "jose-elias-alvarez/null-ls.nvim" },
   { "mfussenegger/nvim-jdtls" },
+  { "nvimtools/none-ls.nvim" },
   { "towolf/vim-helm", ft = "helm" },
   {
     "williamboman/mason.nvim",
