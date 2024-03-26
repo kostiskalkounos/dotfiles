@@ -8,7 +8,7 @@ function M.setup(on_attach)
     save_after_format = false,
     sources = {
       nls.builtins.formatting.black,
-      nls.builtins.formatting.fixjson.with({ filetypes = { "jsonc" } }),
+      --[[ nls.builtins.formatting.fixjson.with({ filetypes = { "jsonc" } }), ]]
       nls.builtins.formatting.prettier,
       nls.builtins.formatting.stylua,
     },
