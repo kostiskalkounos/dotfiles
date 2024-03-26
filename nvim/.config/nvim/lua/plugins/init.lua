@@ -1,4 +1,8 @@
 return {
+  {
+    "almo7aya/openingh.nvim",
+    cmd = { "OpenInGHRepo", "OpenInGHFile", "OpenInGHFileLines" },
+  },
   { "mbbill/undotree", cmd = "UndotreeToggle" },
   { "nvim-pack/nvim-spectre", dependencies = { "nvim-lua/plenary.nvim", "nvim-lua/popup.nvim" } },
   {
