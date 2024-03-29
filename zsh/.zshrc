@@ -93,12 +93,12 @@ git_branch() {
 }
 
 # Check all available colours: `for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done`
-PROMPT='%(!.%F{red}.%F{cyan})%m%f%(1j. %F{yellow}*%f.)%(0?;; %F{red}%?%f)%F{blue} ${PWD/#$HOME/~}%f %F{magenta}$(git_branch)%f'
+PROMPT='%(!.%F{red}.%F{magenta})%m%f%(1j. %F{yellow}*%f.)%(0?;; %F{red}%?%f)%F{blue} ${PWD/#$HOME/~}%f %F{green}$(git_branch)%f'
 
 export FZF_ALT_C_COMMAND="fd -t d --hidden --follow --exclude '.git' --exclude '{node_modules,vendor,.npm,.cache,.venv}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,build,node_modules,vendor,package-lock.json,yarn.lock}" 2> /dev/null'
 export FZF_DEFAULT_COMMAND=$FZF_CTRL_T_COMMAND
-export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:#c678dd,fg+:#ffffff,bg+:-1,hl+:#d658fe --color=info:#61afef,prompt:#61afef,pointer:#c678dd,marker:#61afef,spinner:#61afef,header:#61afef'
+export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:#c6a0f6,fg+:#ffffff,bg+:-1,hl+:#b7bdf8 --color=info:#8aadf4,prompt:#8aadf4,pointer:#c6a0f6,marker:#8aadf4,spinner:#8aadf4,header:#8aadf4'
 export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow=33:st=34"
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
@@ -147,6 +147,7 @@ source "/usr/local/opt/fzf/shell/key-bindings.zsh"
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_HIGHLIGHTERS+=(brackets pattern)
+ZSH_HIGHLIGHT_STYLES[arg0]='fg=#c6a0f6'
 ZSH_HIGHLIGHT_STYLES[autodirectory]='none'
 ZSH_HIGHLIGHT_STYLES[path]='none'
 ZSH_HIGHLIGHT_STYLES[precommand]='fg=green'
