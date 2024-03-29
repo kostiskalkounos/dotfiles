@@ -8,7 +8,7 @@ return {
     require("nvim-tree").setup({
       update_focused_file = {
         enable = true,
-        update_cwd = true,
+        update_cwd = false,
       },
       filters = {
         custom = { "^.git$", "node_modules" },
