@@ -32,6 +32,7 @@
   line-numbers = true
   side-by-side = false
   features = catppuccin-macchiato
+  # features = catppuccin-mocha
   # syntax-theme = Onedark
 
   file-modified-label = modified:

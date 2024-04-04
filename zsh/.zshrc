@@ -98,7 +98,7 @@ PROMPT='%(!.%F{red}.%F{magenta})%m%f%(1j. %F{yellow}*%f.)%(0?;; %F{red}%?%f)%F{b
 export FZF_ALT_C_COMMAND="fd -t d --hidden --follow --exclude '.git' --exclude '{node_modules,vendor,.npm,.cache,.venv}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,build,node_modules,vendor,package-lock.json,yarn.lock}" 2> /dev/null'
 export FZF_DEFAULT_COMMAND=$FZF_CTRL_T_COMMAND
-export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:#c6a0f6,fg+:#ffffff,bg+:-1,hl+:#b7bdf8 --color=info:#8aadf4,prompt:#8aadf4,pointer:#c6a0f6,marker:#8aadf4,spinner:#8aadf4,header:#8aadf4'
+export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:#c6a0f6,fg+:#ffffff,bg+:-1,hl+:#94e2d5 --color=info:#8aadf4,prompt:#8aadf4,pointer:#c6a0f6,marker:#8aadf4,spinner:#8aadf4,header:#8aadf4'
 export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow=33:st=34"
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
