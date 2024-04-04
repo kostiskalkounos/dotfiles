@@ -67,7 +67,7 @@ vim.cmd([[
   autocmd TermEnter * stopinsert
   augroup END
 
-  hi CursorLine guifg=NONE ctermfg=NONE guibg=#363a4f ctermbg=236 gui=NONE cterm=NONE
+  hi CursorLine guifg=NONE ctermfg=NONE guibg=#313244 ctermbg=236 gui=NONE cterm=NONE
   hi CursorLineNr guifg=#abb2bf ctermfg=249 guibg=NONE ctermbg=NONE gui=NONE cterm=NONE
   hi ErrorMsg guifg=#e06c75 ctermfg=168 guibg=NONE ctermbg=NONE gui=NONE cterm=NONE
   hi IncSearch guifg=#282c34 ctermfg=236 guibg=#c678dd ctermbg=176 gui=NONE cterm=NONE
