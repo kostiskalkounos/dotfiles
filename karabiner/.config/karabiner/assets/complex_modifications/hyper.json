@@ -2,7 +2,7 @@
   "title": "Hyper",
   "rules": [
     {
-      "description": "Change Right Command to f19",
+      "description": "Change Right Command to f18",
       "manipulators": [
         {
           "type": "basic",
@@ -11,7 +11,7 @@
           },
           "to": [
             {
-              "key_code": "f19"
+              "key_code": "f18"
             }
           ]
         }
