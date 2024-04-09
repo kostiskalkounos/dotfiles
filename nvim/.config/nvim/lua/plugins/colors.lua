@@ -16,7 +16,7 @@ return {
     })
     vim.cmd.colorscheme("catppuccin")
     local M = {}
-    M.theme = function()
+    function M.theme()
       local colors = {
         bg = "#24273a",
         fg = "#cad3f5",

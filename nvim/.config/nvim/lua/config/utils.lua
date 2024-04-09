@@ -1,6 +1,6 @@
 local M = {}
 
-local count_bufs_by_type = function(loaded_only)
+local function count_bufs_by_type(loaded_only)
   loaded_only = (loaded_only == nil and true or loaded_only)
 
   local count = {

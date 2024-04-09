@@ -1,10 +1,10 @@
 _G.termesc = {}
 
-local t = function(str)
+local function t(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
 
-_G.termesc.smart_esc = function(term_pid)
+function _G.termesc.smart_esc(term_pid)
   local function find_process(pid)
     local p = vim.api.nvim_get_proc(pid)
     if _G.termesc.except[p.name] then
@@ -24,7 +24,7 @@ _G.termesc.smart_esc = function(term_pid)
   end
 end
 
-local set = function(table)
+local function set(table)
   local ret = {}
   for _, v in ipairs(table) do
     ret[v] = true
@@ -32,7 +32,7 @@ local set = function(table)
   return ret
 end
 
-_G.termesc.setup = function(cfg)
+function _G.termesc.setup(cfg)
   if cfg and cfg.key then
     _G.termesc.key = cfg.key
   else

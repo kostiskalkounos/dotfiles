@@ -4,7 +4,7 @@ M.capabilities = vim.lsp.protocol.make_client_capabilities()
 M.capabilities.textDocument.completion.completionItem.snippetSupport = true
 M.capabilities = require("cmp_nvim_lsp").default_capabilities(M.capabilities)
 
-M.setup = function()
+function M.setup()
   local signs = {
     { name = "DiagnosticSignError", text = "" },
     { name = "DiagnosticSignWarn", text = "" },
@@ -37,7 +37,7 @@ M.setup = function()
   vim.diagnostic.config(config)
 end
 
-M.on_attach = function(client, bufnr)
+function M.on_attach(client, bufnr)
   require("config.formatting").setup(client, bufnr)
 
   local opts = { noremap = true, silent = true }

@@ -199,7 +199,7 @@ return {
       })
 
       local original = {}
-      local debug_map = function(lhs, rhs, desc)
+      local function debug_map(lhs, rhs, desc)
         local keymaps = vim.api.nvim_get_keymap("n")
         original[lhs] = vim.tbl_filter(function(v)
           return v.lhs == lhs
@@ -208,7 +208,7 @@ return {
         vim.keymap.set("n", lhs, rhs, { desc = desc })
       end
 
-      local debug_unmap = function()
+      local function debug_unmap()
         for k, v in pairs(original) do
           if v == true then
             vim.keymap.del("n", k)
