@@ -7,19 +7,16 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 
 call plug#begin('~/.vim/plugged')
-  Plug 'joshdick/onedark.vim'
   Plug 'jremmen/vim-ripgrep'
   Plug 'junegunn/fzf.vim'
   Plug 'mbbill/undotree'
-  Plug 'neoclide/coc.nvim', {'branch': 'release'}
-  Plug 'sheerun/vim-polyglot'
-  Plug 'tpope/vim-fugitive'
 call plug#end()
 
-colorscheme onedark
+colorscheme habamax
 filetype plugin indent on
 set autoindent
 set autoread
+set background=dark
 set backspace=indent,eol,start
 set complete+=kspell
 set completeopt=menuone,preview,noinsert
@@ -62,7 +59,6 @@ set softtabstop=2
 set splitbelow
 set splitright
 set tabstop=2
-"set termguicolors
 set ttyfast
 set undodir=~/.vim/undodir
 set undofile
@@ -74,22 +70,6 @@ set wildmenu
 set wildmode=longest:full,full
 syntax on
 
-let g:coc_global_extensions=[
-  \'coc-clangd',
-  \'coc-css',
-  \'coc-eslint',
-  \'coc-html',
-  \'coc-json',
-  \'coc-marketplace',
-  \'coc-pairs',
-  \'coc-prettier',
-  \'coc-pyright',
-  \'coc-sh',
-  \'coc-tsserver',
-\]
-
-let c_no_curly_error = 1
-let g:cpp_simple_highlight = 1
 let g:fzf_layout = {'window': {'width': 0.8, 'height': 0.8, 'highlight': 'Todo', 'border': 'sharp'}}
 let g:netrw_altv = 1
 let g:netrw_banner = 0
@@ -311,22 +291,17 @@ nnoremap <unique> <leader>D :diffget //2<CR>
 nnoremap <unique> <leader>F :diffget //3<CR>
 nnoremap <unique> <leader>G :G<CR>
 nnoremap <unique> <leader>I :buffers<CR>:buffer<Space>
-nnoremap <unique> <leader>M :CocSearch <C-R>=expand("<cword>")<CR><CR>
 nnoremap <unique> <leader>O :h <C-R>=expand("<cword>")<CR><CR>
-nnoremap <unique> <leader>R :CocRestart<CR><CR>
 nnoremap <unique> <leader>S :GFiles<CR>
 nnoremap <unique> <leader>V :set paste!<CR>
 nnoremap <unique> <leader>a :Ripgrep<SPACE>
 nnoremap <unique> <leader>d :Rg<SPACE>
 nnoremap <unique> <leader>i :Buffers<CR>
-nnoremap <unique> <leader>m :CocSearch<SPACE>
 nnoremap <unique> <leader>s :Files<CR>
 nnoremap <unique> <silent> <Leader>n :bn<CR>
 nnoremap <unique> <silent> <Leader>p :bp<CR>
 nnoremap <unique> <silent> <leader><leader> <C-^>
-nnoremap <unique> <silent> <leader><Tab> :CocCommand clangd.switchSourceHeader<CR>
 nnoremap <unique> <silent> <leader>T :vert terminal<CR>
-nnoremap <unique> <silent> <leader>Y :<C-u>CocListResume<CR>
 nnoremap <unique> <silent> <leader>f :call <SID>ToggleNetrw()<CR>
 nnoremap <unique> <silent> <leader>o :setlocal spell! spelllang=en_us<CR>
 nnoremap <unique> <silent> <leader>q :q<CR>
@@ -334,7 +309,6 @@ nnoremap <unique> <silent> <leader>t :terminal<CR>
 nnoremap <unique> <silent> <leader>u :UndotreeShow<CR>
 nnoremap <unique> <silent> <leader>w :w<CR>
 nnoremap <unique> <silent> <leader>x :x<CR>
-nnoremap <unique> <silent> <leader>y :<C-u>CocList diagnostics<cr>
 nnoremap <unique> <silent> <leader>z :nohlsearch<cr>
 vnoremap <unique> <silent> <leader>p "_dP
 
@@ -355,33 +329,7 @@ vnoremap <unique> <silent> <leader>c "+y
 vnoremap <unique> <silent> <leader>d "_d
 vnoremap <unique> <silent> <leader>v "+p
 
-nmap <unique> <leader>B <Plug>(coc-codeaction)
-nmap <unique> <leader>b <Plug>(coc-codeaction-selected)
-nmap <unique> <leader>g <Plug>(coc-fix-current)
-nmap <unique> <leader>r <Plug>(coc-rename)
-xmap <unique> <leader>b <Plug>(coc-codeaction-selected)
-
-nmap <unique> <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <unique> <silent> ]g <Plug>(coc-diagnostic-next)
-nmap <unique> <silent> gd <Plug>(coc-definition)
-nmap <unique> <silent> gi <Plug>(coc-implementation)
-nmap <unique> <silent> gr <Plug>(coc-references)
-nmap <unique> <silent> gy <Plug>(coc-type-definition)
 nnoremap <unique> <silent> K :call <SID>show_documentation()<CR>
-
-inoremap <unique> <silent><expr> <TAB>
-     \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <unique> <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-inoremap <unique> <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-
-inoremap <unique> <silent><nowait><expr> <C-d> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-inoremap <unique> <silent><nowait><expr> <C-u> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-nnoremap <unique> <silent><nowait><expr> <C-d> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-d>"
-nnoremap <unique> <silent><nowait><expr> <C-u> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-u>"
-vnoremap <unique> <silent><nowait><expr> <C-d> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-d>"
-vnoremap <unique> <silent><nowait><expr> <C-u> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-u>"
 
 let g:netrwIsOpen = 0
 fun! s:ToggleNetrw()
@@ -408,32 +356,9 @@ fun! s:RipgrepFzf(query, fullscreen)
   call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
 endfun
 
-fun! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfun
-
-fun! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  elseif (coc#rpc#ready())
-    call CocActionAsync('doHover')
-  else
-    execute '!' . &keywordprg . " " . expand('<cword>')
-  endif
-endfun
-
 augroup trimWhiteSpace
   autocmd!
   autocmd BufWritePre * :%s/\s\+$//e
 augroup end
 
-augroup signatureHelp
-  autocmd!
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
 command! -nargs=* -bang Ripgrep call <SID>RipgrepFzf(<q-args>, <bang>0)
-command! -nargs=0 Format :call <SID>CocAction('format')
-command! -nargs=0 OR :call <SID>CocAction('runCommand', 'editor.action.organizeImport')
-command! -nargs=? Fold :call <SID>CocAction('fold', <f-args>)
