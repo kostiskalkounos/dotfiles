@@ -151,6 +151,8 @@ ZSH_HIGHLIGHT_STYLES[arg0]='fg=#c6a0f6'
 ZSH_HIGHLIGHT_STYLES[autodirectory]='none'
 ZSH_HIGHLIGHT_STYLES[path]='none'
 ZSH_HIGHLIGHT_STYLES[precommand]='fg=green'
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=green'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=green'
 ZSH_HIGHLIGHT_STYLES[single-quoted-argument-unclosed]='fg=red'
 ZSH_HIGHLIGHT_STYLES[double-quoted-argument-unclosed]='fg=red'
 
