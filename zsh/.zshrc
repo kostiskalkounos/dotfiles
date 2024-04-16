@@ -16,7 +16,18 @@ alias ll='ls -lh'
 alias ls='ls -G'
 alias pip=pip3
 alias python=python3
+alias sudo='sudo '
 alias vi=vim
+
+alias brewu='brew update && brew upgrade -g && brew cleanup'
+
+if command -v nvim &> /dev/null; then
+  alias vim=nvim
+  alias vimdiff="nvim -d"
+  export EDITOR=$(which nvim)
+else
+  export EDITOR=$(which vim)
+fi
 
 autoload -U colors && colors
 autoload -U compinit && compinit -u
@@ -79,14 +90,6 @@ jdk() {
   export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
   java -version
 }
-
-if command -v nvim &> /dev/null; then
-  alias vim=nvim
-  alias vimdiff="nvim -d"
-  export EDITOR=$(which nvim)
-else
-  export EDITOR=$(which vim)
-fi
 
 git_branch() {
   git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1 /'
@@ -157,8 +160,8 @@ ZSH_HIGHLIGHT_STYLES[single-quoted-argument-unclosed]='fg=red'
 ZSH_HIGHLIGHT_STYLES[double-quoted-argument-unclosed]='fg=red'
 
 if test -n "$KITTY_INSTALLATION_DIR"; then
-    export KITTY_SHELL_INTEGRATION="enabled"
-    autoload -Uz -- "$KITTY_INSTALLATION_DIR"/shell-integration/zsh/kitty-integration
-    kitty-integration
-    unfunction kitty-integration
+  export KITTY_SHELL_INTEGRATION="enabled"
+  autoload -Uz -- "$KITTY_INSTALLATION_DIR"/shell-integration/zsh/kitty-integration
+  kitty-integration
+  unfunction kitty-integration
 fi
