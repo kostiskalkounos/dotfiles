@@ -1,6 +1,6 @@
 [include]
   path = ~/.gitcredentials
-  path = ~/Dotfiles/git/catppuccin.gitconfig
+  path = ~/Dotfiles/git/.catppuccin.gitconfig
 
 [init]
   defaultBranch = main
