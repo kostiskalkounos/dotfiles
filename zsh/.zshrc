@@ -1,5 +1,6 @@
 bindkey -e
 
+alias brewu='brew update && brew upgrade -g && brew cleanup'
 alias di='dirs -v'
 alias ga='git add'
 alias gb='git branch'
@@ -14,12 +15,11 @@ alias gt='git checkout'
 alias la='ls -lah'
 alias ll='ls -lh'
 alias ls='ls -G'
+alias mvni='mvn clean install -DskipTests -T 1.5C -U'
 alias pip=pip3
 alias python=python3
 alias sudo='sudo '
 alias vi=vim
-
-alias brewu='brew update && brew upgrade -g && brew cleanup'
 
 if command -v nvim &> /dev/null; then
   alias vim=nvim
@@ -96,7 +96,8 @@ git_branch() {
 }
 
 # Check all available colours: `for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done`
-PROMPT='%(!.%F{red}.%F{magenta})%m%f%(1j. %F{yellow}*%f.)%(0?;; %F{red}%?%f)%F{blue} ${PWD/#$HOME/~}%f %F{green}$(git_branch)%f'
+PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{yellow}* %f.)%(0?;;%F{red}%? %f)'
+# PROMPT='%(!.%F{cyan}.%F{magenta})%m%f%(1j. %F{yellow}*%f.)%(0?;; %F{red}%?%f)%F{blue} ${PWD/#$HOME/~}%f %F{green}$(git_branch)%f'
 
 export FZF_ALT_C_COMMAND="fd -t d --hidden --follow --exclude '.git' --exclude '{node_modules,vendor,.npm,.cache,.venv}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,build,node_modules,vendor,package-lock.json,yarn.lock}" 2> /dev/null'
