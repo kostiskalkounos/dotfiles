@@ -13,6 +13,7 @@ yabai -m config                           \
   window_zoom_persist         true        \
   insert_feedback_color       0xff9697d4
 
-yabai -m rule --add app!="^(Code|Brave Browser|Firefox|kitty|Safari)$" manage=off
+yabai -m rule --add app!="^(Brave Browser|Code|Firefox|IntelliJ IDEA|kitty|Safari)$" manage=off
 yabai -m rule --add app="^Firefox$" title="^Library$" manage=off
+yabai -m rule --add app="^IntelliJ IDEA$" title="(^IntelliJ IDEA CE and Plugin Updates|Evaluate|File Cache Conflict|Preferences|Project Structure|Plugins|Run/Debug Configurations|New Project|Select Modules|Settings|Welcome to IntelliJ IDEA)$" manage=off
 yabai -m rule --add app="^Safari$" title="^(General|(Tab|Password|Website|Extension)s|AutoFill|Se(arch|curity)|Privacy|Advanced)$" manage=off
