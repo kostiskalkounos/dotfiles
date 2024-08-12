@@ -5,6 +5,7 @@ return {
     { "nvim-lua/plenary.nvim" },
     { "nvim-lua/popup.nvim" },
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    { "nvim-treesitter/nvim-treesitter" },
   },
   config = function()
     local actions = require("telescope.actions")

@@ -38,8 +38,6 @@ function M.setup()
 end
 
 function M.on_attach(client, bufnr)
-  require("config.formatting").setup(client, bufnr)
-
   local opts = { noremap = true, silent = true }
   vim.keymap.set("n", "<leader>Y", "<cmd>lua vim.diagnostic.setqflist()<CR>", opts)
   vim.keymap.set("n", "<leader>g", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)

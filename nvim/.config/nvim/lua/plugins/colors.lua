@@ -1,6 +1,6 @@
 return {
-  --[[ "kostiskalkounos/onedark", ]]
   "catppuccin/nvim",
+  name = "catppuccin",
   lazy = false,
   priority = 1000,
   dependencies = {
@@ -12,6 +12,27 @@ return {
       background = { -- :h background
         light = "latte",
         dark = "macchiato",
+      },
+      color_overrides = {
+        macchiato = {
+          blue = "#89b4fa",
+          lavender = "#b4befe",
+          sapphire = "#74c7ec",
+        },
+      },
+      highlight_overrides = {
+        macchiato = function(macchiato)
+          return {
+            ["@attribute"] = { fg = macchiato.sapphire },
+            ["@constructor"] = { fg = macchiato.peach },
+            ["@function.builtin"] = { fg = macchiato.sapphire },
+            ["@keyword.operator"] = { fg = macchiato.mauve },
+            ["@module"] = { fg = macchiato.sapphire },
+            ["@variable.builtin"] = { fg = macchiato.mauve },
+            ["@variable.member"] = { fg = macchiato.lavender },
+            ["@variable.parameter"] = { fg = macchiato.text },
+          }
+        end,
       },
     })
     vim.cmd.colorscheme("catppuccin")

@@ -1,14 +1,14 @@
 return {
-  { "leoluz/nvim-dap-go" },
-  { "mfussenegger/nvim-dap-python" },
   {
     "mfussenegger/nvim-dap",
     cmd = "DapContinue",
     dependencies = {
-      { "rcarriga/nvim-dap-ui" },
-      { "theHamsta/nvim-dap-virtual-text" },
+      { "leoluz/nvim-dap-go" },
       { "nvim-neotest/nvim-nio" },
       { "nvim-telescope/telescope-dap.nvim" },
+      { "rcarriga/nvim-dap-ui" },
+      { "theHamsta/nvim-dap-virtual-text" },
+      { "williamboman/mason.nvim" },
     },
     config = function()
       -- vim.fn.sign_define("DapBreakpointCondition", { text = "ü", texthl = "", linehl = "", numhl = "" })

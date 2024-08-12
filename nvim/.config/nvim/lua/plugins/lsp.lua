@@ -1,7 +1,7 @@
 return {
   { "folke/neodev.nvim", ft = "lua" },
   { "mfussenegger/nvim-jdtls" },
-  { "nvimtools/none-ls.nvim" },
+  { "stevearc/conform.nvim" },
   { "towolf/vim-helm", ft = "helm" },
   {
     "williamboman/mason.nvim",
@@ -64,7 +64,24 @@ return {
             end,
           })
 
-          require("config.null-ls").setup(on_attach)
+          require("conform").setup({
+            formatters_by_ft = {
+              lua = { "stylua" },
+              python = { "isort", "black" },
+              javascript = { { "prettierd", "prettier" } },
+            },
+            format_on_save = function()
+              if vim.g.disable_autoformat then
+                return
+              end
+              return { timeout_ms = 500, lsp_format = "true", quiet = "true" }
+            end,
+          })
+
+          vim.api.nvim_create_user_command("FormatToggle", function()
+            vim.g.disable_autoformat = not vim.g.disable_autoformat
+            print("Setting autoformatting to: " .. tostring(not vim.g.disable_autoformat))
+          end, {})
         end,
       },
       {
