@@ -66,15 +66,16 @@ return {
 
           require("conform").setup({
             formatters_by_ft = {
+              go = { "goimports", "gofmt" },
+              javascript = { { "prettierd", "prettier" } },
               lua = { "stylua" },
               python = { "isort", "black" },
-              javascript = { { "prettierd", "prettier" } },
             },
             format_on_save = function()
               if vim.g.disable_autoformat then
                 return
               end
-              return { timeout_ms = 500, lsp_format = "true", quiet = "true" }
+              return { timeout_ms = 500, lsp_format = "fallback", quiet = "true" }
             end,
           })
 
