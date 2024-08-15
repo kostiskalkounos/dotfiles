@@ -13,6 +13,7 @@ Hyper:bind({}, "w", function() hs.application.launchOrFocus("WhatsApp") end)
 Hyper:bind({}, "x", function() hs.application.launchOrFocus("Launchpad") end)
 Hyper:bind({}, "z", function() hs.application.launchOrFocus("Activity Monitor") end)
 
+Hyper:bind({ "cmd" }, "e", function() hs.application.launchOrFocus("Insomnia") end)
 Hyper:bind({ "cmd" }, "f", function() hs.application.launchOrFocus("Visual Studio Code") end)
 Hyper:bind({ "cmd" }, "g", function() hs.application.launchOrFocus("App Store") end)
 Hyper:bind({ "cmd" }, "r", function() hs.application.launchOrFocus("Reminders") end)
