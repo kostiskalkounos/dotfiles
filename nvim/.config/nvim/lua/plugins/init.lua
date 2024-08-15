@@ -11,6 +11,13 @@ return {
     dependencies = "nvim-lua/plenary.nvim",
   },
   {
+    "stevearc/oil.nvim",
+    cmd = "Oil",
+    config = function()
+      require("oil").setup()
+    end,
+  },
+  {
     "NeogitOrg/neogit",
     cmd = "Neogit",
     config = function()

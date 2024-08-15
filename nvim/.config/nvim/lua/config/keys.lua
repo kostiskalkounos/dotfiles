@@ -17,6 +17,8 @@ vim.keymap.set("i", "<space>", "<space><c-g>u", default)
 
 vim.keymap.set("t", "<M-r>", [['<C-\><C-N>"'.nr2char(getchar()).'pi']], default)
 
+vim.keymap.set("n", "-", "<CMD>Oil<CR>", unique)
+
 vim.keymap.set("n", "<M-h>", "<cmd>vertical resize -2<CR>", unique)
 vim.keymap.set("n", "<M-j>", "<cmd>resize -2<CR>", unique)
 vim.keymap.set("n", "<M-k>", "<cmd>resize +2<CR>", unique)
