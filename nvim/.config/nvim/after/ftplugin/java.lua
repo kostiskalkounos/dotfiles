@@ -5,14 +5,14 @@ local home = os.getenv("HOME")
 local workspace_dir = home .. "/.local/share/eclipse/" .. vim.fn.fnamemodify(root_dir, ":p:h:t")
 
 local jar_patterns = {
-  "~/Projects/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar",
-  "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.plugin/target/*.jar",
-  "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.runner/target/*.jar",
-  "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.runner/lib/*.jar",
+  "~/Projects/java/java-debug/com.microsoft.java.debug.plugin/target/com.microsoft.java.debug.plugin-*.jar",
+  "~/Projects/java/vscode-java-test/java-extension/com.microsoft.java.test.plugin/target/*.jar",
+  "~/Projects/java/vscode-java-test/java-extension/com.microsoft.java.test.runner/target/*.jar",
+  "~/Projects/java/vscode-java-test/java-extension/com.microsoft.java.test.runner/lib/*.jar",
 }
 
 local plugin_path =
-  "~/Projects/vscode-java-test/java-extension/com.microsoft.java.test.plugin.site/target/repository/plugins/"
+  "~/Projects/java/vscode-java-test/java-extension/com.microsoft.java.test.plugin.site/target/repository/plugins/"
 local bundle_list = vim.tbl_map(function(x)
   return require("jdtls.path").join(plugin_path, x)
 end, {
@@ -50,6 +50,7 @@ local config = {
     "-Declipse.product=org.eclipse.jdt.ls.core.product",
     "-Dlog.protocol=true",
     "-Dlog.level=ALL",
+    "-javaagent:" .. home .. "/Projects/java/lombok.jar",
     "-Xms4g",
     "--add-modules=ALL-SYSTEM",
     "--add-opens",
