@@ -7,6 +7,7 @@ return {
     "williamboman/mason.nvim",
     cmd = "Mason",
     dependencies = {
+      "jay-babu/mason-nvim-dap.nvim",
       "williamboman/mason-lspconfig.nvim",
       {
         "neovim/nvim-lspconfig",
@@ -29,6 +30,7 @@ return {
             gopls = {},
             helm_ls = {},
             html = {},
+            jdtls = {},
             jsonls = {},
             lemminx = {},
             lua_ls = {
@@ -48,6 +50,10 @@ return {
             yamlls = {},
           }
 
+          require("mason-nvim-dap").setup({
+            ensure_installed = { "java-debug-adapter", "java-test" },
+          })
+
           mason_lspconfig.setup({
             ensure_installed = vim.tbl_keys(servers),
             automatic_installation = true,
@@ -55,19 +61,21 @@ return {
 
           mason_lspconfig.setup_handlers({
             function(server_name)
-              require("lspconfig")[server_name].setup({
-                capabilities = capabilities,
-                on_attach = on_attach,
-                settings = servers[server_name],
-                filetypes = (servers[server_name] or {}).filetypes,
-              })
+              if server_name ~= "jdtls" then
+                require("lspconfig")[server_name].setup({
+                  capabilities = capabilities,
+                  on_attach = on_attach,
+                  settings = servers[server_name],
+                  filetypes = (servers[server_name] or {}).filetypes,
+                })
+              end
             end,
           })
 
           require("conform").setup({
             formatters_by_ft = {
               go = { "goimports", "gofmt" },
-              javascript = { { "prettierd", "prettier" } },
+              javascript = { "prettierd", "prettier" },
               lua = { "stylua" },
               python = { "isort", "black" },
             },

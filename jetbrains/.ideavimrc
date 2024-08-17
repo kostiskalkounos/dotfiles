@@ -67,6 +67,7 @@ nmap <M-h> <Action>(MoveStatementUp)
 nmap <M-l> <Action>(MoveStatementDown)
 
 " map <unique> <silent> <leader>f <Action>(ActivateProjectToolWindow)
+map <unique> <silent> <leader>+ :set nu! rnu!<CR>
 map <unique> <silent> <leader>; <Action>(HideAllWindows)
 map <unique> <silent> <leader><Tab> <Action>(GotoTest)
 map <unique> <silent> <leader><leader> :b#<CR>
@@ -74,7 +75,6 @@ map <unique> <silent> <leader>D <Action>(ToggleLineBreakpoint)
 map <unique> <silent> <leader>G <Action>(Annotate)
 map <unique> <silent> <leader>M <Action>(MainMenu)
 map <unique> <silent> <leader>O <Action>(ViewToolButtons)
-map <unique> <silent> <leader>U :set nu! rnu!<cr>
 map <unique> <silent> <leader>a <Action>(FindInPath)
 map <unique> <silent> <leader>b <Action>(ViewStatusBar)
 map <unique> <silent> <leader>d <Action>(RecentFiles)

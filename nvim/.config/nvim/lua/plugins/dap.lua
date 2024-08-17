@@ -64,7 +64,13 @@ return {
 
       dap.configurations.java = {
         {
-          name = "Debug (Attach) - Remote",
+          name = "Debug Launch (2GB)",
+          type = "java",
+          request = "launch",
+          vmArgs = "" .. "-Xmx2g ",
+        },
+        {
+          name = "Debug Attach (5005)",
           type = "java",
           request = "attach",
           hostName = "127.0.0.1",
@@ -75,6 +81,25 @@ return {
           type = "java",
           request = "launch",
           program = "${file}",
+        },
+        {
+          name = "My Custom Java Run Configuration",
+          type = "java",
+          request = "launch",
+          -- You need to extend the classPath to list your dependencies.
+          -- `nvim-jdtls` would automatically add the `classPaths` property if it is missing
+          -- classPaths = {},
+
+          -- If using multi-module projects, remove otherwise.
+          -- projectName = "yourProjectName",
+
+          -- javaExec = "java",
+          mainClass = "replace.with.your.fully.qualified.MainClass",
+
+          -- If using the JDK9+ module system, this needs to be extended
+          -- `nvim-jdtls` would automatically populate this property
+          -- modulePaths = {},
+          vmArgs = "" .. "-Xmx2g ",
         },
       }
 
@@ -148,10 +173,10 @@ return {
       -- You can set trigger characters OR it will default to '.'
       -- You can also trigger with the omnifunc, <c-x><c-o>
       vim.cmd([[
-      augroup DapRepl
-        au!
-        au FileType dap-repl lua require('dap.ext.autocompl').attach()
-      augroup END
+        augroup DapRepl
+          au!
+          au FileType dap-repl lua require('dap.ext.autocompl').attach()
+        augroup END
       ]])
 
       local dap_ui = require("dapui")
@@ -198,50 +223,16 @@ return {
         -- },
       })
 
-      local original = {}
-      local function debug_map(lhs, rhs, desc)
-        local keymaps = vim.api.nvim_get_keymap("n")
-        original[lhs] = vim.tbl_filter(function(v)
-          return v.lhs == lhs
-        end, keymaps)[1] or true
-
-        vim.keymap.set("n", lhs, rhs, { desc = desc })
-      end
-
-      local function debug_unmap()
-        for k, v in pairs(original) do
-          if v == true then
-            vim.keymap.del("n", k)
-          else
-            local rhs = v.rhs
-
-            v.lhs = nil
-            v.rhs = nil
-            v.buffer = nil
-            v.mode = nil
-            v.sid = nil
-            v.lnum = nil
-
-            vim.keymap.set("n", k, rhs, v)
-          end
-        end
-
-        original = {}
-      end
-
-      dap.listeners.after.event_initialized["dapui_config"] = function()
-        debug_map("asdf", ":echo 'hello world<CR>", "showing things")
-
+      dap.listeners.before.attach.dapui_config = function()
         dap_ui.open()
       end
-
-      dap.listeners.before.event_terminated["dapui_config"] = function()
-        debug_unmap()
-
+      dap.listeners.before.launch.dapui_config = function()
+        dap_ui.open()
+      end
+      dap.listeners.before.event_terminated.dapui_config = function()
         dap_ui.close()
       end
-
-      dap.listeners.before.event_exited["dapui_config"] = function()
+      dap.listeners.before.event_exited.dapui_config = function()
         dap_ui.close()
       end
 
