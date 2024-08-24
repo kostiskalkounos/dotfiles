@@ -30,6 +30,7 @@ return {
           "lua",
           "nix",
           "python",
+          "rust",
           "terraform",
           "toml",
           "tsx",
@@ -89,10 +90,12 @@ return {
         },
       })
 
-      -- Disable semantic highlighting
-      for _, group in ipairs(vim.fn.getcompletion("@lsp", "highlight")) do
-        vim.api.nvim_set_hl(0, group, {})
-      end
+      vim.api.nvim_set_hl(0, "@lsp.typemod.property.static.java", { link = "@constant" })
+
+      -- -- Disable semantic highlighting for all tokens
+      -- for _, group in ipairs(vim.fn.getcompletion("@lsp", "highlight")) do
+      -- vim.api.nvim_set_hl(0, group, {})
+      -- end
     end,
   },
 }

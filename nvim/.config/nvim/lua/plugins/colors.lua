@@ -24,6 +24,7 @@ return {
         macchiato = function(macchiato)
           return {
             ["@attribute"] = { fg = macchiato.sapphire },
+            ["@constant"] = { fg = macchiato.teal },
             ["@constructor"] = { fg = macchiato.peach },
             ["@function.builtin"] = { fg = macchiato.sapphire },
             ["@keyword.operator"] = { fg = macchiato.mauve },
@@ -31,6 +32,11 @@ return {
             ["@variable.builtin"] = { fg = macchiato.mauve },
             ["@variable.member"] = { fg = macchiato.lavender },
             ["@variable.parameter"] = { fg = macchiato.text },
+
+            ["@lsp.mod.constructor"] = { fg = macchiato.peach },
+            ["@lsp.type.annotationMember"] = { fg = macchiato.flamingo },
+            ["@lsp.type.interface"] = { fg = macchiato.sapphire },
+            ["@lsp.type.parameter"] = { fg = macchiato.text },
           }
         end,
       },

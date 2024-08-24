@@ -43,6 +43,7 @@ return {
               },
             },
             pyright = {},
+            rust_analyzer = {},
             taplo = {},
             terraformls = {},
             tsserver = {},
