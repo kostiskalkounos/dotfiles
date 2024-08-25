@@ -20,7 +20,7 @@ function M.setup()
     float = {
       focusable = true,
       style = "minimal",
-      border = "none",
+      border = "rounded",
       source = "always",
       header = "",
       prefix = "",
