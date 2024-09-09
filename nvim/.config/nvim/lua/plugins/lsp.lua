@@ -46,7 +46,7 @@ return {
             rust_analyzer = {},
             taplo = {},
             terraformls = {},
-            tsserver = {},
+            ts_ls = {},
             vimls = {},
             yamlls = {},
           }
