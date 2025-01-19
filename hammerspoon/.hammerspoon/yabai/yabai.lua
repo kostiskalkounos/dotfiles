@@ -13,8 +13,8 @@ Hyper:bind({ "cmd" }, "k", function() yabai.execute("window --swap north") end)
 Hyper:bind({ "cmd" }, "l", function() yabai.execute("window --swap east") end)
 
 -- Cycle windows
-Hyper:bind({ "alt" }, "n", function() hs.execute("$HOME/.hammerspoon/scripts/cycle_clockwise.sh", true) end)
-Hyper:bind({ "alt" }, "p", function() hs.execute("$HOME/.hammerspoon/scripts/cycle_counterclockwise.sh", true) end)
+Hyper:bind({ "alt" }, "n", function() hs.execute("$HOME/.hammerspoon/yabai/scripts/cycle_clockwise.sh", true) end)
+Hyper:bind({ "alt" }, "p", function() hs.execute("$HOME/.hammerspoon/yabai/scripts/cycle_counterclockwise.sh", true) end)
 
 -- Move managed window
 Hyper:bind({}, "left", function() yabai.execute("window --warp west") end)
@@ -29,8 +29,10 @@ Hyper:bind({ "ctrl" }, "k", function() yabai.execute("window --stack north") end
 Hyper:bind({ "ctrl" }, "l", function() yabai.execute("window --stack east") end)
 Hyper:bind({ "ctrl" }, "m", function() yabai.execute("window --insert stack") end)
 
-Hyper:bind({ "ctrl" }, "n", function() hs.execute("yabai -m window --focus stack.next || yabai -m window --focus stack.first", true) end)
-Hyper:bind({ "ctrl" }, "p", function() hs.execute("yabai -m window --focus stack.prev || yabai -m window --focus stack.last", true) end)
+Hyper:bind({ "ctrl" }, "n", function() yabai.execute("window --focus stack.next") end)
+Hyper:bind({ "ctrl" }, "p", function() yabai.execute("window --focus stack.prev") end)
+-- Hyper:bind({ "ctrl" }, "n", function() hs.execute("yabai -m window --focus stack.next || yabai -m window --focus stack.first", true) end)
+-- Hyper:bind({ "ctrl" }, "p", function() hs.execute("yabai -m window --focus stack.prev || yabai -m window --focus stack.last", true) end)
 
 -- Move floating window
 Hyper:bind({ "shift" }, "h", function() yabai.execute("window --move rel:-25:0") end)
@@ -105,8 +107,8 @@ Hyper:bind({ "alt" }, "2", function() yabai.execute("window --display 2 && windo
 Hyper:bind({ "alt" }, "3", function() yabai.execute("window --display 3 && window --focus") end)
 Hyper:bind({ "alt" }, "[", function() yabai.execute("window --display prev && window --focus") end)
 Hyper:bind({ "alt" }, "]", function() yabai.execute("window --display next && window --focus") end)
--- Hyper:bind({ "alt" }, "[", function() yabai.execute("$HOME/.hammerspoon/scripts/moveWinPrev.sh", true) end)
--- Hyper:bind({ "alt" }, "]", function() yabai.execute("$HOME/.hammerspoon/scripts/moveWinNext.sh", true) end)
+-- Hyper:bind({ "alt" }, "[", function() yabai.execute("$HOME/.hammerspoon/yabai/scripts/moveWinPrev.sh", true) end)
+-- Hyper:bind({ "alt" }, "]", function() yabai.execute("$HOME/.hammerspoon/yabai/scripts/moveWinNext.sh", true) end)
 
 -- Move window to monitor without keeping focus
 Hyper:bind({ "shift" }, "1", function() yabai.execute("window --display 1") end)

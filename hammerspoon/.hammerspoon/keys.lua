@@ -21,4 +21,5 @@ Hyper:bind({ "cmd", "ctrl" }, "1", function() hs.osascript.applescriptFromFile("
 Hyper:bind({ "cmd", "ctrl" }, "2", function() hs.osascript.applescriptFromFile("scripts/monitor2.applescript") end)
 Hyper:bind({ "cmd", "ctrl" }, "3", function() hs.osascript.applescriptFromFile("scripts/monitor3.applescript") end)
 
+Hyper:bind({ "cmd", "ctrl" }, "r", function() hs.reload() end)
 Hyper:bind({ "cmd", "shift" }, "r", function() hs.reload() end)

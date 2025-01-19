@@ -17,6 +17,58 @@ local function moveWindowToDisplay(d)
   end
 end
 
+local function resizeWindow(deltaX, deltaY)
+  local win = hs.window.focusedWindow()
+  if not win then return end
+
+  local frame = win:frame()
+  frame.w = frame.w + deltaX
+  frame.h = frame.h + deltaY
+  win:setFrame(frame)
+end
+
+local function moveWindow(deltaX, deltaY)
+  local win = hs.window.focusedWindow()
+  if not win then return end
+
+  local frame = win:frame()
+  frame.x = frame.x + deltaX
+  frame.y = frame.y + deltaY
+  win:setFrame(frame)
+end
+
+local function moveWindowToFraction(x1, y1, x2, y2)
+  local win = hs.window.focusedWindow()
+  local screenMargin = 5
+
+  if not win then return end
+
+  local screenFrame = win:screen():frame()
+  local newFrame = hs.geometry.rect(
+    screenFrame.x + (screenFrame.w * x1) + screenMargin,
+    screenFrame.y + (screenFrame.h * y1) + screenMargin,
+    (screenFrame.w * (x2 - x1)) - (2 * screenMargin),
+    (screenFrame.h * (y2 - y1)) - (2 * screenMargin)
+  )
+  win:setFrame(newFrame)
+end
+
+local function centerWindow()
+  local win = hs.window.focusedWindow()
+  if not win then return end
+
+  local screenFrame = win:screen():frame()
+  local winFrame = win:frame()
+
+  local newX = screenFrame.x + (screenFrame.w - winFrame.w) / 2
+  local newY = screenFrame.y + (screenFrame.h - winFrame.h) / 2
+
+  win:setFrame(hs.geometry.rect(newX, newY, winFrame.w, winFrame.h))
+end
+
+Hyper:bind({}, "[", function() focusScreen(window.focusedWindow():screen():previous()) end)
+Hyper:bind({}, "]", function() focusScreen(window.focusedWindow():screen():next()) end)
+
 Hyper:bind({ "alt" }, "1", moveWindowToDisplay(1))
 Hyper:bind({ "alt" }, "2", moveWindowToDisplay(2))
 Hyper:bind({ "alt" }, "3", moveWindowToDisplay(3))
@@ -37,68 +89,67 @@ Hyper:bind({ "alt" }, "]", function()
   end
 end)
 
-Hyper:bind({}, "[", function() focusScreen(window.focusedWindow():screen():previous()) end)
-Hyper:bind({}, "]", function() focusScreen(window.focusedWindow():screen():next()) end)
-
-Hyper:bind({}, "1", function() focusScreen(window.focusedWindow():screen():next()) end)
-Hyper:bind({}, "2", function() focusScreen(window.focusedWindow():screen():next()) end)
-Hyper:bind({}, "3", function() focusScreen(window.focusedWindow():screen():previous()) end)
-
-Hyper:bind({ "cmd" }, "h", function() window.focusedWindow():moveToUnit("[50,0,0,100]") end)
-Hyper:bind({ "cmd" }, "j", function() window.focusedWindow():moveToUnit("[0,50,100,100]") end)
-Hyper:bind({ "cmd" }, "k", function() window.focusedWindow():moveToUnit("[0,0,100,50]") end)
-Hyper:bind({ "cmd" }, "l", function() window.focusedWindow():moveToUnit("[50,100,100,0]") end)
-Hyper:bind({ "alt" }, "y", function() window.focusedWindow():moveToUnit("[33,0,0,100]") end)
-Hyper:bind({ "alt" }, "u", function() window.focusedWindow():moveToUnit("[0,65,100,100]") end)
-Hyper:bind({ "alt" }, "i", function() window.focusedWindow():moveToUnit("[0,0,100,35]") end)
-Hyper:bind({ "alt" }, "o", function() window.focusedWindow():moveToUnit("[67,100,100,0]") end)
-Hyper:bind({ "cmd" }, "y", function() window.focusedWindow():moveToUnit("[67,0,0,100]") end)
-Hyper:bind({ "cmd" }, "u", function() window.focusedWindow():moveToUnit("[0,35,100,100]") end)
-Hyper:bind({ "cmd" }, "i", function() window.focusedWindow():moveToUnit("[0,0,100,65]") end)
-Hyper:bind({ "cmd" }, "o", function() window.focusedWindow():moveToUnit("[33,100,100,0]") end)
-
-Hyper:bind({}, "Left", function() window.focusedWindow():moveToUnit("[0,0,50,50]") end)
-Hyper:bind({}, "Down", function() window.focusedWindow():moveToUnit("[0,50,50,100]") end)
-Hyper:bind({}, "Up", function() window.focusedWindow():moveToUnit("[50,0,100,50]") end)
-Hyper:bind({}, "Right", function() window.focusedWindow():moveToUnit("[50,50,100,100]") end)
-Hyper:bind({}, ";", function() window.focusedWindow():moveToUnit("[100,0,0,100]") end)
-Hyper:bind({}, "'", function() window.focusedWindow():moveToUnit("[100,0,0,100]") end)
+Hyper:bind({}, "/", function() window.focusedWindow():moveToUnit("[100,0,0,100]") end)
 Hyper:bind({}, "p", function() window.focusedWindow():moveToUnit({ x = 0.125, y = 0.125, w = 0.75, h = 0.75 }) end)
-Hyper:bind({ "cmd" }, "p", function() window.focusedWindow():centerOnScreen() end)
+
+Hyper:bind({ "cmd" }, "p", centerWindow)
+
+Hyper:bind({ "cmd" }, "h", function() moveWindowToFraction(0, 0, 0.5, 1) end)
+Hyper:bind({ "cmd" }, "j", function() moveWindowToFraction(0, 0.5, 1, 1) end)
+Hyper:bind({ "cmd" }, "k", function() moveWindowToFraction(0, 0, 1, 0.5) end)
+Hyper:bind({ "cmd" }, "l", function() moveWindowToFraction(0.5, 0, 1, 1) end)
+
+Hyper:bind({}, "'", function() moveWindowToFraction(0, 0, 1, 1) end)
+Hyper:bind({}, ";", function() moveWindowToFraction(0, 0, 1, 1) end)
+
+Hyper:bind({}, "n", function() moveWindowToFraction(0, 0, 0.5, 0.5) end)
+Hyper:bind({}, "m", function() moveWindowToFraction(0, 0.5, 0.5, 1) end)
+Hyper:bind({}, ",", function() moveWindowToFraction(0.5, 0, 1, 0.5) end)
+Hyper:bind({}, ".", function() moveWindowToFraction(0.5, 0.5, 1, 1) end)
+
+Hyper:bind({ "alt" }, "y", function() moveWindowToFraction(0, 0, 0.33, 1) end)
+Hyper:bind({ "alt" }, "u", function() moveWindowToFraction(0, 0.65, 1, 1) end)
+Hyper:bind({ "alt" }, "i", function() moveWindowToFraction(0, 0, 1, 0.35) end)
+Hyper:bind({ "alt" }, "o", function() moveWindowToFraction(0.67, 0, 1, 1) end)
+
+Hyper:bind({ "cmd" }, "y", function() moveWindowToFraction(0, 0, 0.67, 1) end)
+Hyper:bind({ "cmd" }, "u", function() moveWindowToFraction(0, 0.35, 1, 1) end)
+Hyper:bind({ "cmd" }, "i", function() moveWindowToFraction(0, 0, 1, 0.65) end)
+Hyper:bind({ "cmd" }, "o", function() moveWindowToFraction(0.33, 0, 1, 1) end)
 
 Hyper:bind({}, "h", function() window.filter.focusWest() end)
 Hyper:bind({}, "j", function() window.filter.focusSouth() end)
 Hyper:bind({}, "k", function() window.filter.focusNorth() end)
 Hyper:bind({}, "l", function() window.filter.focusEast() end)
 
-Hyper:bind({}, "i", function()
-  local win = window.focusedWindow()
-  local f = win:frame()
+Hyper:bind({}, "Left", function() resizeWindow(-20, 0) end)
+Hyper:bind({}, "Down", function() resizeWindow(0, 20) end)
+Hyper:bind({}, "Up", function() resizeWindow(0, -20) end)
+Hyper:bind({}, "Right", function() resizeWindow(20, 0) end)
 
-  f.y = f.y - 10
-  win:setFrame(f)
-end)
+Hyper:bind({"ctrl"}, "h", function() moveWindow(-20, 0) end)
+Hyper:bind({"ctrl"}, "j", function() moveWindow(0, 20) end)
+Hyper:bind({"ctrl"}, "k", function() moveWindow(0, -20) end)
+Hyper:bind({"ctrl"}, "l", function() moveWindow(20, 0) end)
 
-Hyper:bind({}, "y", function()
-  local win = window.focusedWindow()
-  local f = win:frame()
+-- Hyper:bind({ "cmd" }, "h", function() window.focusedWindow():moveToUnit("[50,0,0,100]") end)
+-- Hyper:bind({ "cmd" }, "j", function() window.focusedWindow():moveToUnit("[0,50,100,100]") end)
+-- Hyper:bind({ "cmd" }, "k", function() window.focusedWindow():moveToUnit("[0,0,100,50]") end)
+-- Hyper:bind({ "cmd" }, "l", function() window.focusedWindow():moveToUnit("[50,100,100,0]") end)
 
-  f.x = f.x - 10
-  win:setFrame(f)
-end)
+-- Hyper:bind({ "alt" }, "y", function() window.focusedWindow():moveToUnit("[33,0,0,100]") end)
+-- Hyper:bind({ "alt" }, "u", function() window.focusedWindow():moveToUnit("[0,65,100,100]") end)
+-- Hyper:bind({ "alt" }, "i", function() window.focusedWindow():moveToUnit("[0,0,100,35]") end)
+-- Hyper:bind({ "alt" }, "o", function() window.focusedWindow():moveToUnit("[67,100,100,0]") end)
 
-Hyper:bind({}, "o", function()
-  local win = window.focusedWindow()
-  local f = win:frame()
+-- Hyper:bind({ "cmd" }, "y", function() window.focusedWindow():moveToUnit("[67,0,0,100]") end)
+-- Hyper:bind({ "cmd" }, "u", function() window.focusedWindow():moveToUnit("[0,35,100,100]") end)
+-- Hyper:bind({ "cmd" }, "i", function() window.focusedWindow():moveToUnit("[0,0,100,65]") end)
+-- Hyper:bind({ "cmd" }, "o", function() window.focusedWindow():moveToUnit("[33,100,100,0]") end)
 
-  f.x = f.x + 10
-  win:setFrame(f)
-end)
+-- Hyper:bind({}, "n", function() window.focusedWindow():moveToUnit("[0,0,50,50]") end)
+-- Hyper:bind({}, "m", function() window.focusedWindow():moveToUnit("[0,50,50,100]") end)
+-- Hyper:bind({}, ",", function() window.focusedWindow():moveToUnit("[50,0,100,50]") end)
+-- Hyper:bind({}, ".", function() window.focusedWindow():moveToUnit("[50,50,100,100]") end)
 
-Hyper:bind({}, "u", function()
-  local win = window.focusedWindow()
-  local f = win:frame()
-
-  f.y = f.y + 10
-  win:setFrame(f)
-end)
+-- Hyper:bind({ "cmd" }, "p", function() window.focusedWindow():centerOnScreen() end)
