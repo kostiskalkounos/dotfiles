@@ -1,7 +1,9 @@
 local fnutils = require("hs.fnutils")
 local window = require("hs.window")
 
-local function isInScreen(iScreen, win) return win:screen() == iScreen end
+local function isInScreen(iScreen, win)
+  return win:screen() == iScreen
+end
 
 local function focusScreen(iScreen)
   local windows = fnutils.filter(window.orderedWindows(), fnutils.partial(isInScreen, iScreen))
@@ -19,7 +21,9 @@ end
 
 local function resizeWindow(deltaX, deltaY)
   local win = hs.window.focusedWindow()
-  if not win then return end
+  if not win then
+    return
+  end
 
   local frame = win:frame()
   frame.w = frame.w + deltaX
@@ -29,7 +33,9 @@ end
 
 local function moveWindow(deltaX, deltaY)
   local win = hs.window.focusedWindow()
-  if not win then return end
+  if not win then
+    return
+  end
 
   local frame = win:frame()
   frame.x = frame.x + deltaX
@@ -41,7 +47,9 @@ local function moveWindowToFraction(x1, y1, x2, y2)
   local win = hs.window.focusedWindow()
   local screenMargin = 5
 
-  if not win then return end
+  if not win then
+    return
+  end
 
   local screenFrame = win:screen():frame()
   local newFrame = hs.geometry.rect(
@@ -55,7 +63,9 @@ end
 
 local function centerWindow()
   local win = hs.window.focusedWindow()
-  if not win then return end
+  if not win then
+    return
+  end
 
   local screenFrame = win:screen():frame()
   local winFrame = win:frame()
