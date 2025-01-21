@@ -1,7 +1,5 @@
 .DS_Store
-.luarc.json
 .netrwhist
-Spoons
 autoload/
 build
 node_modules
