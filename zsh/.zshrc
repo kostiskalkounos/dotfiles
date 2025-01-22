@@ -78,18 +78,12 @@ man() {
   command man "$@"
 }
 
-javal() {
-  unset JAVA_HOME;
-  export JAVA_HOME=$(/usr/libexec/java_home);
-  java -version
-}
-
-jdk() {
-  version=$1
-  unset JAVA_HOME;
-  export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
-  java -version
-}
+# j() {
+#   version=$1
+#   unset JAVA_HOME;
+#   export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
+#   java -version
+# }
 
 git_branch() {
   git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1 /'
@@ -115,40 +109,41 @@ zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)
 
 export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 
-export JAVA_HOME=$(/usr/libexec/java_home)
+# export JAVA_HOME=$(/usr/libexec/java_home)
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/.ripgreprc"
 
-export CPPFLAGS="-I/usr/local/opt/llvm/include"
-export CPPFLAGS="-I/usr/local/opt/openssl/include"
-export CPPFLAGS="-I/usr/local/opt/ruby/include"
-export CPPFLAGS="-I/usr/local/opt/sqlite/include"
+# export CPPFLAGS="-I/usr/local/opt/llvm/include"
+# export CPPFLAGS="-I/usr/local/opt/openssl/include"
+# export CPPFLAGS="-I/usr/local/opt/ruby/include"
+# export CPPFLAGS="-I/usr/local/opt/sqlite/include"
+# 
+# export LDFLAGS="-L/usr/local/opt/llvm/lib"
+# export LDFLAGS="-L/usr/local/opt/openssl/lib"
+# export LDFLAGS="-L/usr/local/opt/python/lib"
+# export LDFLAGS="-L/usr/local/opt/ruby/lib"
+# export LDFLAGS="-L/usr/local/opt/sqlite/lib"
+# 
+# export PATH="/usr/local/opt/llvm/bin:$PATH"
+# export PATH="/usr/local/opt/openssl/bin:$PATH"
+# export PATH="/usr/local/opt/python/bin:$PATH"
+# export PATH="/usr/local/opt/ruby/bin:$PATH"
+# export PATH="/usr/local/opt/sqlite/bin:$PATH"
+# 
+# export PKG_CONFIG_PATH="/usr/local/opt/python/lib/pkgconfig"
+# export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
+# export PKG_CONFIG_PATH="/usr/local/opt/sqlite/lib/pkgconfig"
 
-export LDFLAGS="-L/usr/local/opt/llvm/lib"
-export LDFLAGS="-L/usr/local/opt/openssl/lib"
-export LDFLAGS="-L/usr/local/opt/python/lib"
-export LDFLAGS="-L/usr/local/opt/ruby/lib"
-export LDFLAGS="-L/usr/local/opt/sqlite/lib"
+# . "$HOME/.cargo/env"
 
-export PATH="/usr/local/opt/llvm/bin:$PATH"
-export PATH="/usr/local/opt/openssl/bin:$PATH"
-export PATH="/usr/local/opt/python/bin:$PATH"
-export PATH="/usr/local/opt/ruby/bin:$PATH"
-export PATH="/usr/local/opt/sqlite/bin:$PATH"
-
-export PKG_CONFIG_PATH="/usr/local/opt/python/lib/pkgconfig"
-export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
-export PKG_CONFIG_PATH="/usr/local/opt/sqlite/lib/pkgconfig"
-
-. "$HOME/.cargo/env"
-
-if [[ ! "$PATH" == */usr/local/opt/fzf/bin* ]]; then
-  export PATH="${PATH:+${PATH}:}/usr/local/opt/fzf/bin"
+if [[ ! "$PATH" == /opt/homebrew/Cellar/fzf/*/bin* ]]; then
+  export PATH="${PATH:+${PATH}:}/opt/homebrew/Cellar/fzf/*/bin"
 fi
 
-[[ $- == *i* ]] && source "/usr/local/opt/fzf/shell/completion.zsh" 2> /dev/null
-source "/usr/local/opt/fzf/shell/key-bindings.zsh"
+[[ $- == *i* ]] && source /opt/homebrew/Cellar/fzf/*/shell/completion.zsh 2> /dev/null
+source /opt/homebrew/Cellar/fzf/*/shell/key-bindings.zsh
 
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /opt/homebrew/Cellar/zsh-syntax-highlighting/*/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_HIGHLIGHTERS+=(brackets pattern)
 ZSH_HIGHLIGHT_STYLES[arg0]='fg=#c6a0f6'
@@ -166,3 +161,5 @@ if test -n "$KITTY_INSTALLATION_DIR"; then
   kitty-integration
   unfunction kitty-integration
 fi
+
+export HOMEBREW_NO_ANALYTICS=1
