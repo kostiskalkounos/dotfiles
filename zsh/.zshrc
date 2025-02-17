@@ -112,36 +112,7 @@ export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 # export JAVA_HOME=$(/usr/libexec/java_home)
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/.ripgreprc"
 
-# export CPPFLAGS="-I/usr/local/opt/llvm/include"
-# export CPPFLAGS="-I/usr/local/opt/openssl/include"
-# export CPPFLAGS="-I/usr/local/opt/ruby/include"
-# export CPPFLAGS="-I/usr/local/opt/sqlite/include"
-# 
-# export LDFLAGS="-L/usr/local/opt/llvm/lib"
-# export LDFLAGS="-L/usr/local/opt/openssl/lib"
-# export LDFLAGS="-L/usr/local/opt/python/lib"
-# export LDFLAGS="-L/usr/local/opt/ruby/lib"
-# export LDFLAGS="-L/usr/local/opt/sqlite/lib"
-# 
-# export PATH="/usr/local/opt/llvm/bin:$PATH"
-# export PATH="/usr/local/opt/openssl/bin:$PATH"
-# export PATH="/usr/local/opt/python/bin:$PATH"
-# export PATH="/usr/local/opt/ruby/bin:$PATH"
-# export PATH="/usr/local/opt/sqlite/bin:$PATH"
-# 
-# export PKG_CONFIG_PATH="/usr/local/opt/python/lib/pkgconfig"
-# export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
-# export PKG_CONFIG_PATH="/usr/local/opt/sqlite/lib/pkgconfig"
-
-# . "$HOME/.cargo/env"
-
-if [[ ! "$PATH" == /opt/homebrew/Cellar/fzf/*/bin* ]]; then
-  export PATH="${PATH:+${PATH}:}/opt/homebrew/Cellar/fzf/*/bin"
-fi
-
-[[ $- == *i* ]] && source /opt/homebrew/Cellar/fzf/*/shell/completion.zsh 2> /dev/null
-source /opt/homebrew/Cellar/fzf/*/shell/key-bindings.zsh
-
+source <(fzf --zsh)
 source /opt/homebrew/Cellar/zsh-syntax-highlighting/*/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 typeset -A ZSH_HIGHLIGHT_STYLES
