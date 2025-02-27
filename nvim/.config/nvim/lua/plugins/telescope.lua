@@ -21,6 +21,10 @@ return {
             ["<c-n>"] = actions.results_scrolling_down,
             ["<c-p>"] = actions.results_scrolling_up,
             ["<esc>"] = actions.close,
+            ["<m-h>"] = actions.results_scrolling_left,
+            ["<m-j>"] = actions.preview_scrolling_left,
+            ["<m-k>"] = actions.preview_scrolling_right,
+            ["<m-l>"] = actions.results_scrolling_right,
           },
         },
         file_ignore_patterns = {
