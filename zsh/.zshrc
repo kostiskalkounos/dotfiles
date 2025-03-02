@@ -78,12 +78,12 @@ man() {
   command man "$@"
 }
 
-# j() {
-#   version=$1
-#   unset JAVA_HOME;
-#   export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
-#   java -version
-# }
+j() {
+  version=$1
+  unset JAVA_HOME;
+  export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
+  java -version
+}
 
 git_branch() {
   git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1 /'
@@ -109,7 +109,8 @@ zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)
 
 export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 
-# export JAVA_HOME=$(/usr/libexec/java_home)
+export HOMEBREW_NO_ANALYTICS=1
+export JAVA_HOME=$(/usr/libexec/java_home)
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/.ripgreprc"
 
 source <(fzf --zsh)
@@ -132,5 +133,3 @@ if test -n "$KITTY_INSTALLATION_DIR"; then
   kitty-integration
   unfunction kitty-integration
 fi
-
-export HOMEBREW_NO_ANALYTICS=1

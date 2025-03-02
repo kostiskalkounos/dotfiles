@@ -7,14 +7,13 @@ Hyper:bind({}, "g", function() hs.application.launchOrFocus("System Preferences"
 Hyper:bind({}, "r", function() hs.application.launchOrFocus("Notes") end)
 Hyper:bind({}, "s", function() hs.application.launchOrFocus("Safari") end)
 Hyper:bind({}, "t", function() hs.application.launchOrFocus("Calculator") end)
-Hyper:bind({}, "v", function() hs.application.launchOrFocus("Firefox") end)
+Hyper:bind({}, "v", function() hs.application.launchOrFocus("Brave Browser") end)
 Hyper:bind({}, "w", function() hs.application.launchOrFocus("WhatsApp") end)
 Hyper:bind({}, "x", function() hs.application.launchOrFocus("Launchpad") end)
 Hyper:bind({}, "z", function() hs.application.launchOrFocus("Activity Monitor") end)
 
 Hyper:bind({ "cmd" }, "g", function() hs.application.launchOrFocus("App Store") end)
 Hyper:bind({ "cmd" }, "r", function() hs.application.launchOrFocus("Reminders") end)
-Hyper:bind({ "cmd" }, "s", function() hs.application.launchOrFocus("Brave Browser") end)
 Hyper:bind({ "cmd" }, "w", function() hs.application.launchOrFocus("Signal") end)
 
 Hyper:bind({ "cmd", "ctrl" }, "1", function() hs.osascript.applescriptFromFile("scripts/monitor1.applescript") end)
