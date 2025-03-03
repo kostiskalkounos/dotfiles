@@ -1,4 +1,4 @@
-local yabai = require("yabai_utils")
+local yabai = require("yabai.utils")
 
 -- Focus window
 Hyper:bind({}, "h", function() yabai.execute("window --focus west") end)

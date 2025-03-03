@@ -16,9 +16,13 @@ Hyper:bind({ "cmd" }, "g", function() hs.application.launchOrFocus("App Store") 
 Hyper:bind({ "cmd" }, "r", function() hs.application.launchOrFocus("Reminders") end)
 Hyper:bind({ "cmd" }, "w", function() hs.application.launchOrFocus("Signal") end)
 
-Hyper:bind({ "cmd", "ctrl" }, "1", function() hs.osascript.applescriptFromFile("scripts/monitor1.applescript") end)
-Hyper:bind({ "cmd", "ctrl" }, "2", function() hs.osascript.applescriptFromFile("scripts/monitor2.applescript") end)
-Hyper:bind({ "cmd", "ctrl" }, "3", function() hs.osascript.applescriptFromFile("scripts/monitor3.applescript") end)
+Hyper:bind({ "cmd", "ctrl" }, "1", function() hs.osascript.applescriptFromFile("hammerspoon/scripts/monitor1.applescript") end)
+Hyper:bind({ "cmd", "ctrl" }, "2", function() hs.osascript.applescriptFromFile("hammerspoon/scripts/monitor2.applescript") end)
+Hyper:bind({ "cmd", "ctrl" }, "3", function() hs.osascript.applescriptFromFile("hammerspoon/scripts/monitor3.applescript") end)
+
+Hyper:bind({ "cmd", "shift" }, "1", function() hs.osascript.applescriptFromFile("hammerspoon/scripts/monitor1.applescript") end)
+Hyper:bind({ "cmd", "shift" }, "2", function() hs.osascript.applescriptFromFile("hammerspoon/scripts/monitor2.applescript") end)
+Hyper:bind({ "cmd", "shift" }, "3", function() hs.osascript.applescriptFromFile("hammerspoon/scripts/monitor3.applescript") end)
 
 Hyper:bind({ "cmd", "ctrl" }, "r", function() hs.reload() end)
 Hyper:bind({ "cmd", "shift" }, "r", function() hs.reload() end)
