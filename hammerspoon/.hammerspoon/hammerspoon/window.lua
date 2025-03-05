@@ -51,20 +51,27 @@ local function moveWindowToFixedSize(width, height)
   win:setFrame({ x = x, y = y, w = width, h = height })
 end
 
-
 local function moveWindowToFraction(x1, y1, x2, y2)
   local win = hs.window.focusedWindow()
-  local screenMargin = 3
-
   if not win then return end
 
   local screenFrame = win:screen():frame()
+
+  local outerMargin = 3
+  local innerMargin = outerMargin / 2
+
+  local leftMargin = (x1 == 0) and outerMargin or innerMargin
+  local rightMargin = (x2 == 1) and outerMargin or innerMargin
+  local topMargin = (y1 == 0) and outerMargin or innerMargin
+  local bottomMargin = (y2 == 1) and outerMargin or innerMargin
+
   local newFrame = hs.geometry.rect(
-    screenFrame.x + (screenFrame.w * x1) + screenMargin,
-    screenFrame.y + (screenFrame.h * y1) + screenMargin,
-    (screenFrame.w * (x2 - x1)) - (2 * screenMargin),
-    (screenFrame.h * (y2 - y1)) - (2 * screenMargin)
+    screenFrame.x + (screenFrame.w * x1) + leftMargin,
+    screenFrame.y + (screenFrame.h * y1) + topMargin,
+    (screenFrame.w * (x2 - x1)) - (leftMargin + rightMargin),
+    (screenFrame.h * (y2 - y1)) - (topMargin + bottomMargin)
   )
+
   win:setFrame(newFrame)
 end
 
@@ -112,8 +119,13 @@ Hyper:bind({}, "l", function() window.filter.focusEast() end)
 Hyper:bind({ "cmd" }, "p", centerWindow)
 Hyper:bind({}, "p", function() moveWindowToFixedSize(1300, 810) end)
 
+Hyper:bind({ "alt" }, "p", function() moveWindowToFraction(0.33, 0, 0.67, 1) end)
+Hyper:bind({ "ctrl" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) end)
+Hyper:bind({ "shift" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) end)
+
 Hyper:bind({}, "'", function() moveWindowToFraction(0, 0, 1, 1) end)
 Hyper:bind({}, ";", function() moveWindowToFraction(0, 0, 1, 1) end)
+Hyper:bind({}, "/", function() window.focusedWindow():moveToUnit("[100,0,0,100]") end)
 
 Hyper:bind({ "cmd" }, "h", function() moveWindowToFraction(0, 0, 0.5, 1) end)
 Hyper:bind({ "cmd" }, "j", function() moveWindowToFraction(0, 0.5, 1, 1) end)
@@ -121,8 +133,8 @@ Hyper:bind({ "cmd" }, "k", function() moveWindowToFraction(0, 0, 1, 0.5) end)
 Hyper:bind({ "cmd" }, "l", function() moveWindowToFraction(0.5, 0, 1, 1) end)
 
 Hyper:bind({ "cmd" }, "y", function() moveWindowToFraction(0, 0, 0.67, 1) end)
-Hyper:bind({ "cmd" }, "u", function() moveWindowToFraction(0, 0.35, 1, 1) end)
-Hyper:bind({ "cmd" }, "i", function() moveWindowToFraction(0, 0, 1, 0.65) end)
+Hyper:bind({ "cmd" }, "u", function() moveWindowToFraction(0, 0.33, 1, 1) end)
+Hyper:bind({ "cmd" }, "i", function() moveWindowToFraction(0, 0, 1, 0.67) end)
 Hyper:bind({ "cmd" }, "o", function() moveWindowToFraction(0.33, 0, 1, 1) end)
 
 Hyper:bind({}, "Left", function() moveWindowToFraction(0, 0, 0.5, 0.5) end)
@@ -131,8 +143,8 @@ Hyper:bind({}, "Up", function() moveWindowToFraction(0.5, 0, 1, 0.5) end)
 Hyper:bind({}, "Right", function() moveWindowToFraction(0.5, 0.5, 1, 1) end)
 
 Hyper:bind({ "alt" }, "y", function() moveWindowToFraction(0, 0, 0.33, 1) end)
-Hyper:bind({ "alt" }, "u", function() moveWindowToFraction(0, 0.65, 1, 1) end)
-Hyper:bind({ "alt" }, "i", function() moveWindowToFraction(0, 0, 1, 0.35) end)
+Hyper:bind({ "alt" }, "u", function() moveWindowToFraction(0, 0.67, 1, 1) end)
+Hyper:bind({ "alt" }, "i", function() moveWindowToFraction(0, 0, 1, 0.33) end)
 Hyper:bind({ "alt" }, "o", function() moveWindowToFraction(0.67, 0, 1, 1) end)
 
 Hyper:bind({ "shift" }, "h", function() resizeWindow(-20, 0) end)
