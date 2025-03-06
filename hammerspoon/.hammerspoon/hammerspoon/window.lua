@@ -88,21 +88,19 @@ local function centerWindow()
   win:setFrame(hs.geometry.rect(newX, newY, winFrame.w, winFrame.h))
 end
 
-local function maximizeAllWindows()
+local function maximizeWindows(x1, y1, x2, y2)
   local allWindows = hs.window.allWindows()
-  for _, win in ipairs(allWindows) do
-      if win:isStandard() then
-          win:maximize()
-      end
-  end
-end
+  local ignoredTitles = { "Calendar", "Finder", "Mail", "Notes", "Reminders", "Signal", "Spotify", "WhatsApp" }
 
-local function maximizeAllWindowsWithGap(x1, y1, x2, y2)
-  local allWindows = hs.window.allWindows()
   for _, win in ipairs(allWindows) do
-      if win:isStandard() then
-          moveWindowToFraction(x1, y1, x2, y2, win)
+    local app = win:application()
+    if win:isStandard() and app and not hs.fnutils.contains(ignoredTitles, app:name()) then
+      if (x1 and y1 and x2 and y2) then
+        moveWindowToFraction(x1, y1, x2, y2, win)
+      else
+        win:maximize()
       end
+    end
   end
 end
 
@@ -145,9 +143,9 @@ Hyper:bind({}, "'", function() moveWindowToFraction(0, 0, 1, 1) end)
 Hyper:bind({}, ";", function() moveWindowToFraction(0, 0, 1, 1) end)
 Hyper:bind({}, "/", function() window.focusedWindow():moveToUnit("[100,0,0,100]") end)
 
-Hyper:bind({ "cmd" }, "'", function() maximizeAllWindowsWithGap(0, 0, 1, 1) end)
-Hyper:bind({ "cmd" }, ";", function() maximizeAllWindowsWithGap(0, 0, 1, 1) end)
-Hyper:bind({ "cmd" }, "/", function() maximizeAllWindows() end)
+Hyper:bind({ "cmd" }, "'", function() maximizeWindows(0, 0, 1, 1) end)
+Hyper:bind({ "cmd" }, ";", function() maximizeWindows(0, 0, 1, 1) end)
+Hyper:bind({ "cmd" }, "/", function() maximizeWindows() end)
 
 Hyper:bind({ "cmd" }, "h", function() moveWindowToFraction(0, 0, 0.5, 1) end)
 Hyper:bind({ "cmd" }, "j", function() moveWindowToFraction(0, 0.5, 1, 1) end)
