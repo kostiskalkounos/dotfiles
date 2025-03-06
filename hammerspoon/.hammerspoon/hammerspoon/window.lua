@@ -51,8 +51,8 @@ local function moveWindowToFixedSize(width, height)
   win:setFrame({ x = x, y = y, w = width, h = height })
 end
 
-local function moveWindowToFraction(x1, y1, x2, y2)
-  local win = hs.window.focusedWindow()
+local function moveWindowToFraction(x1, y1, x2, y2, win)
+  win = win or hs.window.focusedWindow()
   if not win then return end
 
   local screenFrame = win:screen():frame()
@@ -86,6 +86,24 @@ local function centerWindow()
   local newY = screenFrame.y + (screenFrame.h - winFrame.h) / 2
 
   win:setFrame(hs.geometry.rect(newX, newY, winFrame.w, winFrame.h))
+end
+
+local function maximizeAllWindows()
+  local allWindows = hs.window.allWindows()
+  for _, win in ipairs(allWindows) do
+      if win:isStandard() then
+          win:maximize()
+      end
+  end
+end
+
+local function maximizeAllWindowsWithGap(x1, y1, x2, y2)
+  local allWindows = hs.window.allWindows()
+  for _, win in ipairs(allWindows) do
+      if win:isStandard() then
+          moveWindowToFraction(x1, y1, x2, y2, win)
+      end
+  end
 end
 
 Hyper:bind({}, "[", function() focusScreen(window.focusedWindow():screen():previous()) end)
@@ -126,6 +144,10 @@ Hyper:bind({ "shift" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) e
 Hyper:bind({}, "'", function() moveWindowToFraction(0, 0, 1, 1) end)
 Hyper:bind({}, ";", function() moveWindowToFraction(0, 0, 1, 1) end)
 Hyper:bind({}, "/", function() window.focusedWindow():moveToUnit("[100,0,0,100]") end)
+
+Hyper:bind({ "cmd" }, "'", function() maximizeAllWindowsWithGap(0, 0, 1, 1) end)
+Hyper:bind({ "cmd" }, ";", function() maximizeAllWindowsWithGap(0, 0, 1, 1) end)
+Hyper:bind({ "cmd" }, "/", function() maximizeAllWindows() end)
 
 Hyper:bind({ "cmd" }, "h", function() moveWindowToFraction(0, 0, 0.5, 1) end)
 Hyper:bind({ "cmd" }, "j", function() moveWindowToFraction(0, 0.5, 1, 1) end)
