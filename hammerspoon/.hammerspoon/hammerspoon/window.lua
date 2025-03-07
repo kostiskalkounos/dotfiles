@@ -1,6 +1,8 @@
 local fnutils = require("hs.fnutils")
 local window = require("hs.window")
 
+local blacklist = { "Calendar", "Finder", "Mail", "Notes", "Reminders", "Signal", "Spotify", "WhatsApp" }
+
 local function isInScreen(iScreen, win)
   return win:screen() == iScreen
 end
@@ -90,11 +92,10 @@ end
 
 local function maximizeWindows(x1, y1, x2, y2)
   local allWindows = hs.window.allWindows()
-  local ignoredTitles = { "Calendar", "Finder", "Mail", "Notes", "Reminders", "Signal", "Spotify", "WhatsApp" }
 
   for _, win in ipairs(allWindows) do
     local app = win:application()
-    if win:isStandard() and app and not hs.fnutils.contains(ignoredTitles, app:name()) then
+    if win:isStandard() and app and not fnutils.contains(blacklist, app:name()) then
       if (x1 and y1 and x2 and y2) then
         moveWindowToFraction(x1, y1, x2, y2, win)
       else
@@ -102,6 +103,32 @@ local function maximizeWindows(x1, y1, x2, y2)
       end
     end
   end
+end
+
+local function focusWindowInDirection(direction)
+  local win = hs.window.focusedWindow()
+  if not win then return end
+
+  local allWindows = hs.window.visibleWindows()
+  local focusedScreen = win:screen()
+  local candidateWindows = {}
+
+  for _, w in ipairs(allWindows) do
+    local appName = w:application():name()
+    if not hs.fnutils.contains(blacklist, appName) and w:screen() == focusedScreen then
+      table.insert(candidateWindows, w)
+    end
+  end
+
+  local directionMethods = {
+    east = "focusWindowEast",
+    west = "focusWindowWest",
+    north = "focusWindowNorth",
+    south = "focusWindowSouth",
+  }
+
+  local method = directionMethods[direction]
+  win[method](win, candidateWindows)
 end
 
 Hyper:bind({}, "[", function() focusScreen(window.focusedWindow():screen():previous()) end)
@@ -127,10 +154,10 @@ Hyper:bind({ "alt" }, "]", function()
   end
 end)
 
-Hyper:bind({}, "h", function() window.filter.focusWest() end)
-Hyper:bind({}, "j", function() window.filter.focusSouth() end)
-Hyper:bind({}, "k", function() window.filter.focusNorth() end)
-Hyper:bind({}, "l", function() window.filter.focusEast() end)
+Hyper:bind({}, "h", function() focusWindowInDirection("west") end)
+Hyper:bind({}, "j", function() focusWindowInDirection("south") end)
+Hyper:bind({}, "k", function() focusWindowInDirection("north") end)
+Hyper:bind({}, "l", function() focusWindowInDirection("east") end)
 
 Hyper:bind({ "cmd" }, "p", centerWindow)
 Hyper:bind({}, "p", function() moveWindowToFixedSize(1300, 810) end)
