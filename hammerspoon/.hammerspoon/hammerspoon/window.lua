@@ -1,6 +1,8 @@
 local fnutils = require("hs.fnutils")
 local window = require("hs.window")
 
+local blacklist = { "Calendar", "Finder", "Hammerspoon", "Mail", "Notes", "Reminders", "Signal", "Spotify", "WhatsApp" }
+
 local function isInScreen(iScreen, win)
   return win:screen() == iScreen
 end
@@ -8,15 +10,15 @@ end
 local function focusScreen(iScreen)
   local windows = fnutils.filter(window.orderedWindows(), fnutils.partial(isInScreen, iScreen))
   local windowToFocus = #windows > 0 and windows[1] or window.desktop()
+
   windowToFocus:focus()
 end
 
 local function moveWindowToDisplay(d)
-  return function()
-    local displays = hs.screen.allScreens()
-    local win = window.focusedWindow()
-    win:moveToScreen(displays[d], false, true)
-  end
+  local displays = hs.screen.allScreens()
+  local win = window.focusedWindow()
+
+  win:moveToScreen(displays[d], false, true)
 end
 
 local function resizeWindow(deltaX, deltaY)
@@ -26,6 +28,7 @@ local function resizeWindow(deltaX, deltaY)
   local frame = win:frame()
   frame.w = frame.w + deltaX
   frame.h = frame.h + deltaY
+
   win:setFrame(frame)
 end
 
@@ -36,6 +39,7 @@ local function moveWindow(deltaX, deltaY)
   local frame = win:frame()
   frame.x = frame.x + deltaX
   frame.y = frame.y + deltaY
+
   win:setFrame(frame)
 end
 
@@ -44,7 +48,6 @@ local function moveWindowToFixedSize(width, height)
   if not win then return end
 
   local frame = win:screen():frame()
-
   local x = (frame.w - width) / 2 + frame.x
   local y = (frame.h - height) / 2 + frame.y
 
@@ -55,8 +58,6 @@ local function moveWindowToFraction(x1, y1, x2, y2, win)
   win = win or hs.window.focusedWindow()
   if not win then return end
 
-  local screenFrame = win:screen():frame()
-
   local outerMargin = 3
   local innerMargin = outerMargin / 2
 
@@ -65,6 +66,7 @@ local function moveWindowToFraction(x1, y1, x2, y2, win)
   local topMargin = (y1 == 0) and outerMargin or innerMargin
   local bottomMargin = (y2 == 1) and outerMargin or innerMargin
 
+  local screenFrame = win:screen():frame()
   local newFrame = hs.geometry.rect(
     screenFrame.x + (screenFrame.w * x1) + leftMargin,
     screenFrame.y + (screenFrame.h * y1) + topMargin,
@@ -79,8 +81,8 @@ local function centerWindow()
   local win = hs.window.focusedWindow()
   if not win then return end
 
-  local screenFrame = win:screen():frame()
   local winFrame = win:frame()
+  local screenFrame = win:screen():frame()
 
   local newX = screenFrame.x + (screenFrame.w - winFrame.w) / 2
   local newY = screenFrame.y + (screenFrame.h - winFrame.h) / 2
@@ -90,11 +92,12 @@ end
 
 local function maximizeWindows(x1, y1, x2, y2)
   local allWindows = hs.window.allWindows()
-  local ignoredTitles = { "Calendar", "Finder", "Mail", "Notes", "Reminders", "Signal", "Spotify", "WhatsApp" }
 
   for _, win in ipairs(allWindows) do
     local app = win:application()
-    if win:isStandard() and app and not hs.fnutils.contains(ignoredTitles, app:name()) then
+    local bundleID = win:application():bundleID()
+
+    if win:isStandard() and app and not fnutils.contains(blacklist, app:name()) and bundleID ~= "net.whatsapp.WhatsApp" then
       if (x1 and y1 and x2 and y2) then
         moveWindowToFraction(x1, y1, x2, y2, win)
       else
@@ -104,35 +107,50 @@ local function maximizeWindows(x1, y1, x2, y2)
   end
 end
 
+local function focusWindowInDirection(direction)
+  local win = hs.window.focusedWindow()
+  if not win then return end
+
+  local allWindows = hs.window.visibleWindows()
+  local focusedScreen = win:screen()
+  local candidateWindows = {}
+
+  for _, w in ipairs(allWindows) do
+    local appName = w:application():name()
+    local bundleID = w:application():bundleID()
+
+    if not hs.fnutils.contains(blacklist, appName) and bundleID ~= "net.whatsapp.WhatsApp" and w:screen() == focusedScreen then
+      table.insert(candidateWindows, w)
+    end
+  end
+
+  local directionMethods = {
+    east = "focusWindowEast",
+    west = "focusWindowWest",
+    north = "focusWindowNorth",
+    south = "focusWindowSouth",
+  }
+
+  local method = directionMethods[direction]
+  win[method](win, candidateWindows)
+end
+
 Hyper:bind({}, "[", function() focusScreen(window.focusedWindow():screen():previous()) end)
 Hyper:bind({}, "]", function() focusScreen(window.focusedWindow():screen():next()) end)
 
-Hyper:bind({ "alt" }, "1", moveWindowToDisplay(1))
-Hyper:bind({ "alt" }, "2", moveWindowToDisplay(2))
-Hyper:bind({ "alt" }, "3", moveWindowToDisplay(3))
+Hyper:bind({ "alt" }, "1", function() moveWindowToDisplay(1) end)
+Hyper:bind({ "alt" }, "2", function() moveWindowToDisplay(2) end)
+Hyper:bind({ "alt" }, "3", function() moveWindowToDisplay(3) end)
 
-Hyper:bind({ "alt" }, "[", function()
-  if window.focusedWindow():moveOneScreenWest() then
-    window.focusedWindow():moveOneScreenWest()
-  else
-    window.focusedWindow():moveOneScreenEast()
-  end
-end)
+Hyper:bind({ "alt" }, "[", function() if window.focusedWindow():moveOneScreenWest() then window.focusedWindow():moveOneScreenWest() else window.focusedWindow():moveOneScreenEast() end end)
+Hyper:bind({ "alt" }, "]", function() if window.focusedWindow():moveOneScreenEast() then window.focusedWindow():moveOneScreenEast() else window.focusedWindow():moveOneScreenWest() end end)
 
-Hyper:bind({ "alt" }, "]", function()
-  if window.focusedWindow():moveOneScreenEast() then
-    window.focusedWindow():moveOneScreenEast()
-  else
-    window.focusedWindow():moveOneScreenWest()
-  end
-end)
+Hyper:bind({}, "h", function() focusWindowInDirection("west") end)
+Hyper:bind({}, "j", function() focusWindowInDirection("south") end)
+Hyper:bind({}, "k", function() focusWindowInDirection("north") end)
+Hyper:bind({}, "l", function() focusWindowInDirection("east") end)
 
-Hyper:bind({}, "h", function() window.filter.focusWest() end)
-Hyper:bind({}, "j", function() window.filter.focusSouth() end)
-Hyper:bind({}, "k", function() window.filter.focusNorth() end)
-Hyper:bind({}, "l", function() window.filter.focusEast() end)
-
-Hyper:bind({ "cmd" }, "p", centerWindow)
+Hyper:bind({ "cmd" }, "p", function() centerWindow() end)
 Hyper:bind({}, "p", function() moveWindowToFixedSize(1300, 810) end)
 
 Hyper:bind({ "alt" }, "p", function() moveWindowToFraction(0.33, 0, 0.67, 1) end)
