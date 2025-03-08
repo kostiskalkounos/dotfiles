@@ -12,6 +12,18 @@ alias gll='git log --graph --topo-order --abbrev-commit --date=short --decorate 
 alias gr='git rebase'
 alias gs='git status -sb'
 alias gt='git checkout'
+
+alias k='kubectl'
+alias ka='kubectl apply -f'
+alias kd='kubectl describe'
+alias ke='kubectl exex -it'
+alias kg='kubectl get'
+alias kgd='kubectl get deployments'
+alias kgp='kubectl get pods'
+alias kl='kubectl logs -f'
+alias ks='kubens'
+alias kx='kubectx'
+
 alias la='ls -lah'
 alias ll='ls -lh'
 alias ls='ls -G'
@@ -19,6 +31,7 @@ alias mvni='mvn clean install -DskipTests -T 1.5C -U'
 alias pip=pip3
 alias python=python3
 alias sudo='sudo '
+alias v=vi
 alias vi=vim
 
 if command -v nvim &> /dev/null; then
