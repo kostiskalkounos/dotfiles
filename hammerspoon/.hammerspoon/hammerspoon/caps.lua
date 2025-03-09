@@ -1,5 +1,8 @@
 -- Remap caps to ctrl in settings before using
 
+local eventtap = require("hs.eventtap")
+local timer = require("hs.timer")
+
 local sendEscape = false
 local lastMods = {}
 
@@ -7,7 +10,7 @@ local function controlKeyHandler()
   sendEscape = false
 end
 
-local controlKeyTimer = hs.timer.delayed.new(0.3, controlKeyHandler)
+local controlKeyTimer = timer.delayed.new(0.3, controlKeyHandler)
 
 local function controlHandler(evt)
   local newMods = evt:getFlags()
@@ -24,15 +27,15 @@ local function controlHandler(evt)
     if sendEscape then
       return true,
         {
-          hs.eventtap.event.newKeyEvent({}, "escape", true),
-          hs.eventtap.event.newKeyEvent({}, "escape", false),
+          eventtap.event.newKeyEvent({}, "escape", true),
+          eventtap.event.newKeyEvent({}, "escape", false),
         }
     end
   end
   return false
 end
 
-local controlTap = hs.eventtap.new({ hs.eventtap.event.types.flagsChanged }, controlHandler)
+local controlTap = eventtap.new({ eventtap.event.types.flagsChanged }, controlHandler)
 controlTap:start()
 
 return {

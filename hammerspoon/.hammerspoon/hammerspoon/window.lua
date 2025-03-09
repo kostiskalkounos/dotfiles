@@ -1,4 +1,6 @@
 local fnutils = require("hs.fnutils")
+local geometry = require("hs.geometry")
+local screen = require("hs.screen")
 local window = require("hs.window")
 
 local blacklist = { "Calendar", "Finder", "Hammerspoon", "Mail", "Notes", "Reminders", "Signal", "Spotify", "WhatsApp" }
@@ -15,14 +17,14 @@ local function focusScreen(iScreen)
 end
 
 local function moveWindowToDisplay(d)
-  local displays = hs.screen.allScreens()
+  local displays = screen.allScreens()
   local win = window.focusedWindow()
 
   win:moveToScreen(displays[d], false, true)
 end
 
 local function resizeWindow(deltaX, deltaY)
-  local win = hs.window.focusedWindow()
+  local win = window.focusedWindow()
   if not win then return end
 
   local frame = win:frame()
@@ -33,7 +35,7 @@ local function resizeWindow(deltaX, deltaY)
 end
 
 local function moveWindow(deltaX, deltaY)
-  local win = hs.window.focusedWindow()
+  local win = window.focusedWindow()
   if not win then return end
 
   local frame = win:frame()
@@ -44,7 +46,7 @@ local function moveWindow(deltaX, deltaY)
 end
 
 local function moveWindowToFixedSize(width, height)
-  local win = hs.window.focusedWindow()
+  local win = window.focusedWindow()
   if not win then return end
 
   local frame = win:screen():frame()
@@ -55,7 +57,7 @@ local function moveWindowToFixedSize(width, height)
 end
 
 local function moveWindowToFraction(x1, y1, x2, y2, win)
-  win = win or hs.window.focusedWindow()
+  win = win or window.focusedWindow()
   if not win then return end
 
   local outerMargin = 3
@@ -67,7 +69,7 @@ local function moveWindowToFraction(x1, y1, x2, y2, win)
   local bottomMargin = (y2 == 1) and outerMargin or innerMargin
 
   local screenFrame = win:screen():frame()
-  local newFrame = hs.geometry.rect(
+  local newFrame = geometry.rect(
     screenFrame.x + (screenFrame.w * x1) + leftMargin,
     screenFrame.y + (screenFrame.h * y1) + topMargin,
     (screenFrame.w * (x2 - x1)) - (leftMargin + rightMargin),
@@ -78,7 +80,7 @@ local function moveWindowToFraction(x1, y1, x2, y2, win)
 end
 
 local function centerWindow()
-  local win = hs.window.focusedWindow()
+  local win = window.focusedWindow()
   if not win then return end
 
   local winFrame = win:frame()
@@ -87,11 +89,11 @@ local function centerWindow()
   local newX = screenFrame.x + (screenFrame.w - winFrame.w) / 2
   local newY = screenFrame.y + (screenFrame.h - winFrame.h) / 2
 
-  win:setFrame(hs.geometry.rect(newX, newY, winFrame.w, winFrame.h))
+  win:setFrame(geometry.rect(newX, newY, winFrame.w, winFrame.h))
 end
 
 local function maximizeWindows(x1, y1, x2, y2)
-  local allWindows = hs.window.allWindows()
+  local allWindows = window.allWindows()
 
   for _, win in ipairs(allWindows) do
     local app = win:application()
@@ -108,10 +110,10 @@ local function maximizeWindows(x1, y1, x2, y2)
 end
 
 local function focusWindowInDirection(direction)
-  local win = hs.window.focusedWindow()
+  local win = window.focusedWindow()
   if not win then return end
 
-  local allWindows = hs.window.visibleWindows()
+  local allWindows = window.visibleWindows()
   local focusedScreen = win:screen()
   local candidateWindows = {}
 
@@ -119,7 +121,7 @@ local function focusWindowInDirection(direction)
     local appName = w:application():name()
     local bundleID = w:application():bundleID()
 
-    if not hs.fnutils.contains(blacklist, appName) and bundleID ~= "net.whatsapp.WhatsApp" and w:screen() == focusedScreen then
+    if not fnutils.contains(blacklist, appName) and bundleID ~= "net.whatsapp.WhatsApp" and w:screen() == focusedScreen then
       table.insert(candidateWindows, w)
     end
   end
