@@ -22,6 +22,32 @@ alias kl='kubectl logs -f'
 alias ks='kubens'
 alias kx='kubectx'
 
+alias d='docker'
+alias dc='docker compose'
+
+alias dps='docker ps'
+alias dpa='docker ps -a'
+alias di='docker images'
+alias drm='docker rm -f'
+alias drmi='docker rmi -f'
+alias dstop='docker stop'
+alias dstart='docker start'
+alias drestart='docker restart'
+
+alias dlogs='docker logs -f'
+alias dexec='docker exec -it'
+alias dsh='docker exec -it $1 sh'
+alias dbash='docker exec -it $1 bash'
+
+alias dcu='docker compose up -d'
+alias dcd='docker compose down'
+alias dcr='docker compose restart'
+alias dcl='docker compose logs -f'
+
+alias dprune='docker system prune -af'
+alias dvolrm='docker volume rm $(docker volume ls -q)'
+alias dnetrm='docker network rm $(docker network ls -q)'
+
 alias la='ls -lah'
 alias ld='lazydocker'
 alias lg='lazygit'
