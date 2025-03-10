@@ -1,7 +1,5 @@
 bindkey -e
 
-alias brewu='brew update && brew upgrade -g && brew cleanup'
-alias di='dirs -v'
 alias ga='git add'
 alias gb='git branch'
 alias gc='git commit'
@@ -24,7 +22,10 @@ alias kl='kubectl logs -f'
 alias ks='kubens'
 alias kx='kubectx'
 
+alias brewu='brew update && brew upgrade -g && brew cleanup'
 alias la='ls -lah'
+alias ld='lazydocker'
+alias lg='lazygit'
 alias ll='ls -lh'
 alias ls='ls -G'
 alias mvni='mvn clean install -DskipTests -T 1.5C -U'
