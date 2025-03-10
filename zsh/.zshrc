@@ -1,6 +1,5 @@
 bindkey -e
 
-alias brewu='brew update && brew upgrade -g && brew cleanup'
 alias ga='git add'
 alias gb='git branch'
 alias gc='git commit'
@@ -23,11 +22,39 @@ alias kl='kubectl logs -f'
 alias ks='kubens'
 alias kx='kubectx'
 
+alias d='docker'
+alias dc='docker compose'
+
+alias dps='docker ps'
+alias dpa='docker ps -a'
+alias di='docker images'
+alias drm='docker rm -f'
+alias drmi='docker rmi -f'
+alias dstop='docker stop'
+alias dstart='docker start'
+alias drestart='docker restart'
+
+alias dlogs='docker logs -f'
+alias dexec='docker exec -it'
+alias dsh='docker exec -it $1 sh'
+alias dbash='docker exec -it $1 bash'
+
+alias dcu='docker compose up -d'
+alias dcd='docker compose down'
+alias dcr='docker compose restart'
+alias dcl='docker compose logs -f'
+
+alias dprune='docker system prune -af'
+alias dvolrm='docker volume rm $(docker volume ls -q)'
+alias dnetrm='docker network rm $(docker network ls -q)'
+
 alias la='ls -lah'
 alias ld='lazydocker'
 alias lg='lazygit'
 alias ll='ls -lh'
-alias ls='ls -G'
+alias ls='gls --color=auto --group-directories-first'
+
+alias brewu='brew update && brew upgrade -g && brew cleanup'
 alias mvni='mvn clean install -DskipTests -T 1.5C -U'
 alias pip=pip3
 alias python=python3
@@ -123,6 +150,7 @@ zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)
 
 export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 
+export HOMEBREW_NO_ANALYTICS=1
 export JAVA_HOME=$(/usr/libexec/java_home)
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/.ripgreprc"
 
@@ -153,13 +181,12 @@ if [[ ! "$PATH" == */usr/local/opt/fzf/bin* ]]; then
   export PATH="${PATH:+${PATH}:}/usr/local/opt/fzf/bin"
 fi
 
-[[ $- == *i* ]] && source "/usr/local/opt/fzf/shell/completion.zsh" 2> /dev/null
-source "/usr/local/opt/fzf/shell/key-bindings.zsh"
-
+source <(fzf --zsh)
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_HIGHLIGHTERS+=(brackets pattern)
-ZSH_HIGHLIGHT_STYLES[arg0]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[arg0]='fg=magenta'
 ZSH_HIGHLIGHT_STYLES[autodirectory]='none'
 ZSH_HIGHLIGHT_STYLES[path]='none'
 ZSH_HIGHLIGHT_STYLES[precommand]='fg=green'
@@ -174,3 +201,4 @@ if test -n "$KITTY_INSTALLATION_DIR"; then
   kitty-integration
   unfunction kitty-integration
 fi
+
