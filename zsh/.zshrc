@@ -22,12 +22,13 @@ alias kl='kubectl logs -f'
 alias ks='kubens'
 alias kx='kubectx'
 
-alias brewu='brew update && brew upgrade -g && brew cleanup'
 alias la='ls -lah'
 alias ld='lazydocker'
 alias lg='lazygit'
 alias ll='ls -lh'
-alias ls='ls -G'
+alias ls='gls --color=auto --group-directories-first'
+
+alias brewu='brew update && brew upgrade -g && brew cleanup'
 alias mvni='mvn clean install -DskipTests -T 1.5C -U'
 alias pip=pip3
 alias python=python3
@@ -132,7 +133,7 @@ source /opt/homebrew/Cellar/zsh-syntax-highlighting/*/share/zsh-syntax-highlight
 
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_HIGHLIGHTERS+=(brackets pattern)
-ZSH_HIGHLIGHT_STYLES[arg0]='fg=#c6a0f6'
+ZSH_HIGHLIGHT_STYLES[arg0]='fg=magenta'
 ZSH_HIGHLIGHT_STYLES[autodirectory]='none'
 ZSH_HIGHLIGHT_STYLES[path]='none'
 ZSH_HIGHLIGHT_STYLES[precommand]='fg=green'
