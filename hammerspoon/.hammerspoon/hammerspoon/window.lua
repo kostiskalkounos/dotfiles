@@ -3,7 +3,12 @@ local geometry = require("hs.geometry")
 local screen = require("hs.screen")
 local window = require("hs.window")
 
-local blacklist = { "Calendar", "Finder", "Hammerspoon", "Mail", "Notes", "Reminders", "Signal", "Spotify", "WhatsApp" }
+local whitelist = {
+  "Brave Browser",
+  "Ghostty",
+  "Safari",
+  "kitty",
+}
 
 local function isInScreen(iScreen, win)
   return win:screen() == iScreen
@@ -97,9 +102,8 @@ local function maximizeWindows(x1, y1, x2, y2)
 
   for _, win in ipairs(allWindows) do
     local app = win:application()
-    local bundleID = win:application():bundleID()
 
-    if win:isStandard() and app and not fnutils.contains(blacklist, app:name()) and bundleID ~= "net.whatsapp.WhatsApp" then
+    if win:isStandard() and app and fnutils.contains(whitelist, app:name()) then
       if (x1 and y1 and x2 and y2) then
         moveWindowToFraction(x1, y1, x2, y2, win)
       else
@@ -119,9 +123,8 @@ local function focusWindowInDirection(direction)
 
   for _, w in ipairs(allWindows) do
     local appName = w:application():name()
-    local bundleID = w:application():bundleID()
 
-    if not fnutils.contains(blacklist, appName) and bundleID ~= "net.whatsapp.WhatsApp" and w:screen() == focusedScreen then
+    if fnutils.contains(whitelist, appName) and w:screen() == focusedScreen then
       table.insert(candidateWindows, w)
     end
   end

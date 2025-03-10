@@ -1,4 +1,5 @@
 local hotkey = require("hs.hotkey")
+
 local hyper = hotkey.modal.new({}, "F17")
 
 local function pressed() hyper:enter() end
