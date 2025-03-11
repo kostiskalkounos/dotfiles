@@ -22,6 +22,28 @@ alias kl='kubectl logs -f'
 alias ks='kubens'
 alias kx='kubectx'
 
+alias p='podman'
+alias ps='podman ps'
+alias pa='podman ps -a'
+alias pi='podman images'
+alias prm='podman rm -f'
+alias prmi='podman rmi -f'
+alias pstop='podman stop'
+alias pstart='podman start'
+alias prestart='podman restart'
+alias pprune='podman system prune -af'
+
+alias pl='podman logs -f'
+alias pexec='podman exec -it'
+alias psh='podman exec -it $1 sh'
+alias pbash='podman exec -it $1 bash'
+
+alias pc='podman-compose'
+alias pcu='podman-compose up -d'
+alias pcd='podman-compose down'
+alias pcl='podman-compose logs -f'
+alias pcr='podman-compose restart'
+
 alias d='docker'
 alias dc='docker compose'
 
