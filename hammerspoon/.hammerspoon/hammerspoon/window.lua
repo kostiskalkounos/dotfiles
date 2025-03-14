@@ -162,13 +162,11 @@ Hyper:bind({ "alt" }, "p", function() moveWindowToFraction(0.33, 0, 0.67, 1) end
 Hyper:bind({ "ctrl" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) end)
 Hyper:bind({ "shift" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) end)
 
-Hyper:bind({}, "'", function() moveWindowToFraction(0, 0, 1, 1) end)
+Hyper:bind({}, "'", function() window.focusedWindow():moveToUnit("[100,0,0,100]") end)
 Hyper:bind({}, ";", function() moveWindowToFraction(0, 0, 1, 1) end)
-Hyper:bind({}, "/", function() window.focusedWindow():moveToUnit("[100,0,0,100]") end)
 
-Hyper:bind({ "cmd" }, "'", function() maximizeWindows(0, 0, 1, 1) end)
+Hyper:bind({ "cmd" }, "'", function() maximizeWindows() end)
 Hyper:bind({ "cmd" }, ";", function() maximizeWindows(0, 0, 1, 1) end)
-Hyper:bind({ "cmd" }, "/", function() maximizeWindows() end)
 
 Hyper:bind({ "cmd" }, "h", function() moveWindowToFraction(0, 0, 0.5, 1) end)
 Hyper:bind({ "cmd" }, "j", function() moveWindowToFraction(0, 0.5, 1, 1) end)

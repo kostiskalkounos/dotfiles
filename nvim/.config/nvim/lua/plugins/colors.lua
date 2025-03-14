@@ -8,8 +8,8 @@ return {
   },
   config = function()
     require("catppuccin").setup({
-      flavour = "macchiato", -- latte, frappe, macchiato, mocha
-      background = { -- :h background
+      flavour = "auto",
+      background = {
         light = "latte",
         dark = "macchiato",
       },
@@ -21,6 +21,24 @@ return {
         },
       },
       highlight_overrides = {
+        latte = function(latte)
+          return {
+            ["@attribute"] = { fg = latte.sapphire },
+            ["@constant"] = { fg = latte.teal },
+            ["@constructor"] = { fg = latte.peach },
+            ["@function.builtin"] = { fg = latte.sapphire },
+            ["@keyword.operator"] = { fg = latte.mauve },
+            ["@module"] = { fg = latte.sapphire },
+            ["@variable.builtin"] = { fg = latte.mauve },
+            ["@variable.member"] = { fg = latte.lavender },
+            ["@variable.parameter"] = { fg = latte.text },
+
+            ["@lsp.mod.constructor"] = { fg = latte.peach },
+            ["@lsp.type.annotationMember"] = { fg = latte.flamingo },
+            ["@lsp.type.interface"] = { fg = latte.sapphire },
+            ["@lsp.type.parameter"] = { fg = latte.text },
+          }
+        end,
         macchiato = function(macchiato)
           return {
             ["@attribute"] = { fg = macchiato.sapphire },
@@ -45,8 +63,8 @@ return {
     local M = {}
     function M.theme()
       local colors = {
-        bg = "#24273a",
-        fg = "#cad3f5",
+        bg = "", -- "#24273a",
+        fg = "", -- "#cad3f5",
         inactive = "#6e738d",
       }
 
@@ -92,8 +110,6 @@ return {
     require("lualine").setup({
       options = {
         icons_enabled = true,
-        -- theme = "onedark",
-        -- theme = "catppuccin",
         theme = M.theme(),
         component_separators = { left = "", right = "" },
         section_separators = { left = "", right = "" },
