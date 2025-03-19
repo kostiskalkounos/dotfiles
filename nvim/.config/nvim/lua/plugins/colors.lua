@@ -30,12 +30,11 @@ return {
             ["@keyword.operator"] = { fg = latte.mauve },
             ["@module"] = { fg = latte.sapphire },
             ["@variable.builtin"] = { fg = latte.mauve },
-            ["@variable.member"] = { fg = latte.lavender },
+            ["@variable.member"] = { fg = latte.pink },
             ["@variable.parameter"] = { fg = latte.text },
 
             ["@lsp.mod.constructor"] = { fg = latte.peach },
             ["@lsp.type.annotationMember"] = { fg = latte.flamingo },
-            ["@lsp.type.interface"] = { fg = latte.sapphire },
             ["@lsp.type.parameter"] = { fg = latte.text },
           }
         end,

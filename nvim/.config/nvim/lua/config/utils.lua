@@ -1,7 +1,7 @@
 local M = {}
 
 local function count_bufs_by_type(loaded_only)
-  loaded_only = (loaded_only == nil and true or loaded_only)
+  loaded_only = loaded_only ~= false
 
   local count = {
     acwrite = 0,
@@ -14,13 +14,10 @@ local function count_bufs_by_type(loaded_only)
     terminal = 0,
   }
 
-  local buftypes = vim.api.nvim_list_bufs()
-
-  for _, bufname in pairs(buftypes) do
-    if (not loaded_only) or vim.api.nvim_buf_is_loaded(bufname) then
-      local buftype = vim.api.nvim_buf_get_option(bufname, "buftype")
-      buftype = buftype ~= "" and buftype or "normal"
-      count[buftype] = count[buftype] + 1
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if not loaded_only or vim.api.nvim_buf_is_loaded(buf) then
+      local buftype = vim.api.nvim_buf_get_option(buf, "buftype")
+      count[buftype == "" and "normal" or buftype] = count[buftype == "" and "normal" or buftype] + 1
     end
   end
 
@@ -28,12 +25,22 @@ local function count_bufs_by_type(loaded_only)
 end
 
 function M.close_buffer()
-  local bufTable = count_bufs_by_type()
+  local current_buf = vim.api.nvim_get_current_buf()
 
-  if bufTable.normal <= 1 then
-    vim.api.nvim_exec([[:q]], true)
+  if vim.api.nvim_buf_get_option(current_buf, "modified") then
+    local bufnr = vim.api.nvim_get_current_buf()
+    local filename = vim.api.nvim_buf_get_name(bufnr)
+    if filename == "" then
+      filename = "buffer" .. tostring(bufnr)
+    end
+    vim.api.nvim_echo({ { "Unsaved changes in " .. filename, "MoreMsg" } }, true, {})
   else
-    vim.api.nvim_exec([[:bd]], true)
+    local buf_counts = count_bufs_by_type()
+    if buf_counts.normal <= 1 then
+      vim.cmd.q()
+    else
+      vim.cmd.bd()
+    end
   end
 end
 
