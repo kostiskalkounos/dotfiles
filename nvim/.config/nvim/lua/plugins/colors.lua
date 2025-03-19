@@ -30,7 +30,7 @@ return {
             ["@keyword.operator"] = { fg = latte.mauve },
             ["@module"] = { fg = latte.sapphire },
             ["@variable.builtin"] = { fg = latte.mauve },
-            ["@variable.member"] = { fg = latte.lavender },
+            ["@variable.member"] = { fg = latte.pink },
             ["@variable.parameter"] = { fg = latte.text },
 
             ["@lsp.mod.constructor"] = { fg = latte.peach },

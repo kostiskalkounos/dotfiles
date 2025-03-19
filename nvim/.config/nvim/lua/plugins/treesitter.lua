@@ -90,6 +90,7 @@ return {
         },
       })
 
+      vim.api.nvim_set_hl(0, "@lsp.type.property.java", { link = "@variable.member" })
       vim.api.nvim_set_hl(0, "@lsp.typemod.property.static.java", { link = "@constant" })
 
       -- -- Disable semantic highlighting for all tokens
