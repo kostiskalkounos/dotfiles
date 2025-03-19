@@ -68,6 +68,12 @@ return {
           type = "java",
           request = "launch",
           vmArgs = "" .. "-Xmx2g ",
+          env = function()
+            local java_version = require("config.java").getJavaVersion()
+            if java_version then
+              vim.env.JAVA_HOME = vim.fn.systemlist("/usr/libexec/java_home -v " .. java_version)[1]
+            end
+          end,
         },
         {
           name = "Debug Attach (5005)",
