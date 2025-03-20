@@ -90,8 +90,8 @@ return {
         },
       })
 
-      vim.api.nvim_set_hl(0, "@lsp.type.property.java", { link = "@variable.member" })
-      vim.api.nvim_set_hl(0, "@lsp.typemod.property.static.java", { link = "@constant" })
+      vim.api.nvim_set_hl(0, "@lsp.type.property", { link = "@variable.member" })
+      vim.api.nvim_set_hl(0, "@lsp.typemod.property.static", { link = "@constant" })
 
       -- -- Disable semantic highlighting for all tokens
       -- for _, group in ipairs(vim.fn.getcompletion("@lsp", "highlight")) do
