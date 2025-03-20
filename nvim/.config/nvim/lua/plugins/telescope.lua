@@ -41,11 +41,7 @@ return {
           ".clangd",
           ".git",
           ".venv",
-          "build",
           "node_modules",
-          "package-lock.json",
-          "vendor",
-          "yarn.lock",
         },
       },
       extensions = {

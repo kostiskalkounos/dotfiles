@@ -52,7 +52,7 @@ local config = {
         enabled = false,
       },
       configuration = {
-        updateBuildConfiguration = "interactive",
+        updateBuildConfiguration = "automatic",
         runtimes = {
           {
             name = "JavaSE-23",
