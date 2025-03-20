@@ -2,13 +2,13 @@ return {
   "hrsh7th/nvim-cmp",
   event = "InsertEnter",
   dependencies = {
-    { "L3MON4D3/LuaSnip" },
-    { "hrsh7th/cmp-buffer" },
-    { "hrsh7th/cmp-nvim-lsp" },
-    { "hrsh7th/cmp-path" },
-    { "rafamadriz/friendly-snippets" },
-    { "saadparwaiz1/cmp_luasnip" },
-    { "windwp/nvim-autopairs" },
+    "L3MON4D3/LuaSnip",
+    "hrsh7th/cmp-buffer",
+    "hrsh7th/cmp-nvim-lsp",
+    "hrsh7th/cmp-path",
+    "rafamadriz/friendly-snippets",
+    "saadparwaiz1/cmp_luasnip",
+    "windwp/nvim-autopairs",
   },
   config = function()
     local rhs = function(rhs_str)
@@ -247,7 +247,7 @@ return {
     })
 
     require("nvim-autopairs").setup({
-      check_ts = true, -- treesitter integration
+      check_ts = true,
       disable_filetype = { "TelescopePrompt" },
       ts_config = {
         lua = { "string", "source" },
@@ -258,7 +258,7 @@ return {
         map = "<M-e>",
         chars = { "{", "[", "(", '"', "'" },
         pattern = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], "%s+", ""),
-        offset = 0, -- Offset from pattern match
+        offset = 0,
         end_key = "$",
         keys = "qwertyuiopzxcvbnmasdfghjkl",
         check_comma = true,

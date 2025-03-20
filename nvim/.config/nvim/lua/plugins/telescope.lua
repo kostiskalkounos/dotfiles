@@ -1,11 +1,11 @@
 return {
   "nvim-telescope/telescope.nvim",
-  cmd = { "Telescope" },
+  cmd = "Telescope",
   dependencies = {
-    { "nvim-lua/plenary.nvim" },
-    { "nvim-lua/popup.nvim" },
+    "nvim-lua/plenary.nvim",
+    "nvim-lua/popup.nvim",
+    "nvim-treesitter/nvim-treesitter",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
-    { "nvim-treesitter/nvim-treesitter" },
   },
   config = function()
     local actions = require("telescope.actions")
@@ -28,24 +28,12 @@ return {
           },
         },
         file_ignore_patterns = {
-          "%.a",
-          "%.class",
-          "%.mkv",
-          "%.mp4",
-          "%.o",
-          "%.out",
-          "%.pdf",
-          "%.zip",
           ".DS_Store",
           ".cache",
           ".clangd",
           ".git",
           ".venv",
-          "build",
           "node_modules",
-          "package-lock.json",
-          "vendor",
-          "yarn.lock",
         },
       },
       extensions = {
