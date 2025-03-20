@@ -1,73 +1,93 @@
 return {
+  "mfussenegger/nvim-jdtls",
   { "folke/neodev.nvim", ft = "lua" },
-  { "mfussenegger/nvim-jdtls" },
-  { "stevearc/conform.nvim" },
+  { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
+  { "stevearc/conform.nvim", event = "BufWritePre" },
   { "towolf/vim-helm", ft = "helm" },
+  {
+    "j-hui/fidget.nvim",
+    event = "LspAttach",
+    opts = {
+      text = { spinner = "star" },
+      window = { relative = "editor" },
+    },
+    tag = "legacy",
+  },
+  {
+    "jay-babu/mason-nvim-dap.nvim",
+    cmd = { "DapInstall", "DapUninstall" },
+    config = function()
+      require("mason-nvim-dap").setup({
+        ensure_installed = { "delve", "java-debug-adapter", "java-test" },
+        automatic_installation = true,
+        handlers = {
+          function(config)
+            require("mason-nvim-dap").default_setup(config)
+          end,
+        },
+      })
+    end,
+  },
   {
     "williamboman/mason.nvim",
     cmd = "Mason",
     dependencies = {
-      "jay-babu/mason-nvim-dap.nvim",
       "williamboman/mason-lspconfig.nvim",
       {
         "neovim/nvim-lspconfig",
         event = "BufReadPost",
         config = function()
-          require("config.handlers").setup()
-          require("mason").setup()
-
+          local handlers = require("config.handlers")
+          local mason = require("mason")
           local mason_lspconfig = require("mason-lspconfig")
+          local lspconfig = require("lspconfig")
+          mason.setup()
 
-          local capabilities = require("config.handlers").capabilities
-          local on_attach = require("config.handlers").on_attach
+          local servers_to_install = {
+            "bashls",
+            "clangd",
+            "cssls",
+            "dockerls",
+            "eslint",
+            "gopls",
+            "helm_ls",
+            "html",
+            "jdtls",
+            "jsonls",
+            "lemminx",
+            "lua_ls",
+            "pyright",
+            "rust_analyzer",
+            "taplo",
+            "terraformls",
+            "ts_ls",
+            "vimls",
+            "yamlls",
+          }
 
-          local servers = {
-            bashls = {},
-            clangd = {},
-            cssls = {},
-            dockerls = {},
-            eslint = {},
-            gopls = {},
-            helm_ls = {},
-            html = {},
-            jdtls = {},
-            jsonls = {},
-            lemminx = {},
+          local servers_settings = {
             lua_ls = {
               Lua = {
-                diagnostics = {
-                  globals = { "hs", "vim", "jit" },
-                },
+                diagnostics = { globals = { "hs", "vim", "jit" } },
                 telemetry = { enable = false },
                 workspace = { checkThirdParty = false },
               },
             },
-            pyright = {},
-            rust_analyzer = {},
-            taplo = {},
-            terraformls = {},
-            ts_ls = {},
-            vimls = {},
-            yamlls = {},
           }
 
-          require("mason-nvim-dap").setup({
-            ensure_installed = { "java-debug-adapter", "java-test" },
-          })
-
           mason_lspconfig.setup({
-            ensure_installed = vim.tbl_keys(servers),
+            ensure_installed = servers_to_install,
             automatic_installation = true,
           })
 
           mason_lspconfig.setup_handlers({
             function(server_name)
               if server_name ~= "jdtls" then
-                require("lspconfig")[server_name].setup({
-                  capabilities = capabilities,
-                  on_attach = on_attach,
-                  settings = servers[server_name],
-                  filetypes = (servers[server_name] or {}).filetypes,
+                lspconfig[server_name].setup({
+                  handlers.setup(),
+                  capabilities = handlers.capabilities,
+                  on_attach = handlers.on_attach,
+                  settings = servers_settings[server_name],
                 })
               end
             end,
@@ -84,34 +104,14 @@ return {
               if vim.g.disable_autoformat then
                 return
               end
-              return { timeout_ms = 500, lsp_format = "fallback", quiet = "true" }
+              return { timeout_ms = 500, lsp_format = "fallback", quiet = true }
             end,
           })
 
           vim.api.nvim_create_user_command("FormatToggle", function()
             vim.g.disable_autoformat = not vim.g.disable_autoformat
-            print("Setting autoformatting to: " .. tostring(not vim.g.disable_autoformat))
+            print("Autoformatting: " .. tostring(not vim.g.disable_autoformat))
           end, {})
-        end,
-      },
-      {
-        "j-hui/fidget.nvim",
-        config = function()
-          require("fidget").setup({
-            text = {
-              spinner = "star",
-            },
-            window = {
-              relative = "editor",
-            },
-          })
-        end,
-        tag = "legacy",
-      },
-      {
-        "lewis6991/gitsigns.nvim",
-        config = function()
-          require("gitsigns").setup()
         end,
       },
     },
