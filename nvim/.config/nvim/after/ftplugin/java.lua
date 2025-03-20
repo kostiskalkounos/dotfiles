@@ -14,10 +14,8 @@ extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 
 -- See `:help vim.lsp.start_client` for an overview of the supported `config` options.
 local config = {
-  -- See: https://github.com/eclipse/eclipse.jdt.ls#running-from-the-command-line
   cmd = {
     "java",
-    --'-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005',
     "-Declipse.application=org.eclipse.jdt.ls.core.id1",
     "-Dosgi.bundles.defaultStartLevel=4",
     "-Declipse.product=org.eclipse.jdt.ls.core.product",
@@ -57,29 +55,17 @@ local config = {
         updateBuildConfiguration = "interactive",
         runtimes = {
           {
-            name = "JavaSE-11",
-            path = os.getenv("JDK11"),
+            name = "JavaSE-23",
+            path = vim.fn.systemlist("(/usr/libexec/java_home -v 23)")[1],
           },
           {
             name = "JavaSE-17",
-            path = os.getenv("JDK17"),
+            path = vim.fn.systemlist("(/usr/libexec/java_home -v 17)")[1],
           },
           {
-            name = "JavaSE-21",
-            path = os.getenv("JDK21"),
+            name = "JavaSE-1.8",
+            path = vim.fn.systemlist("(/usr/libexec/java_home -v 1.8)")[1],
           },
-          {
-            name = "JavaSE-22",
-            path = os.getenv("JDK22"),
-          },
-          -- {
-          --   name = "JavaSE-18",
-          --   path = home .. "/.m2/jdks/jdk-18.0.2.1+1/",
-          -- },
-          -- {
-          --   name = "JavaSE-15",
-          --   path = home .. "/.sdkman/candidates/java/15.0.1-open/",
-          -- },
         },
       },
       contentProvider = {
@@ -99,7 +85,7 @@ local config = {
       maven = {
         downloadSources = true,
       },
-      maxConcurrentBuilds = 1,
+      maxConcurrentBuilds = 4,
       references = {
         includeDecompiledSources = true,
       },
@@ -160,9 +146,17 @@ config["on_attach"] = function(client, bufnr)
   jdtls.setup_dap({ hotcodereplace = "auto" })
   require("jdtls.dap").setup_dap_main_class_configs()
 
+  local function runTests(fn)
+    local java_version = require("config.java").getJavaVersion()
+    if java_version then
+      vim.env.JAVA_HOME = vim.fn.systemlist("/usr/libexec/java_home -v " .. java_version)[1]
+    end
+    fn()
+  end
+
   local default = { noremap = true, silent = true }
-  vim.keymap.set("n", "<F9>", "<cmd>lua require('jdtls').test_class()<CR>", default)
-  vim.keymap.set("n", "<F10>", "<cmd>lua require('jdtls').test_nearest_method()<CR>", default)
+  vim.keymap.set("n", "<F9>", function() runTests(require("jdtls").test_class) end, default)
+  vim.keymap.set("n", "<F10>", function() runTests(require("jdtls").test_nearest_method) end, default)
 end
 
 jdtls.start_or_attach(config)
