@@ -1,54 +1,41 @@
-_G.termesc = {}
+local M = {}
 
 local function t(str)
   return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
 
-function _G.termesc.smart_esc(term_pid)
-  local function find_process(pid)
-    local p = vim.api.nvim_get_proc(pid)
-    if _G.termesc.except[p.name] then
+local function find_process(pid, except)
+  local p = vim.api.nvim_get_proc(pid)
+  if p and except[p.name] then
+    return true
+  end
+  for _, child in ipairs(vim.api.nvim_get_proc_children(pid)) do
+    if find_process(child, except) then
       return true
     end
-    for _, v in ipairs(vim.api.nvim_get_proc_children(pid)) do
-      if find_process(v) then
-        return true
-      end
-    end
-    return false
   end
-  if find_process(term_pid) then
-    return t(_G.termesc.key)
-  else
-    return t("<C-\\><C-n>")
-  end
+  return false
 end
 
-local function set(table)
+function M.smart_esc(term_pid)
+  return t(find_process(term_pid, M.except) and M.key or "<C-\\><C-n>")
+end
+
+local function to_set(list)
   local ret = {}
-  for _, v in ipairs(table) do
+  for _, v in ipairs(list) do
     ret[v] = true
   end
   return ret
 end
 
-function _G.termesc.setup(cfg)
-  if cfg and cfg.key then
-    _G.termesc.key = cfg.key
-  else
-    _G.termesc.key = "<Esc>"
-  end
-  if cfg and cfg.except then
-    _G.termesc.except = set(cfg.except)
-  else
-    _G.termesc.except = { nvim = true }
-  end
-  vim.api.nvim_set_keymap(
-    "t",
-    _G.termesc.key,
-    "v:lua.termesc.smart_esc(b:terminal_job_pid)",
-    { noremap = true, expr = true }
-  )
+function M.setup(cfg)
+  M.key = (cfg and cfg.key) or "<Esc>"
+  M.except = (cfg and cfg.except) and to_set(cfg.except) or { nvim = true }
+
+  _G.termesc = M
+
+  vim.api.nvim_set_keymap("t", M.key, "v:lua.termesc.smart_esc(b:terminal_job_pid)", { noremap = true, expr = true })
 end
 
-return _G.termesc
+return M

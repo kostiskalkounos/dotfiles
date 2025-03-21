@@ -4,14 +4,9 @@ return {
     event = "BufReadPre",
     build = ":TSUpdate",
     dependencies = {
-      { "nvim-treesitter/nvim-treesitter-textobjects" },
+      "nvim-treesitter/nvim-treesitter-textobjects",
       { "nvim-treesitter/playground", cmd = "TSHighlightCapturesUnderCursor" },
-      {
-        "windwp/nvim-ts-autotag",
-        config = function()
-          require("nvim-ts-autotag").setup()
-        end,
-      },
+      { "windwp/nvim-ts-autotag", opts = {} },
     },
     config = function()
       require("nvim-treesitter.configs").setup({
@@ -21,6 +16,9 @@ return {
           "cpp",
           "css",
           "dockerfile",
+          "git_config",
+          "git_rebase",
+          "gitcommit",
           "go",
           "groovy",
           "html",
@@ -41,15 +39,12 @@ return {
         },
         highlight = { enable = not vim.g.vscode },
         indent = { enable = true },
-        autopairs = {
-          enable = true,
-        },
+        autopairs = { enable = true },
         textobjects = {
           select = {
             enable = true,
-            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+            lookahead = true,
             keymaps = {
-              -- You can use the capture groups defined in textobjects.scm
               ["aa"] = "@parameter.outer",
               ["ia"] = "@parameter.inner",
               ["af"] = "@function.outer",
@@ -60,43 +55,22 @@ return {
           },
           move = {
             enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
-            goto_next_start = {
-              ["]f"] = "@function.outer",
-              ["]]"] = "@class.outer",
-            },
-            goto_next_end = {
-              ["]F"] = "@function.outer",
-              ["]["] = "@class.outer",
-            },
-            goto_previous_start = {
-              ["[f"] = "@function.outer",
-              ["[["] = "@class.outer",
-            },
-            goto_previous_end = {
-              ["[F"] = "@function.outer",
-              ["[]"] = "@class.outer",
-            },
+            set_jumps = true,
+            goto_next_start = { ["]f"] = "@function.outer", ["]]"] = "@class.outer" },
+            goto_next_end = { ["]F"] = "@function.outer", ["]["] = "@class.outer" },
+            goto_previous_start = { ["[f"] = "@function.outer", ["[["] = "@class.outer" },
+            goto_previous_end = { ["[F"] = "@function.outer", ["[]"] = "@class.outer" },
           },
           swap = {
             enable = true,
-            swap_next = {
-              ["[p"] = "@parameter.inner",
-            },
-            swap_previous = {
-              ["]p"] = "@parameter.inner",
-            },
+            swap_next = { ["[p"] = "@parameter.inner" },
+            swap_previous = { ["]p"] = "@parameter.inner" },
           },
         },
       })
 
       vim.api.nvim_set_hl(0, "@lsp.type.property", { link = "@variable.member" })
       vim.api.nvim_set_hl(0, "@lsp.typemod.property.static", { link = "@constant" })
-
-      -- -- Disable semantic highlighting for all tokens
-      -- for _, group in ipairs(vim.fn.getcompletion("@lsp", "highlight")) do
-      -- vim.api.nvim_set_hl(0, group, {})
-      -- end
     end,
   },
 }
