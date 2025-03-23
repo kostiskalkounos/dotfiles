@@ -98,17 +98,14 @@ local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 config.init_options = { extendedClientCapabilities = extendedClientCapabilities }
 
-local function run_tests(test_fn)
-  local java_version = require("config.java").getJavaVersion()
-  if java_version then
-    vim.env.JAVA_HOME = get_java_home(java_version)
-  end
-  test_fn()
-end
-
 config.on_attach = function(client, bufnr)
   if not config.init_options.bundles then
     config.init_options.bundles = get_bundles()
+  end
+
+  local java_version = require("config.java").getJavaVersion()
+  if java_version then
+    vim.env.JAVA_HOME = get_java_home(java_version)
   end
 
   handlers.on_attach(client, bufnr)
@@ -123,11 +120,10 @@ config.on_attach = function(client, bufnr)
   local set = vim.keymap.set
 
   set("n", "<F9>", function()
-    run_tests(jdtls.test_class)
+    jdtls.test_class()
   end, opts)
-
   set("n", "<F10>", function()
-    run_tests(jdtls.test_nearest_method)
+    jdtls.test_nearest_method()
   end, opts)
 end
 

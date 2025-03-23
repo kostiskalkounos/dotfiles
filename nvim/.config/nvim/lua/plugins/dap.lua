@@ -1,7 +1,7 @@
 return {
   {
     "mfussenegger/nvim-dap",
-    cmd = "DapContinue",
+    cmd = { "DapContinue", "DapToggleBreakpoint", "DapStepOver", "DapStepInto", "DapStepOut" },
     dependencies = {
       "leoluz/nvim-dap-go",
       "nvim-neotest/nvim-nio",
@@ -62,12 +62,6 @@ return {
           type = "java",
           request = "launch",
           vmArgs = "-Xmx4g ",
-          env = function()
-            local java_version = require("config.java").getJavaVersion()
-            if java_version then
-              vim.env.JAVA_HOME = vim.fn.systemlist("/usr/libexec/java_home -v " .. java_version)[1]
-            end
-          end,
         },
         {
           name = "Debug Attach (5005)",
