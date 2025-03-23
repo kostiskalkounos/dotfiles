@@ -98,17 +98,60 @@ local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 config.init_options = { extendedClientCapabilities = extendedClientCapabilities }
 
-local function run_tests(test_fn)
-  local java_version = require("config.java").getJavaVersion()
-  if java_version then
-    vim.env.JAVA_HOME = get_java_home(java_version)
+local function read_version_from_file(filename, patterns, transform)
+  local path = vim.fn.findfile(filename, vim.fn.getcwd() .. ";")
+  if path == "" then
+    return nil
   end
-  test_fn()
+
+  local content = table.concat(vim.fn.readfile(path), "\n")
+
+  for _, pattern in ipairs(patterns) do
+    local version = content:match(pattern)
+    if version then
+      return transform and transform(version) or version
+    end
+  end
+
+  return nil
+end
+
+local version_patterns = {
+  ["pom.xml"] = {
+    patterns = {
+      "<java%.version>(%d+)</java%.version>",
+      "<maven%.compiler%.source>(%d+)</maven%.compiler%.source>",
+    },
+  },
+  ["build.gradle"] = {
+    patterns = {
+      "sourceCompatibility%s*=%s*['\"]?(1%.%d+)['\"]?",
+      "sourceCompatibility%s*=%s*['\"]?(%d+)['\"]?",
+    },
+    transform = function(v)
+      return v:gsub("1%.", "")
+    end,
+  },
+}
+
+local function getJavaVersion()
+  for filename, config in pairs(version_patterns) do
+    local version = read_version_from_file(filename, config.patterns, config.transform)
+    if version then
+      return version
+    end
+  end
+  return nil
 end
 
 config.on_attach = function(client, bufnr)
   if not config.init_options.bundles then
     config.init_options.bundles = get_bundles()
+  end
+
+  local java_version = getJavaVersion()
+  if java_version then
+    vim.env.JAVA_HOME = get_java_home(java_version)
   end
 
   handlers.on_attach(client, bufnr)
@@ -123,11 +166,10 @@ config.on_attach = function(client, bufnr)
   local set = vim.keymap.set
 
   set("n", "<F9>", function()
-    run_tests(jdtls.test_class)
+    jdtls.test_class()
   end, opts)
-
   set("n", "<F10>", function()
-    run_tests(jdtls.test_nearest_method)
+    jdtls.test_nearest_method()
   end, opts)
 end
 

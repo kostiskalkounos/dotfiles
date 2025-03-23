@@ -22,33 +22,30 @@ function M.setup()
 end
 
 function M.on_attach(client, bufnr)
-  local keymap = vim.keymap.set
+  local set = vim.keymap.set
   local opts = { noremap = true, silent = true, buffer = bufnr }
 
-  local mappings = {
-    ["<leader>Y"] = vim.diagnostic.setqflist,
-    ["<leader>g"] = vim.lsp.buf.code_action,
-    ["<leader>m"] = "<cmd>Telescope diagnostics<CR>",
-    ["<leader>o"] = vim.diagnostic.open_float,
-    ["<leader>r"] = vim.lsp.buf.rename,
-    ["<leader>y"] = vim.diagnostic.setloclist,
-    ["K"] = vim.lsp.buf.hover,
-    ["[d"] = vim.diagnostic.goto_prev,
-    ["]d"] = vim.diagnostic.goto_next,
-    ["[e"] = function() vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR }) end,
-    ["]e"] = function() vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR }) end,
-    ["gD"] = "<cmd>Telescope lsp_definitions<CR>",
-    ["gI"] = "<cmd>Telescope lsp_implementations<CR>",
-    ["gR"] = "<cmd>Telescope lsp_references<CR>",
-    ["gd"] = vim.lsp.buf.definition,
-    ["gi"] = vim.lsp.buf.implementation,
-    ["gr"] = vim.lsp.buf.references,
-  }
-
-  for key, cmd in pairs(mappings) do
-    keymap("n", key, cmd, opts)
-  end
+  set("n", "<leader>Y", vim.diagnostic.setqflist, opts)
+  set("n", "<leader>g", vim.lsp.buf.code_action, opts)
+  set("n", "<leader>m", "<cmd>Telescope diagnostics<CR>", opts)
+  set("n", "<leader>o", vim.diagnostic.open_float, opts)
+  set("n", "<leader>r", vim.lsp.buf.rename, opts)
+  set("n", "<leader>y", vim.diagnostic.setloclist, opts)
+  set("n", "K", vim.lsp.buf.hover, opts)
+  set("n", "[d", vim.diagnostic.goto_prev, opts)
+  set("n", "]d", vim.diagnostic.goto_next, opts)
+  set("n", "[e", function()
+    vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+  end, opts)
+  set("n", "]e", function()
+    vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+  end, opts)
+  set("n", "gD", "<cmd>Telescope lsp_definitions<CR>", opts)
+  set("n", "gI", "<cmd>Telescope lsp_implementations<CR>", opts)
+  set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
+  set("n", "gd", vim.lsp.buf.definition, opts)
+  set("n", "gi", vim.lsp.buf.implementation, opts)
+  set("n", "gr", vim.lsp.buf.references, opts)
 end
 
 return M
-
