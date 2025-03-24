@@ -21,7 +21,7 @@ function M.close_buffer()
   if vim.api.nvim_buf_get_option(current_buf, "modified") then
     local filename = vim.api.nvim_buf_get_name(current_buf)
     filename = filename ~= "" and filename or "buffer" .. tostring(current_buf)
-    vim.api.nvim_echo({ { "Unsaved changes in " .. filename, "CursorLineNr" } }, true, {})
+    vim.api.nvim_echo({ { "Unsaved changes in " .. filename, "ErrorMsg" } }, true, {})
     return
   end
 
