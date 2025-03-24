@@ -14,13 +14,13 @@ return {
         ["@constructor"] = { fg = palette.peach },
         ["@function.builtin"] = { fg = palette.sapphire },
         ["@keyword.operator"] = { fg = palette.mauve },
+        ["@lsp.mod.constructor"] = { fg = palette.peach },
+        ["@lsp.type.annotationMember"] = { fg = palette.flamingo },
+        ["@lsp.type.parameter"] = { fg = palette.text },
         ["@module"] = { fg = palette.sapphire },
         ["@variable.builtin"] = { fg = palette.mauve },
         ["@variable.member"] = { fg = is_light and palette.pink or palette.lavender },
         ["@variable.parameter"] = { fg = palette.text },
-        ["@lsp.mod.constructor"] = { fg = palette.peach },
-        ["@lsp.type.annotationMember"] = { fg = palette.flamingo },
-        ["@lsp.type.parameter"] = { fg = palette.text },
         ["CurSearch"] = { bg = palette.mauve },
       }
     end
