@@ -14,13 +14,14 @@ return {
         ["@constructor"] = { fg = palette.peach },
         ["@function.builtin"] = { fg = palette.sapphire },
         ["@keyword.operator"] = { fg = palette.mauve },
+        ["@lsp.mod.constructor"] = { fg = palette.peach },
+        ["@lsp.type.annotationMember"] = { fg = palette.flamingo },
+        ["@lsp.type.parameter"] = { fg = palette.text },
         ["@module"] = { fg = palette.sapphire },
         ["@variable.builtin"] = { fg = palette.mauve },
         ["@variable.member"] = { fg = is_light and palette.pink or palette.lavender },
         ["@variable.parameter"] = { fg = palette.text },
-        ["@lsp.mod.constructor"] = { fg = palette.peach },
-        ["@lsp.type.annotationMember"] = { fg = palette.flamingo },
-        ["@lsp.type.parameter"] = { fg = palette.text },
+        ["CurSearch"] = { bg = palette.mauve },
       }
     end
 
@@ -28,7 +29,6 @@ return {
       flavour = "auto",
       background = { light = "latte", dark = "macchiato" },
       color_overrides = {
-        latte = { red = "#ed8796" },
         macchiato = { blue = "#89b4fa", lavender = "#b4befe", sapphire = "#74c7ec" },
       },
       highlight_overrides = {

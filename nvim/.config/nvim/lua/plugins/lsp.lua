@@ -1,6 +1,14 @@
 return {
   "mfussenegger/nvim-jdtls",
-  { "folke/neodev.nvim", ft = "lua" },
+  {
+    "folke/lazydev.nvim",
+    ft = "lua",
+    opts = {
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  },
   { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
   { "stevearc/conform.nvim", event = "BufWritePre" },
   { "towolf/vim-helm", ft = "helm" },
