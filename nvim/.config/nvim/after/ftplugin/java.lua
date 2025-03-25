@@ -4,23 +4,16 @@ local home = os.getenv("HOME")
 local root_pattern = require("lspconfig").util.root_pattern
 local mason_share = home .. "/.local/share/nvim/mason/share"
 
-local java_homes = {}
-local function get_java_home(version)
-  if not java_homes[version] then
-    java_homes[version] = vim.fn.trim(vim.fn.system("/usr/libexec/java_home -v " .. version))
-  end
-  return java_homes[version]
-end
-
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
 local workspace_dir = home .. "/.local/share/eclipse/" .. project_name
 
-local function get_bundles()
-  return vim.tbl_flatten({
-    vim.fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", 1),
-    vim.fn.split(vim.fn.glob(mason_share .. "/java-test/*.jar", 1), "\n"),
-  })
-end
+local bundles = vim.tbl_flatten({
+  vim.fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
+  vim.fn.split(vim.fn.glob(mason_share .. "/java-test/*.jar", true), "\n"),
+})
+
+local extendedClientCapabilities = jdtls.extendedClientCapabilities
+extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 
 local config = {
   cmd = {
@@ -29,9 +22,9 @@ local config = {
     "-Dosgi.bundles.defaultStartLevel=4",
     "-Declipse.product=org.eclipse.jdt.ls.core.product",
     "-Dlog.protocol=true",
-    "-Dlog.level=ALL",
+    "-Dlog.level=WARNING",
     "-javaagent:" .. mason_share .. "/jdtls/lombok.jar",
-    "-Xmx4g",
+    "-Xmx2g",
     "--add-modules=ALL-SYSTEM",
     "--add-opens",
     "java.base/java.util=ALL-UNNAMED",
@@ -53,25 +46,22 @@ local config = {
     java = {
       autobuild = { enabled = false },
       configuration = {
-        updateBuildConfiguration = "automatic",
-        runtimes = {
-          { name = "JavaSE-23", path = get_java_home("23") },
-          { name = "JavaSE-17", path = get_java_home("17") },
-          { name = "JavaSE-1.8", path = get_java_home("1.8") },
-        },
+        updateBuildConfiguration = "interactive",
       },
       contentProvider = { preferred = "fernflower" },
       eclipse = { downloadSources = true },
-      format = { enabled = true },
-      implementationsCodeLens = { enabled = true },
       maven = { downloadSources = true },
-      maxConcurrentBuilds = 4,
+      maxConcurrentBuilds = 2,
+      implementationsCodeLens = { enabled = false },
+      referencesCodeLens = { enabled = false },
       references = { includeDecompiledSources = true },
-      referencesCodeLens = { enabled = true },
+      format = { enabled = true },
       saveActions = { organizeImports = false },
       signatureHelp = { enabled = true },
     },
     completion = {
+      maxResults = 20,
+      importOrder = { "java", "javax", "com", "org" },
       favoriteStaticMembers = {
         "org.hamcrest.MatcherAssert.assertThat",
         "org.hamcrest.Matchers.*",
@@ -81,96 +71,93 @@ local config = {
         "java.util.Objects.requireNonNullElse",
         "org.mockito.Mockito.*",
       },
-      importOrder = { "java", "javax", "com", "org" },
-    },
-    sources = { organizeImports = { starThreshold = 9999, staticStarThreshold = 9999 } },
-    codeGeneration = {
-      toString = { template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}" },
-      useBlocks = true,
+      sources = { organizeImports = { starThreshold = 9999, staticStarThreshold = 9999 } },
+      codeGeneration = {
+        toString = { template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}" },
+        useBlocks = true,
+      },
     },
   },
 
   capabilities = require("cmp_nvim_lsp").default_capabilities(),
-  flags = { allow_incremental_sync = true },
+  flags = {
+    allow_incremental_sync = true,
+    debounce_text_changes = 150,
+  },
+
+  init_options = {
+    bundles = bundles,
+    extendedClientCapabilities = extendedClientCapabilities,
+  },
 }
-
-local extendedClientCapabilities = jdtls.extendedClientCapabilities
-extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
-config.init_options = { extendedClientCapabilities = extendedClientCapabilities }
-
-local function read_version_from_file(filename, patterns, transform)
-  local path = vim.fn.findfile(filename, vim.fn.getcwd() .. ";")
-  if path == "" then
-    return nil
-  end
-
-  local content = table.concat(vim.fn.readfile(path), "\n")
-
-  for _, pattern in ipairs(patterns) do
-    local version = content:match(pattern)
-    if version then
-      return transform and transform(version) or version
-    end
-  end
-
-  return nil
-end
 
 local version_patterns = {
   ["pom.xml"] = {
     patterns = {
-      "<java%.version>(%d+)</java%.version>",
-      "<maven%.compiler%.source>(%d+)</maven%.compiler%.source>",
+      "<java%.version>([%d.]+)</java%.version>",
+      "<maven%.compiler%.source>([%d.]+)</maven%.compiler%.source>",
+      "<maven%.compiler%.target>([%d.]+)</maven%.compiler%.target>",
     },
   },
   ["build.gradle"] = {
     patterns = {
-      "sourceCompatibility%s*=%s*['\"]?(1%.%d+)['\"]?",
-      "sourceCompatibility%s*=%s*['\"]?(%d+)['\"]?",
+      "sourceCompatibility%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
+      "targetCompatibility%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
+      "java%.version%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
     },
-    transform = function(v)
-      return v:gsub("1%.", "")
-    end,
+  },
+  ["build.gradle.kts"] = {
+    patterns = {
+      "sourceCompatibility%s*=%s*JavaVersion%.VERSION_(%d+%.?%d*)",
+      "targetCompatibility%s*=%s*JavaVersion%.VERSION_(%d+%.?%d*)",
+    },
   },
 }
 
 local function getJavaVersion()
-  for filename, config in pairs(version_patterns) do
-    local version = read_version_from_file(filename, config.patterns, config.transform)
-    if version then
-      return version
+  local root_dir = config.root_dir
+  if not root_dir then
+    return nil
+  end
+
+  for filename, conf in pairs(version_patterns) do
+    local path = vim.fs.find(filename, { upward = true, path = root_dir, limit = 1 })[1]
+    if path then
+      for line in io.lines(path) do
+        for _, pattern in ipairs(conf.patterns) do
+          local version = line:match(pattern)
+          if version then
+            return version
+          end
+        end
+      end
     end
   end
   return nil
 end
 
 config.on_attach = function(client, bufnr)
-  if not config.init_options.bundles then
-    config.init_options.bundles = get_bundles()
-  end
-
   local java_version = getJavaVersion()
+
   if java_version then
-    vim.env.JAVA_HOME = get_java_home(java_version)
+    local current_java_home = vim.env.JAVA_HOME
+    local detected_java_home = vim.fn.trim(vim.fn.system("/usr/libexec/java_home -v " .. java_version))
+
+    if detected_java_home ~= "" and current_java_home ~= detected_java_home then
+      vim.env.JAVA_HOME = detected_java_home
+    end
   end
 
   handlers.on_attach(client, bufnr)
-
-  jdtls.setup.add_commands()
   jdtls.setup_dap({ hotcodereplace = "auto" })
+  jdtls.setup.add_commands()
 
   local jdtls_dap = require("jdtls.dap")
   jdtls_dap.setup_dap_main_class_configs()
 
-  local opts = { noremap = true, silent = true }
-  local set = vim.keymap.set
-
-  set("n", "<F9>", function()
-    jdtls.test_class()
-  end, opts)
-  set("n", "<F10>", function()
-    jdtls.test_nearest_method()
-  end, opts)
+  local opts = { noremap = true, silent = true, buffer = bufnr }
+  vim.keymap.set("n", "<F9>", jdtls.test_class, opts)
+  vim.keymap.set("n", "<F10>", jdtls.test_nearest_method, opts)
 end
 
 jdtls.start_or_attach(config)
