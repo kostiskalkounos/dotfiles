@@ -43,8 +43,38 @@ return {
 
     vim.cmd.colorscheme("catppuccin")
 
-    local function lualine_theme()
-      local colors = { inactive = "#6e738d" }
+    vim.schedule(function()
+      local function filename_component()
+        return function()
+          local fn = vim.fn.expand("%:~:.")
+          if vim.startswith(fn, "jdt://") then
+            fn = fn:match("(.-)%?")
+          end
+          if fn == "" then
+            fn = "[No Name]"
+          end
+          if vim.bo.modified then
+            fn = fn .. " [+]"
+          end
+          if not vim.bo.modifiable or vim.bo.readonly then
+            fn = fn .. " [-]"
+          end
+          if vim.fn.expand("%") ~= "" and vim.bo.buftype == "" and vim.fn.filereadable(vim.fn.expand("%")) == 0 then
+            fn = fn .. " [New]"
+          end
+          return fn
+        end
+      end
+
+      local is_light = vim.o.background == "light"
+      local colors = is_light and {
+        bg = "#eff1f5",
+        fg = "#4c4f69",
+      } or {
+        bg = "#24273a",
+        fg = "#cad3f5",
+      }
+
       local function mode_section()
         return {
           a = { fg = colors.fg, bg = colors.bg },
@@ -52,67 +82,44 @@ return {
           c = { fg = colors.fg, bg = colors.bg },
         }
       end
-      return {
-        normal = mode_section(),
-        command = mode_section(),
-        insert = mode_section(),
-        visual = mode_section(),
-        terminal = mode_section(),
-        replace = mode_section(),
-        inactive = {
-          a = { fg = colors.inactive, bg = colors.bg },
-          b = { fg = colors.inactive, bg = colors.bg },
-          c = { fg = colors.inactive, bg = colors.bg },
+
+      require("lualine").setup({
+        options = {
+          icons_enabled = true,
+          theme = {
+            normal = mode_section(),
+            command = mode_section(),
+            insert = mode_section(),
+            visual = mode_section(),
+            terminal = mode_section(),
+            replace = mode_section(),
+            inactive = {
+              a = { fg = colors.inactive, bg = colors.bg },
+              b = { fg = colors.inactive, bg = colors.bg },
+              c = { fg = colors.inactive, bg = colors.bg },
+            },
+          },
+          component_separators = "",
+          section_separators = "",
+          always_divide_middle = true,
         },
-      }
-    end
-
-    local function filename_component()
-      return function()
-        local fn = vim.fn.expand("%:~:.")
-        if vim.startswith(fn, "jdt://") then
-          fn = fn:match("(.-)%?")
-        end
-        if fn == "" then
-          fn = "[No Name]"
-        end
-        if vim.bo.modified then
-          fn = fn .. " [+]"
-        end
-        if not vim.bo.modifiable or vim.bo.readonly then
-          fn = fn .. " [-]"
-        end
-        if vim.fn.expand("%") ~= "" and vim.bo.buftype == "" and vim.fn.filereadable(vim.fn.expand("%")) == 0 then
-          fn = fn .. " [New]"
-        end
-        return fn
-      end
-    end
-
-    require("lualine").setup({
-      options = {
-        icons_enabled = true,
-        theme = lualine_theme(),
-        component_separators = "",
-        section_separators = "",
-        always_divide_middle = true,
-      },
-      sections = {
-        lualine_a = { filename_component() },
-        lualine_b = { "diff" },
-        lualine_c = {},
-        lualine_x = { { "diagnostics", update_in_insert = false }, { "branch", padding = { left = 2 } } },
-        lualine_y = { "location" },
-        lualine_z = { "progress" },
-      },
-      inactive_sections = {
-        lualine_a = { filename_component() },
-        lualine_b = {},
-        lualine_c = {},
-        lualine_x = { { "branch", padding = { left = 2 } } },
-        lualine_y = { "location" },
-        lualine_z = { "progress" },
-      },
-    })
+        sections = {
+          lualine_a = { filename_component() },
+          lualine_b = { "diff" },
+          lualine_c = {},
+          lualine_x = { { "diagnostics", update_in_insert = false }, { "branch", padding = { left = 2 } } },
+          lualine_y = { "location" },
+          lualine_z = { "progress" },
+        },
+        inactive_sections = {
+          lualine_a = { filename_component() },
+          lualine_b = {},
+          lualine_c = {},
+          lualine_x = { { "branch", padding = { left = 2 } } },
+          lualine_y = { "location" },
+          lualine_z = { "progress" },
+        },
+      })
+    end)
   end,
 }
