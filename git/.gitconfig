@@ -7,7 +7,7 @@
 
 [core]
   excludesfile = ~/.gitignore
-  pager = delta
+  pager = ~/Dotfiles/git/git-delta
 
 [color]
   ui = auto
@@ -32,8 +32,6 @@
 [delta]
   line-numbers = true
   side-by-side = false
-  # features = catppuccin-macchiato
-  # https://github.com/dandavison/delta/issues/1678
   file-modified-label = modified:
 
 [interactive]
