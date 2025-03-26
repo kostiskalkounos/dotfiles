@@ -1,7 +1,7 @@
 [delta "catppuccin-latte"]
 	blame-palette = "#eff1f5 #e6e9ef #dce0e8 #ccd0da #bcc0cc"
 	commit-decoration-style = "box ul"
-	dark = false
+  light = true
 	file-decoration-style = "#4c4f69"
 	file-style = "#4c4f69"
 	hunk-header-decoration-style = "box ul"
