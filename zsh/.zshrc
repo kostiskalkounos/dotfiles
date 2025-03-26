@@ -187,7 +187,7 @@ git_branch() {
 PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{yellow}* %f.)%(0?;;%F{red}%? %f)'
 # PROMPT='%(!.%F{cyan}.%F{magenta})%m%f%(1j. %F{yellow}*%f.)%(0?;; %F{red}%?%f)%F{blue} ${PWD/#$HOME/~}%f %F{green}$(git_branch)%f'
 
-export FZF_ALT_C_COMMAND="fd -t d --hidden --follow --exclude '.git' --exclude '{node_modules,vendor,.npm,.cache,.venv}' . $HOME"
+export FZF_ALT_C_COMMAND="fd -t d --exclude '.git' --exclude '{node_modules,vendor,.npm,.cache,.venv}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,build,node_modules,vendor,package-lock.json,yarn.lock}" 2> /dev/null'
 export FZF_DEFAULT_COMMAND=$FZF_CTRL_T_COMMAND
 export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
@@ -206,6 +206,8 @@ export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 export HOMEBREW_NO_ANALYTICS=1
 export JAVA_HOME=$(/usr/libexec/java_home)
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/.ripgreprc"
+
+eval "$(zoxide init zsh)"
 
 source <(fzf --zsh)
 source /opt/homebrew/Cellar/zsh-syntax-highlighting/*/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
