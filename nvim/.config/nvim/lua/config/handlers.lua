@@ -4,16 +4,17 @@ M.capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.m
 M.capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 function M.setup()
-  vim.fn.sign_define({
-    { name = "DiagnosticSignError", text = "", texthl = "DiagnosticSignError", numhl = "" },
-    { name = "DiagnosticSignWarn", text = "", texthl = "DiagnosticSignWarn", numhl = "" },
-    { name = "DiagnosticSignHint", text = "󰌶", texthl = "DiagnosticSignHint", numhl = "" },
-    { name = "DiagnosticSignInfo", text = "", texthl = "DiagnosticSignInfo", numhl = "" },
-  })
-
   vim.diagnostic.config({
-    float = { focusable = true, style = "minimal", border = "rounded", source = "always" },
-    signs = { active = true },
+    float = { focusable = true, style = "minimal", border = "rounded", source = true },
+    signs = {
+      active = true,
+      text = {
+        [vim.diagnostic.severity.ERROR] = "",
+        [vim.diagnostic.severity.WARN] = "",
+        [vim.diagnostic.severity.HINT] = "󰌶",
+        [vim.diagnostic.severity.INFO] = "",
+      },
+    },
     severity_sort = true,
     underline = true,
     update_in_insert = false,

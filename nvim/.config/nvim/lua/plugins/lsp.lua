@@ -10,16 +10,12 @@ return {
     },
   },
   { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
-  { "stevearc/conform.nvim", event = "BufWritePre" },
-  { "towolf/vim-helm", ft = "helm" },
+  { "stevearc/conform.nvim",   event = "BufWritePre" },
+  { "towolf/vim-helm",         ft = "helm" },
   {
     "j-hui/fidget.nvim",
     event = "LspAttach",
-    opts = {
-      text = { spinner = "star" },
-      window = { relative = "editor" },
-    },
-    tag = "legacy",
+    opts = {},
   },
   {
     "jay-babu/mason-nvim-dap.nvim",
@@ -49,9 +45,10 @@ return {
           local mason = require("mason")
           local mason_lspconfig = require("mason-lspconfig")
           local lspconfig = require("lspconfig")
+
           mason.setup()
 
-          local servers_to_install = {
+          local servers = {
             "bashls",
             "clangd",
             "cssls",
@@ -84,18 +81,19 @@ return {
           }
 
           mason_lspconfig.setup({
-            ensure_installed = servers_to_install,
+            ensure_installed = servers,
             automatic_installation = true,
           })
+
+          handlers.setup()
 
           mason_lspconfig.setup_handlers({
             function(server_name)
               if server_name ~= "jdtls" then
                 lspconfig[server_name].setup({
-                  handlers.setup(),
                   capabilities = handlers.capabilities,
                   on_attach = handlers.on_attach,
-                  settings = servers_settings[server_name],
+                  settings = servers_settings[server_name] or {},
                 })
               end
             end,
