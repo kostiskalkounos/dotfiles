@@ -7,6 +7,7 @@ alias gd='git diff'
 alias gf='git commit --amend --no-edit'
 alias gl='git log --oneline --all'
 alias gll='git log --graph --topo-order --abbrev-commit --date=short --decorate --all --boundary --pretty=format:"%Cgreen%ad %C(yellow)%h%Creset%C(red)%d%Creset %s %Cblue[%cn]%Creset"'
+alias gp='git push'
 alias gr='git rebase'
 alias gs='git status -sb'
 alias gt='git checkout'
@@ -173,7 +174,7 @@ man() {
 }
 
 j() {
-# sudo ln -sfn /usr/local/opt/openjdk@<number>/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-<number>.jdk
+  # sudo ln -sfn /usr/local/opt/openjdk@<number>/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-<number>.jdk
   unset JAVA_HOME
   if [ -n "$1" ]; then
     export JAVA_HOME=$(/usr/libexec/java_home -v "$1")
@@ -261,4 +262,3 @@ if test -n "$KITTY_INSTALLATION_DIR"; then
   kitty-integration
   unfunction kitty-integration
 fi
-
