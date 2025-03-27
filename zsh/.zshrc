@@ -173,10 +173,13 @@ man() {
 }
 
 j() {
-  # sudo ln -sfn /usr/local/opt/openjdk@<number>/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-<number>.jdk
-  version=$1
-  unset JAVA_HOME;
-  export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
+# sudo ln -sfn /usr/local/opt/openjdk@<number>/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-<number>.jdk
+  unset JAVA_HOME
+  if [ -n "$1" ]; then
+    export JAVA_HOME=$(/usr/libexec/java_home -v "$1")
+  else
+    export JAVA_HOME=$(/usr/libexec/java_home)
+  fi
   java -version
 }
 
