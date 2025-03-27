@@ -7,6 +7,7 @@ alias gd='git diff'
 alias gf='git commit --amend --no-edit'
 alias gl='git log --oneline --all'
 alias gll='git log --graph --topo-order --abbrev-commit --date=short --decorate --all --boundary --pretty=format:"%Cgreen%ad %C(yellow)%h%Creset%C(red)%d%Creset %s %Cblue[%cn]%Creset"'
+alias gp='git push'
 alias gr='git rebase'
 alias gs='git status -sb'
 alias gt='git checkout'
@@ -163,30 +164,6 @@ setopt PUSHD_MINUS
 setopt PUSHD_SILENT
 setopt SHARE_HISTORY
 
-man() {
-  LESS_TERMCAP_md=$'\e[00;34m' \
-  LESS_TERMCAP_me=$'\e[0m' \
-  LESS_TERMCAP_se=$'\e[0m' \
-  LESS_TERMCAP_ue=$'\e[0m' \
-  LESS_TERMCAP_us=$'\e[00;32m' \
-  command man "$@"
-}
-
-j() {
-  version=$1
-  unset JAVA_HOME;
-  export JAVA_HOME=$(/usr/libexec/java_home -v"$version");
-  java -version
-}
-
-git_branch() {
-  git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1 /'
-}
-
-# Check all available colours: `for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done`
-PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{yellow}* %f.)%(0?;;%F{red}%? %f)'
-# PROMPT='%(!.%F{cyan}.%F{magenta})%m%f%(1j. %F{yellow}*%f.)%(0?;; %F{red}%?%f)%F{blue} ${PWD/#$HOME/~}%f %F{green}$(git_branch)%f'
-
 export FZF_ALT_C_COMMAND="fd -t d --exclude '{.git,.npm,.cache,.venv,node_modules}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,node_modules}" 2> /dev/null'
 export FZF_DEFAULT_COMMAND=$FZF_CTRL_T_COMMAND
@@ -206,6 +183,34 @@ export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 export HOMEBREW_NO_ANALYTICS=1
 export JAVA_HOME=$(/usr/libexec/java_home)
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/.ripgreprc"
+
+j() {
+  # sudo ln -sfn /usr/local/opt/openjdk@<number>/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-<number>.jdk
+  unset JAVA_HOME
+  if [ -n "$1" ]; then
+    export JAVA_HOME=$(/usr/libexec/java_home -v "$1")
+  else
+    export JAVA_HOME=$(/usr/libexec/java_home)
+  fi
+  java -version
+}
+
+man() {
+  LESS_TERMCAP_md=$'\e[00;34m' \
+  LESS_TERMCAP_me=$'\e[0m' \
+  LESS_TERMCAP_se=$'\e[0m' \
+  LESS_TERMCAP_ue=$'\e[0m' \
+  LESS_TERMCAP_us=$'\e[00;32m' \
+  command man "$@"
+}
+
+git_branch() {
+  git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1 /'
+}
+
+# Check all available colours: `for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done`
+PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{yellow}* %f.)%(0?;;%F{red}%? %f)'
+# PROMPT='%(!.%F{cyan}.%F{magenta})%m%f%(1j. %F{yellow}*%f.)%(0?;; %F{red}%?%f)%F{blue} ${PWD/#$HOME/~}%f %F{green}$(git_branch)%f'
 
 eval "$(zoxide init zsh)"
 
