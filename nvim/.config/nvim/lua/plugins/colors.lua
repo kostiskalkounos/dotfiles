@@ -43,7 +43,26 @@ return {
 
     vim.cmd.colorscheme("catppuccin")
 
-    vim.schedule(function()
+    local function setup_lualine()
+      local is_light = vim.o.background == "light"
+      local colors = is_light and {
+        bg = "#eff1f5",
+        fg = "#4c4f69",
+        inactive = "#8c8fa1",
+      } or {
+        bg = "#24273a",
+        fg = "#cad3f5",
+        inactive = "#6e738d",
+      }
+
+      local function mode_section()
+        return {
+          a = { fg = colors.fg, bg = colors.bg },
+          b = { fg = colors.fg, bg = colors.bg },
+          c = { fg = colors.fg, bg = colors.bg },
+        }
+      end
+
       local function filename_component()
         return function()
           local fn = vim.fn.expand("%:~:.")
@@ -64,23 +83,6 @@ return {
           end
           return fn
         end
-      end
-
-      local is_light = vim.o.background == "light"
-      local colors = is_light and {
-        bg = "#eff1f5",
-        fg = "#4c4f69",
-      } or {
-        bg = "#24273a",
-        fg = "#cad3f5",
-      }
-
-      local function mode_section()
-        return {
-          a = { fg = colors.fg, bg = colors.bg },
-          b = { fg = colors.fg, bg = colors.bg },
-          c = { fg = colors.fg, bg = colors.bg },
-        }
       end
 
       require("lualine").setup({
@@ -120,6 +122,19 @@ return {
           lualine_z = { "progress" },
         },
       })
-    end)
+    end
+
+    vim.api.nvim_create_autocmd("OptionSet", {
+      pattern = "background",
+      callback = function()
+        vim.schedule(function()
+          setup_lualine()
+        end)
+      end,
+    })
+
+    vim.api.nvim_create_user_command("ToggleTheme", function()
+      vim.o.background = vim.o.background == "light" and "dark" or "light"
+    end, {})
   end,
 }
