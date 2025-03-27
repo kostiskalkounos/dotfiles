@@ -25,13 +25,32 @@ return {
 
       require("nvim-dap-virtual-text").setup({
         all_frames = false,
+        all_references = false,
+        clear_on_continue = false,
         commented = false,
+        enable_commands = false,
         enabled = true,
         enabled_commands = false,
+        filter_references_pattern = "",
         highlight_changed_variables = true,
         highlight_new_as_changed = true,
+        only_first_definition = true,
         show_stop_reason = true,
+        text_prefix = "",
+        separator = ",",
+        error_prefix = "  ",
+        info_prefix = "  ",
+        virt_lines = false,
+        virt_lines_above = false,
         virt_text_pos = "eol",
+
+        display_callback = function(variable, buf, stackframe, node, options)
+          if options.virt_text_pos == "inline" then
+            return " = " .. variable.value:gsub("%s+", " ")
+          else
+            return variable.name .. " = " .. variable.value:gsub("%s+", " ")
+          end
+        end,
       })
 
       local dap = require("dap")
@@ -165,9 +184,55 @@ return {
       local dap_ui = require("dapui")
 
       dap_ui.setup({
+        icons = { expanded = "", collapsed = "", current_frame = "" },
+        mappings = {
+          expand = { "<CR>", "<2-LeftMouse>" },
+          open = "o",
+          remove = "d",
+          edit = "e",
+          repl = "r",
+          toggle = "t",
+        },
+        element_mappings = {},
+        expand_lines = true,
+        force_buffers = true,
         layouts = {
-          { elements = { "scopes", "breakpoints", "stacks", "watches" }, size = 40, position = "left" },
-          { elements = { "repl", "console" }, size = 10, position = "bottom" },
+          {
+            elements = { "scopes", "breakpoints", "stacks", "watches" },
+            size = 40,
+            position = "left",
+          },
+          {
+            elements = { "repl", "console" },
+            size = 10,
+            position = "bottom",
+          },
+        },
+        floating = {
+          max_height = nil,
+          max_width = nil,
+          border = "rounded",
+          mappings = { close = { "q", "<Esc>" } },
+        },
+        windows = { indent = 1 },
+        render = {
+          max_type_length = nil,
+          indent = 1,
+        },
+        controls = {
+          enabled = true,
+          element = "repl",
+          icons = {
+            pause = "",
+            play = "",
+            step_into = "",
+            step_over = "",
+            step_out = "",
+            step_back = "",
+            run_last = "",
+            terminate = "",
+            disconnect = "",
+          },
         },
       })
 
