@@ -171,21 +171,24 @@ export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=h
 export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow=33:st=34"
 
+if [ -z "$ZSH_INITIAL_THEME_SET" ]; then
+  if [[ $(defaults read -g AppleInterfaceStyle 2>/dev/null) =~ ^[Dd]ark$ ]]; then
+    source ~/Dotfiles/zsh/fzf_dark
+  else
+    source ~/Dotfiles/zsh/fzf_light
+  fi
+  export ZSH_INITIAL_THEME_SET=1
+fi
+
 update_fzf_theme() {
   if [ -f /tmp/theme_state ]; then
     THEME=$(cat /tmp/theme_state)
     case "$THEME" in
-      "light")
-        export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=light --color=fg:-1,bg:-1,hl:magenta,fg+:black,bg+:#ccd0da,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
-        ;;
-      "dark")
-        export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
-        ;;
+      "light") source ~/Dotfiles/zsh/fzf_light ;;
+      "dark") source ~/Dotfiles/zsh/fzf_dark ;;
     esac
   fi
 }
-
-update_fzf_theme
 trap 'update_fzf_theme' USR1
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
