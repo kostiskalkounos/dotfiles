@@ -1,29 +1,23 @@
+local darkWallpaper, lightWallpaper
+local scriptTemplate =
+  'tell app "System Events"\n  tell appearance preferences to set dark mode to %s\n  tell every desktop to set picture to "%s"\nend tell'
+local cmdTemplate = 'pkill -%s zsh; [ -n "$TMUX" ] && TMUX_THEME=%s tmux source-file ~/.tmux/%s.conf >/dev/null 2>&1 &'
+
 Hyper:bind({}, "/", function()
+  darkWallpaper = darkWallpaper or hs.fs.pathToAbsolute("~/.hammerspoon/wallpapers/catalina.jpg")
+  lightWallpaper = lightWallpaper or hs.fs.pathToAbsolute("~/.hammerspoon/wallpapers/forest.jpg")
+
   local success, darkMode =
     hs.osascript.applescript('tell app "System Events" to tell appearance preferences to return dark mode')
-
-  local lightWallpaper = "~/.hammerspoon/wallpapers/forest.jpg"
-  local darkWallpaper = "~/.hammerspoon/wallpapers/catalina.jpg"
-  local themeStateFile = "/tmp/theme_state"
-
   if not success then
     return
   end
 
-  if darkMode then
-    hs.osascript.applescript('tell app "System Events" to tell appearance preferences to set dark mode to false')
-    hs.osascript.applescript(
-      ('tell app "System Events" to tell every desktop to set picture to "%s"'):format(lightWallpaper)
-    )
-    hs.execute(string.format("echo 'light' > %s", themeStateFile), true)
-  else
-    hs.osascript.applescript('tell app "System Events" to tell appearance preferences to set dark mode to true')
-    hs.osascript.applescript(
-      ('tell app "System Events" to tell every desktop to set picture to "%s"'):format(darkWallpaper)
-    )
-    hs.execute(string.format("echo 'dark' > %s", themeStateFile), true)
-  end
+  local newMode = not darkMode
+  local theme = newMode and "dark" or "light"
+  local wallpaper = newMode and darkWallpaper or lightWallpaper
+  local signal = newMode and "USR1" or "USR2"
 
-  hs.execute("tmux source-file ~/.tmux.conf", true)
-  hs.execute("pkill -USR1 zsh", true)
+  hs.osascript._osascript(string.format(scriptTemplate, tostring(newMode), wallpaper), "AppleScript")
+  hs.execute(string.format(cmdTemplate, signal, theme, theme), true)
 end)
