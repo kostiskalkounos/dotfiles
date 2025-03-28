@@ -24,5 +24,6 @@ Hyper:bind({}, "/", function()
     hs.execute(string.format("echo 'dark' > %s", themeStateFile), true)
   end
 
+  hs.execute("tmux source-file ~/.tmux.conf", true)
   hs.execute("pkill -USR1 zsh", true)
 end)
