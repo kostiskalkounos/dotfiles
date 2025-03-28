@@ -194,26 +194,29 @@ PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{
 export FZF_ALT_C_COMMAND="fd -t d --exclude '{.git, node_modules,.npm,.cache,.venv}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,,node_modules}" 2> /dev/null'
 export FZF_DEFAULT_COMMAND=$FZF_CTRL_T_COMMAND
-export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
 export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow=33:st=34"
 
-update_fzf_theme() {
-  if [ -f /tmp/theme_state ]; then
-    THEME=$(cat /tmp/theme_state)
-    case "$THEME" in
-      "light")
-        export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=light --color=fg:-1,bg:-1,hl:magenta,fg+:black,bg+:#ccd0da,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
-        ;;
-      "dark")
-        export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
-        ;;
-    esac
-  fi
-}
+LIGHT_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=light --color=fg:-1,bg:-1,hl:magenta,fg+:black,bg+:#ccd0da,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
+DARK_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
 
-update_fzf_theme
-trap 'update_fzf_theme' USR1
+case "$FZF_THEME" in
+  dark) export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" ;;
+  light) export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" ;;
+  *)
+    local mode=$(defaults read -g AppleInterfaceStyle 2>/dev/null)
+    if [[ "$mode" == "Dark" ]]; then
+      export FZF_THEME="dark"
+      export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"
+    else
+      export FZF_THEME="light"
+      export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"
+    fi
+    ;;
+esac
+
+trap 'export FZF_THEME=light FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"' USR1
+trap 'export FZF_THEME=dark FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"' USR2
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
