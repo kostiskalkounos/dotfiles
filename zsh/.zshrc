@@ -190,13 +190,30 @@ git_branch() {
 
 # Check all available colours: `for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done`
 PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{yellow}* %f.)%(0?;;%F{red}%? %f)'
-# PROMPT='%(!.%F{cyan}.%F{magenta})%m%f%(1j. %F{yellow}*%f.)%(0?;; %F{red}%?%f)%F{blue} ${PWD/#$HOME/~}%f %F{green}$(git_branch)%f'
 
 export FZF_ALT_C_COMMAND="fd -t d --exclude '{.git, node_modules,.npm,.cache,.venv}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,,node_modules}" 2> /dev/null'
 export FZF_DEFAULT_COMMAND=$FZF_CTRL_T_COMMAND
 export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
+export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow=33:st=34"
+
+update_fzf_theme() {
+  if [ -f /tmp/theme_state ]; then
+    THEME=$(cat /tmp/theme_state)
+    case "$THEME" in
+      "light")
+        export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=light --color=fg:-1,bg:-1,hl:magenta,fg+:black,bg+:#ccd0da,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
+        ;;
+      "dark")
+        export FZF_DEFAULT_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
+        ;;
+    esac
+  fi
+}
+
+update_fzf_theme
+trap 'update_fzf_theme' USR1
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
@@ -205,8 +222,6 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' use-cache yes
 zstyle ':completion:*:complete:(cd|pushd):*' tag-order 'local-directories named-directories'
 zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)'
-
-export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 
 export HOMEBREW_NO_ANALYTICS=1
 export JAVA_HOME=$(/usr/libexec/java_home)
