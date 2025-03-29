@@ -6,101 +6,22 @@ alias gc='git commit'
 alias gd='git diff'
 alias gf='git commit --amend --no-edit'
 alias gl='git log --oneline --all'
-alias gll='git log --graph --topo-order --abbrev-commit --date=short --decorate --all --boundary --pretty=format:"%Cgreen%ad %C(yellow)%h%Creset%C(red)%d%Creset %s %Cblue[%cn]%Creset"'
 alias gp='git push'
 alias gr='git rebase'
 alias gs='git status -sb'
 alias gt='git checkout'
+gll() { git log --graph --topo-order --abbrev-commit --date=short --decorate --all --boundary --pretty=format:"%Cgreen%ad %C(yellow)%h%Creset%C(red)%d%Creset %s %Cblue[%cn]%Creset" "$@"; }
 
 alias k='kubectl'
-alias ka='kubectl apply -f'
-alias kd='kubectl describe'
-alias ke='kubectl exec -it'
-alias kg='kubectl get'
-alias kgd='kubectl get deployments'
-alias kgp='kubectl get pods'
-alias kl='kubectl logs -f'
 alias ks='kubens'
 alias kx='kubectx'
 
-alias p='podman'
-alias pa='podman ps -a'
-alias pi='podman images'
-alias pprune='podman system prune -af'
-alias pps='podman ps'
-alias prestart='podman restart'
-alias prm='podman rm -f'
-alias prmi='podman rmi -f'
-alias pstart='podman start'
-alias pstop='podman stop'
-
-alias pl='podman logs -f'
-alias pexec='podman exec -it'
-alias psh='podman exec -it $1 sh'
-alias pbash='podman exec -it $1 bash'
-
-alias pc='podman-compose'
-alias pcu='podman-compose up -d'
-alias pcd='podman-compose down'
-alias pcl='podman-compose logs -f'
-alias pcr='podman-compose restart'
-
+alias c='colima'
+alias cn='colima nerdctl'
 alias d='docker'
 alias dc='docker compose'
-
-alias dps='docker ps'
-alias dpa='docker ps -a'
-alias di='docker images'
-alias drm='docker rm -f'
-alias drmi='docker rmi -f'
-alias dstop='docker stop'
-alias dstart='docker start'
-alias drestart='docker restart'
-
-alias dlogs='docker logs -f'
-alias dexec='docker exec -it'
-alias dsh='docker exec -it $1 sh'
-alias dbash='docker exec -it $1 bash'
-
-alias dcu='docker compose up -d'
-alias dcd='docker compose down'
-alias dcr='docker compose restart'
-alias dcl='docker compose logs -f'
-
-alias dprune='docker system prune -af'
-alias dvolrm='docker volume rm $(docker volume ls -q)'
-alias dnetrm='docker network rm $(docker network ls -q)'
-
-alias cl='colima'
-alias cls='colima start'
-alias clst='colima stop'
-alias clr='colima restart'
-alias clstatus='colima status'
-
-alias c='colima nerdctl'
-alias cn='colima nerdctl'
-alias cnps='colima nerdctl ps'
-alias cnpa='colima nerdctl ps -a'
-alias cni='colima nerdctl images'
-alias cnrm='colima nerdctl rm -f'
-alias cnrmi='colima nerdctl rmi -f'
-alias cnstop='colima nerdctl stop'
-alias cnstart='colima nerdctl start'
-alias cnrestart='colima nerdctl restart'
-
-alias cnlogs='colima nerdctl logs -f'
-alias cnexec='colima nerdctl exec -it'
-alias cnsh='colima nerdctl exec -it $1 sh'
-alias cnbash='colima nerdctl exec -it $1 bash'
-
-alias cnu='colima nerdctl compose up -d'
-alias cnd='colima nerdctl compose down'
-alias cnr='colima nerdctl compose restart'
-alias cnl='colima nerdctl compose logs -f'
-
-alias cnprune='colima nerdctl system prune -af'
-alias cnvolrm='colima nerdctl volume rm $(colima nerdctl volume ls -q)'
-alias cnnetrm='colima nerdctl network rm $(colima nerdctl network ls -q)'
+alias p='podman'
+alias pc='podman-compose'
 
 alias la='ls -lah'
 alias ld='lazydocker'
@@ -116,19 +37,19 @@ alias sudo='sudo '
 alias v=vi
 alias vi=vim
 
-if command -v nvim &> /dev/null; then
+if type nvim >/dev/null 2>&1; then
   alias vim=nvim
   alias vimdiff="nvim -d"
-  export EDITOR=$(which nvim)
+  export EDITOR=nvim
 else
-  export EDITOR=$(which vim)
+  export EDITOR=vim
 fi
 
-autoload -U colors && colors
-autoload -U compinit && compinit -u
-autoload -U down-line-or-beginning-search && zle -N down-line-or-beginning-search
-autoload -U edit-command-line && zle -N edit-command-line
-autoload -U up-line-or-beginning-search && zle -N up-line-or-beginning-search
+autoload colors && colors
+autoload compinit && compinit -u
+autoload down-line-or-beginning-search && zle -N down-line-or-beginning-search
+autoload edit-command-line && zle -N edit-command-line
+autoload up-line-or-beginning-search && zle -N up-line-or-beginning-search
 zle_highlight=('paste:none')
 
 bindkey '^N' down-line-or-beginning-search
@@ -174,13 +95,9 @@ man() {
 }
 
 j() {
-  # sudo ln -sfn /usr/local/opt/openjdk@<number>/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-<number>.jdk
+ # sudo ln -sfn /usr/local/opt/openjdk@<number>/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-<number>.jdk
   unset JAVA_HOME
-  if [ -n "$1" ]; then
-    export JAVA_HOME=$(/usr/libexec/java_home -v "$1")
-  else
-    export JAVA_HOME=$(/usr/libexec/java_home)
-  fi
+  export JAVA_HOME=${JAVA_HOME:-$(/usr/libexec/java_home -v "${1:-}") }
   java -version
 }
 
@@ -229,29 +146,12 @@ zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)
 export HOMEBREW_NO_ANALYTICS=1
 export JAVA_HOME=$(/usr/libexec/java_home)
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/.ripgreprc"
-
-export CPPFLAGS="-I/usr/local/opt/llvm/include"
-export CPPFLAGS="-I/usr/local/opt/openssl/include"
-export CPPFLAGS="-I/usr/local/opt/ruby/include"
-export CPPFLAGS="-I/usr/local/opt/sqlite/include"
-
-export LDFLAGS="-L/usr/local/opt/llvm/lib"
-export LDFLAGS="-L/usr/local/opt/openssl/lib"
-export LDFLAGS="-L/usr/local/opt/python/lib"
-export LDFLAGS="-L/usr/local/opt/ruby/lib"
-export LDFLAGS="-L/usr/local/opt/sqlite/lib"
-
-export PATH="/usr/local/opt/llvm/bin:$PATH"
-export PATH="/usr/local/opt/openssl/bin:$PATH"
-export PATH="/usr/local/opt/python/bin:$PATH"
-export PATH="/usr/local/opt/ruby/bin:$PATH"
-export PATH="/usr/local/opt/sqlite/bin:$PATH"
-
-export PKG_CONFIG_PATH="/usr/local/opt/python/lib/pkgconfig"
-export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"
-export PKG_CONFIG_PATH="/usr/local/opt/sqlite/lib/pkgconfig"
-
 . "$HOME/.cargo/env"
+
+export CPPFLAGS="-I/usr/local/opt/llvm/include -I/usr/local/opt/openssl/include -I/usr/local/opt/ruby/include -I/usr/local/opt/sqlite/include"
+export LDFLAGS="-L/usr/local/opt/llvm/lib -L/usr/local/opt/openssl/lib -L/usr/local/opt/python/lib -L/usr/local/opt/ruby/lib -L/usr/local/opt/sqlite/lib"
+export PATH="/usr/local/opt/llvm/bin:/usr/local/opt/openssl/bin:/usr/local/opt/python/bin:/usr/local/opt/ruby/bin:/usr/local/opt/sqlite/bin:$PATH"
+export PKG_CONFIG_PATH="/usr/local/opt/python/lib/pkgconfig:/usr/local/opt/ruby/lib/pkgconfig:/usr/local/opt/sqlite/lib/pkgconfig"
 
 if [[ ! "$PATH" == */usr/local/opt/fzf/bin* ]]; then
   export PATH="${PATH:+${PATH}:}/usr/local/opt/fzf/bin"
