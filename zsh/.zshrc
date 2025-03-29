@@ -102,11 +102,14 @@ j() {
   java -version
 }
 
+#git_branch() {
+#  git branch 2>/dev/null | sed -n 's/^\* \(.*\)/\1 /p'
+#}
+
 git_branch() {
-  git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1 /'
+  git branch --no-color 2>/dev/null | awk '/^\*/ {print substr($0, 3)" "}'
 }
 
-# Check all available colours: `for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done`
 PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{yellow}* %f.)%(0?;;%F{red}%? %f)'
 
 export FZF_ALT_C_COMMAND="fd -t d --exclude '{.git,.npm,.cache,.venv,node_modules}' . $HOME"
