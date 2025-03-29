@@ -6,7 +6,8 @@ alias gc='git commit'
 alias gd='git diff'
 alias gf='git commit --amend --no-edit'
 alias gl='git log --oneline --all'
-alias gp='git push'
+alias gp='git pull'
+alias gu='git push'
 alias gr='git rebase'
 alias gs='git status -sb'
 alias gt='git checkout'
@@ -101,13 +102,6 @@ j() {
   java -version
 }
 
-git_branch() {
-  git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1 /'
-}
-
-# Check all available colours: `for code in {000..255}; do print -P -- "$code: %F{$code}Color%f"; done`
-PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{yellow}* %f.)%(0?;;%F{red}%? %f)'
-
 export FZF_ALT_C_COMMAND="fd -t d --exclude '{.git, node_modules,.npm,.cache,.venv}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,,node_modules}" 2> /dev/null'
 export FZF_DEFAULT_COMMAND=$FZF_CTRL_T_COMMAND
@@ -157,6 +151,7 @@ if [[ ! "$PATH" == */usr/local/opt/fzf/bin* ]]; then
   export PATH="${PATH:+${PATH}:}/usr/local/opt/fzf/bin"
 fi
 
+eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 
 source <(fzf --zsh)
