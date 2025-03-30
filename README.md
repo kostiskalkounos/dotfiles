@@ -1,5 +1,4 @@
-# Dotfiles
-Managed with <a href="https://www.gnu.org/software/stow/">GNU Stow</a>.
+# MacOS settings
 
 ## Drag windows with cmd + ctrl + click
 defaults write -g NSWindowShouldDragOnGesture -bool true
