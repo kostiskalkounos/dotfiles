@@ -4,7 +4,7 @@ vim.opt.belloff = "all"
 vim.opt.breakindent = true
 vim.opt.cindent = true
 vim.opt.complete:append("kspell")
-vim.opt.completeopt = { "menuone", "noinsert", "preview" }
+vim.opt.completeopt = { "fuzzy", "menuone", "noinsert", "preview" }
 vim.opt.cursorline = true
 vim.opt.diffopt:append("foldcolumn:0")
 vim.opt.directory:append(".")
