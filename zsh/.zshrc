@@ -126,10 +126,10 @@ case "$FZF_THEME" in
   light) export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" ;;
   *)
     if defaults read -g AppleInterfaceStyle 2>/dev/null | grep -q Dark; then
-      export FZF_THEME=dark
+      export FZF_THEME=Dark
       export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"
     else
-      export FZF_THEME=light
+      export FZF_THEME=Light
       export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"
     fi
     ;;
