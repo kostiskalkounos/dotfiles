@@ -6,11 +6,11 @@ alias gc='git commit'
 alias gd='git diff'
 alias gf='git commit --amend --no-edit'
 alias gl='git log'
-alias gp='git pull'
+alias gp='git push'
 alias gr='git rebase'
 alias gs='git status -sb'
 alias gt='git checkout'
-alias gu='git push'
+alias gu='git pull'
 gll() { git log --graph --topo-order --abbrev-commit --date=short --decorate --all --boundary --pretty=format:"%Cgreen%ad %C(yellow)%h%Creset%C(red)%d%Creset %s %Cblue[%cn]%Creset" "$@"; }
 
 alias k='kubectl'
@@ -122,10 +122,10 @@ case "$FZF_THEME" in
   light) export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" ;;
   *)
     if defaults read -g AppleInterfaceStyle 2>/dev/null | grep -q Dark; then
-      export FZF_THEME=dark
+      export FZF_THEME=Dark
       export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"
     else
-      export FZF_THEME=light
+      export FZF_THEME=Light
       export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"
     fi
     ;;
