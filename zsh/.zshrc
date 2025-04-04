@@ -6,11 +6,11 @@ alias gc='git commit'
 alias gd='git diff'
 alias gf='git commit --amend --no-edit'
 alias gl='git log'
-alias gp='git pull'
+alias gp='git push'
 alias gr='git rebase'
 alias gs='git status -sb'
 alias gt='git checkout'
-alias gu='git push'
+alias gu='git pull'
 gll() { git log --graph --topo-order --abbrev-commit --date=short --decorate --all --boundary --pretty=format:"%Cgreen%ad %C(yellow)%h%Creset%C(red)%d%Creset %s %Cblue[%cn]%Creset" "$@"; }
 
 alias k='kubectl'
