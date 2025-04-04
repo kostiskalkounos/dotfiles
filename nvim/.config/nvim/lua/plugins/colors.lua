@@ -45,17 +45,15 @@ return {
 
     local function setup_lualine()
       local is_light = vim.o.background == "light"
-      local colors = is_light
-          and {
-            bg = "#eff1f5",
-            fg = "#4c4f69",
-            inactive = "#8c8fa1",
-          }
-        or {
-          bg = "#24273a",
-          fg = "#cad3f5",
-          inactive = "#6e738d",
-        }
+      local colors = is_light and {
+        bg = "#eff1f5",
+        fg = "#4c4f69",
+        inactive = "#8c8fa1",
+      } or {
+        bg = "#24273a",
+        fg = "#cad3f5",
+        inactive = "#6e738d",
+      }
 
       local function mode_section()
         return {

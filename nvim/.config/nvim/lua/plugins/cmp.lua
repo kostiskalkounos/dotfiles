@@ -217,7 +217,8 @@ return {
         { name = "path" },
       },
       formatting = {
-        -- fields = { "kind", "abbr", "menu" },
+        fields = { 'abbr', 'kind', 'menu' },
+        expandable_indicator = true,
         max_width = 0,
         format = function(entry, vim_item)
           vim_item.menu = ({
@@ -234,6 +235,7 @@ return {
         end,
       },
       sorting = {
+        priority_weight = 2,
         comparators = {
           cmp.config.compare.offset,
           cmp.config.compare.exact,

@@ -10,8 +10,8 @@ return {
     },
   },
   { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
-  { "stevearc/conform.nvim", event = "BufWritePre" },
-  { "towolf/vim-helm", ft = "helm" },
+  { "stevearc/conform.nvim",   event = "BufWritePre" },
+  { "towolf/vim-helm",         ft = "helm" },
   {
     "j-hui/fidget.nvim",
     event = "LspAttach",

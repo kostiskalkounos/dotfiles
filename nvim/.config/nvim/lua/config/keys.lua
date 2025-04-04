@@ -159,13 +159,3 @@ end, default)
 set("n", "<F8>", function()
   require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
 end, default)
-
-vim.cmd([[
-  augroup Terminal
-    au!
-    au TermOpen * setlocal nonumber norelativenumber
-  augroup end
-
-  command! -nargs=* Term split | terminal <args>
-  command! -nargs=* Vterm vsplit | terminal <args>
-]])
