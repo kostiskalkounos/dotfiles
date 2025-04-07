@@ -135,8 +135,8 @@ case "$FZF_THEME" in
     ;;
 esac
 
-trap 'export FZF_THEME=dark FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"' USR1
-trap 'export FZF_THEME=light FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"' USR2
+trap 'export FZF_THEME=dark FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" NVIM_THEME=dark' USR1
+trap 'export FZF_THEME=light FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" NVIM_THEME=light' USR2
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
