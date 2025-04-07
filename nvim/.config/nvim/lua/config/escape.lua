@@ -1,41 +1,37 @@
 local M = {}
+local a = vim.api
+local r = a.nvim_replace_termcodes
+local p = a.nvim_get_proc
+local c = a.nvim_get_proc_children
+local k = a.nvim_set_keymap
+local d = r("<C-\\><C-n>", true, true, true)
 
-local function t(str)
-  return vim.api.nvim_replace_termcodes(str, true, true, true)
-end
+local function t(s) return r(s, true, true, true) end
 
-local function find_process(pid, except)
-  local p = vim.api.nvim_get_proc(pid)
-  if p and except[p.name] then
-    return true
-  end
-  for _, child in ipairs(vim.api.nvim_get_proc_children(pid)) do
-    if find_process(child, except) then
-      return true
-    end
+local function f(i, e)
+  local x = p(i)
+  if x then
+    if e[x.name] then return true end
+    local h = c(i)
+    for _, w in ipairs(h) do if f(w, e) then return true end end
   end
   return false
 end
 
-function M.smart_esc(term_pid)
-  return t(find_process(term_pid, M.except) and M.key or "<C-\\><C-n>")
+function M.smart_esc(z) return f(z, M.except) and t(M.key) or d end
+
+local function s(l)
+  local x = {}
+  for _, v in ipairs(l) do x[v] = true end
+  return x
 end
 
-local function to_set(list)
-  local ret = {}
-  for _, v in ipairs(list) do
-    ret[v] = true
-  end
-  return ret
-end
-
-function M.setup(cfg)
-  M.key = (cfg and cfg.key) or "<Esc>"
-  M.except = (cfg and cfg.except) and to_set(cfg.except) or { nvim = true }
-
+function M.setup(g)
+  M.key = g and g.key or "<Esc>"
+  M.except = g and g.except and s(g.except) or { nvim = true }
   _G.termesc = M
-
-  vim.api.nvim_set_keymap("t", M.key, "v:lua.termesc.smart_esc(b:terminal_job_pid)", { noremap = true, expr = true })
+  local o = { noremap = true, expr = true }
+  k("t", M.key, "v:lua.termesc.smart_esc(b:terminal_job_pid)", o)
 end
 
 return M
