@@ -1,60 +1,45 @@
-local api = vim.api
+local api_nvim_create_augroup = vim.api.nvim_create_augroup
+local api_nvim_create_autocmd = vim.api.nvim_create_autocmd
+local api_nvim_create_user_command = vim.api.nvim_create_user_command
+local api_nvim_command = vim.api.nvim_command
 local opt_local = vim.opt_local
+local cmd = vim.cmd
 
-local function augroup(name)
-  return api.nvim_create_augroup(name, { clear = true })
-end
-
-api.nvim_create_autocmd("TextYankPost", {
-  group = augroup("highlight_yank"),
-  callback = function()
-    vim.highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = true })
-  end,
+api_nvim_create_autocmd("TextYankPost", {
+  group = api_nvim_create_augroup("highlight_yank", { clear = true }),
+  callback = function() vim.highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = true }) end
 })
 
-api.nvim_create_autocmd({ "BufEnter", "BufFilePost" }, {
-  group = augroup("Jenkinsfile"),
+api_nvim_create_autocmd({ "BufEnter", "BufFilePost" }, {
+  group = api_nvim_create_augroup("Jenkinsfile", { clear = true }),
   pattern = "Jenkinsfile*",
-  callback = function()
-    vim.cmd("set filetype=groovy")
-  end,
+  callback = function() cmd("set filetype=groovy") end
 })
 
-local group = api.nvim_create_augroup("CursorLineControl", { clear = true })
-local function set_cursorline(event, value, pattern)
-  api.nvim_create_autocmd(event, {
-    group = group,
-    pattern = pattern,
-    callback = function()
-      opt_local.cursorline = value
-    end,
-  })
-end
+local g = api_nvim_create_augroup("CursorLineControl", { clear = true })
+api_nvim_create_autocmd("WinLeave", { group = g, callback = function() opt_local.cursorline = false end })
+api_nvim_create_autocmd("WinEnter", { group = g, callback = function() opt_local.cursorline = true end })
+api_nvim_create_autocmd("FileType",
+  { group = g, pattern = "TelescopePrompt", callback = function() opt_local.cursorline = false end })
 
-set_cursorline("WinLeave", false)
-set_cursorline("WinEnter", true)
-set_cursorline("FileType", false, "TelescopePrompt")
-
-local terminal_augroup = api.nvim_create_augroup("Terminal", { clear = true })
-api.nvim_create_autocmd("TermOpen", {
-  group = terminal_augroup,
+local t = api_nvim_create_augroup("Terminal", { clear = true })
+api_nvim_create_autocmd("TermOpen", {
+  group = t,
   pattern = "*",
   callback = function()
     opt_local.number = false
     opt_local.relativenumber = false
-    vim.cmd("startinsert!")
-  end,
+    cmd("startinsert!")
+  end
 })
 
-local function create_terminal_cmd(name, split_cmd, resize_lines)
-  api.nvim_create_user_command(name, function(opts)
-    api.nvim_command(split_cmd)
-    if resize_lines then
-      api.nvim_command("resize " .. resize_lines)
-    end
-    api.nvim_command("terminal " .. opts.args)
-  end, { nargs = "*", complete = "file" })
-end
+api_nvim_create_user_command("Term", function(o)
+  api_nvim_command("split")
+  api_nvim_command("resize 15")
+  api_nvim_command("terminal " .. o.args)
+end, { nargs = "*", complete = "file" })
 
-create_terminal_cmd("Term", "split", 15)
-create_terminal_cmd("Vterm", "vsplit")
+api_nvim_create_user_command("Vterm", function(o)
+  api_nvim_command("vsplit")
+  api_nvim_command("terminal " .. o.args)
+end, { nargs = "*", complete = "file" })
