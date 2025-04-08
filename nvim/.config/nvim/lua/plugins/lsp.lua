@@ -74,7 +74,7 @@ return {
           local servers_settings = {
             lua_ls = {
               Lua = {
-                diagnostics = { globals = { "hs", "vim", "jit" } },
+                diagnostics = { globals = { "hs", "jit", "require", "vim" } },
                 telemetry = { enable = false },
                 workspace = { checkThirdParty = false },
               },
