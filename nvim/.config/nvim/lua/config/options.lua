@@ -1,65 +1,66 @@
-vim.opt.autoindent = true
-vim.opt.backup = false
-vim.opt.belloff = "all"
-vim.opt.breakindent = true
-vim.opt.cindent = true
+vim.o.autoindent = true
+vim.o.backup = false
+vim.o.belloff = "all"
+vim.o.breakindent = true
+vim.o.cindent = true
+vim.o.cursorline = true
+vim.o.expandtab = true
+vim.o.ff = "unix"
+vim.o.foldlevelstart = 99
+vim.o.foldmethod = "indent"
+vim.o.hidden = true
+vim.o.ignorecase = true
+vim.o.inccommand = "split"
+vim.o.joinspaces = false
+vim.o.laststatus = 2
+vim.o.lazyredraw = true
+vim.o.linebreak = true
+vim.o.list = true
+vim.o.makeprg = "make -j4 -w"
+vim.o.mouse = "a"
+vim.o.number = true
+vim.o.path = "$PWD/**"
+vim.o.pumheight = 15
+vim.o.relativenumber = true
+vim.o.ruler = false
+vim.o.scrolloff = 0
+vim.o.shiftround = true
+vim.o.shiftwidth = 2
+vim.o.showmatch = true
+vim.o.showmode = false
+vim.o.sidescroll = 0
+vim.o.sidescrolloff = 0
+vim.o.signcolumn = "yes"
+vim.o.smartcase = true
+vim.o.smartindent = true
+vim.o.smarttab = true
+vim.o.softtabstop = 2
+vim.o.spellcapcheck = ""
+vim.o.splitbelow = true
+vim.o.splitright = true
+vim.o.swapfile = false
+vim.o.tabstop = 2
+vim.o.termguicolors = true
+vim.o.timeout = false
+vim.o.undofile = true
+vim.o.updatetime = 300
+vim.o.virtualedit = "block"
+vim.o.wildignorecase = true
+vim.o.wildmenu = true
+vim.o.wildmode = "longest:full,full"
+vim.o.wrap = false
+
 vim.opt.complete:append("kspell")
 vim.opt.completeopt = { "fuzzy", "menuone", "noinsert", "preview" }
-vim.opt.cursorline = true
 vim.opt.diffopt:append("foldcolumn:0")
 vim.opt.directory:append(".")
-vim.opt.expandtab = true
-vim.opt.ff = "unix"
-vim.opt.foldlevelstart = 99
-vim.opt.foldmethod = "indent"
-vim.opt.hidden = true
-vim.opt.ignorecase = true
-vim.opt.inccommand = "split"
 vim.opt.isfname:append("@-@")
-vim.opt.joinspaces = false
-vim.opt.laststatus = 2
-vim.opt.lazyredraw = true
-vim.opt.linebreak = true
-vim.opt.list = true
 vim.opt.listchars:append("tab:  ,extends:>,precedes:<,trail:·,nbsp:⎵")
-vim.opt.makeprg = "make -j4 -w"
-vim.opt.mouse = "a"
-vim.opt.number = true
-vim.opt.path = "$PWD/**"
-vim.opt.pumheight = 15
-vim.opt.relativenumber = true
-vim.opt.ruler = false
-vim.opt.scrolloff = 0
-vim.opt.shiftround = true
-vim.opt.shiftwidth = 2
 vim.opt.shortmess:append("c")
-vim.opt.showmatch = true
-vim.opt.showmode = false
-vim.opt.sidescroll = 0
-vim.opt.sidescrolloff = 0
-vim.opt.signcolumn = "yes"
-vim.opt.smartcase = true
-vim.opt.smartindent = true
-vim.opt.smarttab = true
-vim.opt.softtabstop = 2
-vim.opt.spellcapcheck = ""
-vim.opt.splitbelow = true
-vim.opt.splitright = true
 vim.opt.suffixes:remove(".h")
-vim.opt.swapfile = false
-vim.opt.tabstop = 2
-vim.opt.termguicolors = true
-vim.opt.timeout = false
-vim.opt.undofile = true
-vim.opt.updatetime = 300
-vim.opt.virtualedit = "block"
 vim.opt.wildignore:append(
   "*.o,*.rej,*.so,.cache/*,.clangd/*,.venv/*,build/*,node_modules/*,vendor/*,package-lock.json,yarn.lock"
 )
-vim.opt.wildignorecase = true
-vim.opt.wildmenu = true
-vim.opt.wildmode = "longest:full,full"
-vim.opt.wrap = false
 
 if vim.fn.filereadable("/usr/local/bin/python3") == 1 then
   vim.g.python3_host_prog = "/usr/local/bin/python3"

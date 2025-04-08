@@ -13,7 +13,7 @@ api_nvim_create_autocmd("TextYankPost", {
 api_nvim_create_autocmd({ "BufEnter", "BufFilePost" }, {
   group = api_nvim_create_augroup("Jenkinsfile", { clear = true }),
   pattern = "Jenkinsfile*",
-  callback = function() cmd("set filetype=groovy") end
+  callback = function() vim.bo.filetype = "groovy" end
 })
 
 local g = api_nvim_create_augroup("CursorLineControl", { clear = true })
