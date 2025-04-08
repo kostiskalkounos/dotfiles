@@ -5,30 +5,24 @@ return {
   opts = {
     actions = { open_file = { resize_window = false } },
     update_focused_file = { enable = true, update_cwd = false },
-    filters = { custom = { "^.git$", "node_modules" } },
+    filters = { custom = { ["^.git$"] = true, ["node_modules"] = true } }
   },
-  config = function(_, opts)
-    local view = require("nvim-tree.view")
-    local api = require("nvim-tree.api")
-
-    vim.api.nvim_create_augroup("save_nvim_tree_width", { clear = true })
-    vim.api.nvim_create_autocmd("WinResized", {
-      group = "save_nvim_tree_width",
+  config = function(_, o)
+    local v, a, r = require "nvim-tree.view", require "nvim-tree.api", vim.api
+    r.nvim_create_augroup("s", { clear = true })
+    r.nvim_create_autocmd("WinResized", {
+      group = "s",
       pattern = "*",
       callback = function()
-        local filetree_winnr = view.get_winnr()
-        if filetree_winnr and vim.tbl_contains(vim.v.event.windows, filetree_winnr) then
-          vim.t.filetree_width = vim.api.nvim_win_get_width(filetree_winnr)
+        local w = v.get_winnr()
+        if w and vim.tbl_contains(vim.v.event.windows, w) then
+          vim.t.w = r.nvim_win_get_width(w)
         end
-      end,
-    })
-
-    api.events.subscribe(api.events.Event.TreeOpen, function()
-      if vim.t.filetree_width then
-        view.resize(vim.t.filetree_width)
       end
+    })
+    a.events.subscribe(a.events.Event.TreeOpen, function()
+      if vim.t.w then v.resize(vim.t.w) end
     end)
-
-    require("nvim-tree").setup(opts)
-  end,
+    require "nvim-tree".setup(o)
+  end
 }
