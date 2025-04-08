@@ -10,6 +10,13 @@ return {
     },
     config = function()
       require "nvim-treesitter.configs".setup({
+        auto_install = false,
+        autopairs = { enable = true },
+        highlight = { enable = not vim.g.vscode },
+        ignore_install = {},
+        indent = { enable = true },
+        modules = {},
+        sync_install = false,
         ensure_installed = {
           "bash",
           "c",
@@ -37,9 +44,6 @@ return {
           "xml",
           "yaml",
         },
-        highlight = { enable = not vim.g.vscode },
-        indent = { enable = true },
-        autopairs = { enable = true },
         textobjects = {
           select = {
             enable = true,
