@@ -1,37 +1,55 @@
 local M = {}
-local a = vim.api
-local r = a.nvim_replace_termcodes
-local p = a.nvim_get_proc
-local c = a.nvim_get_proc_children
-local k = a.nvim_set_keymap
-local d = r("<C-\\><C-n>", true, true, true)
 
-local function t(s) return r(s, true, true, true) end
+local nvimApi = vim.api
+local replaceTermcodes = nvimApi.nvim_replace_termcodes
+local getProcess = nvimApi.nvim_get_proc
+local getChildProcesses = nvimApi.nvim_get_proc_children
+local set = vim.keymap.set
+local defaultEscapeSequence = replaceTermcodes("<C-\\><C-n>", true, true, true)
 
-local function f(i, e)
-  local x = p(i)
-  if x then
-    if e[x.name] then return true end
-    local h = c(i)
-    for _, w in ipairs(h) do if f(w, e) then return true end end
+local function transformKeySequence(sequence)
+  return replaceTermcodes(sequence, true, true, true)
+end
+
+local function hasExcludedProcess(processId, excludedProcesses)
+  local processInfo = getProcess(processId)
+  if processInfo then
+    if excludedProcesses[processInfo.name] then
+      return true
+    end
+    local childProcessIds = getChildProcesses(processId)
+    for _, childProcessId in ipairs(childProcessIds) do
+      if hasExcludedProcess(childProcessId, excludedProcesses) then
+        return true
+      end
+    end
   end
   return false
 end
 
-function M.smart_esc(z) return f(z, M.except) and t(M.key) or d end
-
-local function s(l)
-  local x = {}
-  for _, v in ipairs(l) do x[v] = true end
-  return x
+function M.smartEscape(processId)
+  return hasExcludedProcess(processId, M.excludedProcesses)
+      and transformKeySequence(M.escapeKey)
+      or defaultEscapeSequence
 end
 
-function M.setup(g)
-  M.key = g and g.key or "<Esc>"
-  M.except = g and g.except and s(g.except) or { nvim = true }
+local function createExclusionSet(processNames)
+  local exclusionSet = {}
+  for _, processName in ipairs(processNames) do
+    exclusionSet[processName] = true
+  end
+  return exclusionSet
+end
+
+function M.setup(config)
+  M.escapeKey = config and config.key or "<Esc>"
+  M.excludedProcesses = config and config.except
+      and createExclusionSet(config.except)
+      or { nvim = true }
   _G.termesc = M
-  local o = { noremap = true, expr = true }
-  k("t", M.key, "v:lua.termesc.smart_esc(b:terminal_job_pid)", o)
+  set("t", M.escapeKey,
+    "v:lua.termesc.smartEscape(b:terminal_job_pid)",
+    { noremap = true, expr = true })
 end
 
 return M

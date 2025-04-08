@@ -55,6 +55,7 @@ return {
       })
 
       local dap = require "dap"
+      local dap_repl = require "dap.repl"
 
       dap.adapters.nlua = function(callback, config)
         callback({ type = "server", host = config.host or "127.0.0.1", port = config.port or 8086 })
@@ -131,8 +132,7 @@ return {
           assert(not err, err)
           if chunk then
             vim.schedule(function()
-              local d = require "dap.repl"
-              d.append(chunk)
+              dap_repl.append(chunk)
             end)
           end
         end)
@@ -277,7 +277,7 @@ return {
         dap.step_back()
       end, default)
       set("n", "<F6>", function()
-        dap.repl.toggle()
+        dap_repl.toggle()
       end, default)
       set("n", "<F7>", function()
         dap.toggle_breakpoint()
