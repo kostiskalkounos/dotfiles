@@ -11,6 +11,7 @@ return {
     "nvim-pack/nvim-spectre",
     dependencies = { "nvim-lua/plenary.nvim", "nvim-lua/popup.nvim" },
     cmd = "Spectre",
+    opts = {}
   },
   {
     "sindrets/diffview.nvim",

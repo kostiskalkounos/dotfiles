@@ -1,6 +1,7 @@
 local M = {}
 
-M.capabilities = require "cmp_nvim_lsp".default_capabilities(vim.lsp.protocol.make_client_capabilities())
+local c = require "cmp_nvim_lsp"
+M.capabilities = c.default_capabilities(vim.lsp.protocol.make_client_capabilities())
 M.capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 function M.setup()

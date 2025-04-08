@@ -4,7 +4,8 @@ return {
     keys = { "gc", "gb", "gcc", "gbc", "v", "V", "<C-v>" },
     dependencies = "JoosepAlviste/nvim-ts-context-commentstring",
     config = function()
-      require "Comment".setup({
+      local c = require "Comment"
+      c.setup({
         pre_hook = function(ctx)
           local U = require "Comment.utils"
           local ts_utils = require "ts_context_commentstring.utils"
@@ -21,7 +22,8 @@ return {
         end,
       })
 
-      require "ts_context_commentstring".setup({ enable_autocmd = false })
+      local t = require "ts_context_commentstring"
+      t.setup({ enable_autocmd = false })
     end,
   },
 }

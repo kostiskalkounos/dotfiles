@@ -23,7 +23,8 @@ return {
       )
       vim.fn.sign_define("DapLogPoint", { text = ".>", texthl = "DiagnosticInfo", linehl = "", numhl = "" })
 
-      require "nvim-dap-virtual-text".setup({
+      local virt_text = require "nvim-dap-virtual-text"
+      virt_text.setup({
         all_frames = false,
         all_references = false,
         clear_on_continue = false,
@@ -130,7 +131,8 @@ return {
           assert(not err, err)
           if chunk then
             vim.schedule(function()
-              require "dap.repl".append(chunk)
+              local d = require "dap.repl"
+              d.append(chunk)
             end)
           end
         end)
@@ -177,7 +179,8 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "dap-repl",
         callback = function()
-          require "dap.ext.autocompl".attach()
+          local d = require "dap.ext.autocompl"
+          d.attach()
         end,
       })
 
@@ -252,7 +255,8 @@ return {
         dap_ui.close()
       end
 
-      require "dap-go".setup()
+      local dap_go = require "dap-go"
+      dap_go.setup()
     end,
   },
 }

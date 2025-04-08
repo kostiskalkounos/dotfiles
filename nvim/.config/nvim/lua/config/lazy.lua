@@ -33,4 +33,5 @@ local options = {
   },
 }
 
-require "lazy".setup("plugins", options)
+local l = require "lazy"
+l.setup("plugins", options)

@@ -18,7 +18,8 @@ return {
     local cmp = require "cmp"
     local luasnip = require "luasnip"
 
-    require "luasnip/loaders/from_vscode".lazy_load()
+    local vs = require "luasnip/loaders/from_vscode"
+    vs.lazy_load()
 
     local kind_icons = {
       Text = "󰉿",
@@ -246,7 +247,8 @@ return {
       },
     })
 
-    require "nvim-autopairs".setup({
+    local autopairs = require "nvim-autopairs"
+    autopairs.setup({
       check_ts = true,
       disable_filetype = { "TelescopePrompt" },
       ts_config = {

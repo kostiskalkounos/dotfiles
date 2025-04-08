@@ -10,7 +10,8 @@ return {
   config = function()
     local actions = require "telescope.actions"
 
-    require "telescope".setup({
+    local t = require "telescope"
+    t.setup({
       defaults = {
         mappings = {
           i = {
@@ -51,6 +52,6 @@ return {
       },
     })
 
-    require "telescope".load_extension("fzf")
+    t.load_extension("fzf")
   end,
 }

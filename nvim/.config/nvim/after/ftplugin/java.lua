@@ -3,6 +3,8 @@ local handlers = require "config.handlers"
 local home = os.getenv("HOME")
 local root_pattern = require "lspconfig".util.root_pattern
 local mason_share = home .. "/.local/share/nvim/mason/share"
+local cmp = require "cmp_nvim_lsp"
+
 
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
 local workspace_dir = home .. "/.local/share/eclipse/" .. project_name
@@ -79,7 +81,7 @@ local config = {
     },
   },
 
-  capabilities = require "cmp_nvim_lsp".default_capabilities(),
+  capabilities = cmp.default_capabilities(),
   flags = {
     allow_incremental_sync = true,
     debounce_text_changes = 150,

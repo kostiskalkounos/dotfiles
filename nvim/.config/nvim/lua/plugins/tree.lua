@@ -23,6 +23,7 @@ return {
     a.events.subscribe(a.events.Event.TreeOpen, function()
       if vim.t.w then v.resize(vim.t.w) end
     end)
-    require "nvim-tree".setup(o)
+    local t = require "nvim-tree"
+    t.setup(o)
   end
 }

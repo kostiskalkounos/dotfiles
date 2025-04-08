@@ -3,7 +3,8 @@ require "config.options"
 require "config.autocmds"
 require "config.lazy"
 
-require "config.escape".setup({
+local c = require "config.escape"
+c.setup({
   key = "<Esc>",
   except = { "nvim", "fzf" },
 })

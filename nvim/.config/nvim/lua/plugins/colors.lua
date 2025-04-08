@@ -97,7 +97,8 @@ return {
       local colors = lualine_themes[is_light and "light" or "dark"]
       local mode = get_mode_section(colors)
 
-      require "lualine".setup({
+      local l = require "lualine"
+      l.setup({
         options = {
           icons_enabled = true,
           theme = {

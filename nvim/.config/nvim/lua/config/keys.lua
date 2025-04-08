@@ -121,6 +121,11 @@ set("v", "<leader>c", [["+y]], default)
 set("v", "<leader>p", "p", default)
 set("v", "<leader>v", [["+p]], default)
 
+local b = require "config.buffers"
+set("n", "<leader>q", function()
+  b.close_buffer()
+end, unique)
+
 set("n", "<leader>B", function()
   require "spectre".open()
 end, unique)
@@ -129,10 +134,6 @@ set("n", "<leader>b", function()
 end, unique)
 set("v", "<leader>b", function()
   require "spectre".open_visual()
-end, unique)
-
-set("n", "<leader>q", function()
-  require "config.buffers".close_buffer()
 end, unique)
 
 set("n", "<F1>", function()

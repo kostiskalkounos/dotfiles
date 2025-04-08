@@ -21,12 +21,13 @@ return {
     "jay-babu/mason-nvim-dap.nvim",
     cmd = { "DapInstall", "DapUninstall" },
     config = function()
-      require "mason-nvim-dap".setup({
+      local m = require "mason-nvim-dap"
+      m.setup({
         ensure_installed = { "delve", "java-debug-adapter", "java-test" },
         automatic_installation = true,
         handlers = {
           function(config)
-            require "mason-nvim-dap".default_setup(config)
+            m.default_setup(config)
           end,
         },
       })
@@ -99,7 +100,8 @@ return {
             end,
           })
 
-          require "conform".setup({
+          local c = require "conform"
+          c.setup({
             formatters_by_ft = {
               go = { "goimports", "gofmt" },
               javascript = { "prettierd", "prettier" },
