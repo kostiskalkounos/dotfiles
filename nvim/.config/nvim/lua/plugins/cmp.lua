@@ -59,7 +59,7 @@ return {
       return col == 0 or vim.api.nvim_get_current_line():sub(col, col):match("%s")
     end
 
-    local in_leading_indent = function()
+    local leading_indent = function()
       local col = column()
       local line = vim.api.nvim_get_current_line()
       local prefix = line:sub(1, col)
@@ -86,7 +86,7 @@ return {
         local col = column()
         local line = vim.api.nvim_get_current_line()
         local prefix = line:sub(1, col)
-        if in_leading_indent() then
+        if leading_indent() then
           keys = rhs("<BS>")
         else
           local previous_char = prefix:sub(#prefix, #prefix)
@@ -162,7 +162,7 @@ return {
         end,
       },
       mapping = cmp.mapping.preset.insert({
-        ["<BS>"] = cmp.mapping(function(_fallback)
+        ["<BS>"] = cmp.mapping(function(fallback)
           smart_bs()
         end, { "i", "s" }),
 
@@ -178,7 +178,7 @@ return {
           end
         end, { "i", "s" }),
 
-        ["<Tab>"] = cmp.mapping(function(_fallback)
+        ["<Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             local entries = cmp.get_entries()
             if #entries == 1 then
@@ -200,7 +200,7 @@ return {
             cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
           elseif luasnip.in_snippet() and luasnip.jumpable(-1) then
             luasnip.jump(-1)
-          elseif in_leading_indent() then
+          elseif leading_indent() then
             smart_bs(true)
           elseif in_whitespace() then
             smart_bs()
