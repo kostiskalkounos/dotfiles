@@ -1,18 +1,17 @@
 local jdtls = require "jdtls"
 local handlers = require "config.handlers"
-local home = os.getenv("HOME")
-local root_pattern = require "lspconfig".util.root_pattern
-local mason_share = home .. "/.local/share/nvim/mason/share"
+local lsp_util = require "lspconfig.util"
+local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
 local cmp = require "cmp_nvim_lsp"
 
-
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
-local workspace_dir = home .. "/.local/share/eclipse/" .. project_name
+local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name
 
-local bundles = vim.tbl_flatten({
+local Iter = require("vim.iter")
+local bundles = Iter({
   vim.fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
-  vim.fn.split(vim.fn.glob(mason_share .. "/java-test/*.jar", true), "\n"),
-})
+  vim.split(vim.fn.glob(mason_share .. "/java-test/*.jar", true), "\n"),
+}):flatten():totable()
 
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
@@ -28,28 +27,21 @@ local config = {
     "-javaagent:" .. mason_share .. "/jdtls/lombok.jar",
     "-Xmx2g",
     "--add-modules=ALL-SYSTEM",
-    "--add-opens",
-    "java.base/java.util=ALL-UNNAMED",
-    "--add-opens",
-    "java.base/java.lang=ALL-UNNAMED",
-    "-jar",
-    mason_share .. "/jdtls/plugins/org.eclipse.equinox.launcher.jar",
-    "-configuration",
-    home .. "/.local/share/nvim/mason/packages/jdtls/config_mac",
-    "-data",
-    workspace_dir,
+    "--add-opens", "java.base/java.util=ALL-UNNAMED",
+    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+    "-jar", mason_share .. "/jdtls/plugins/org.eclipse.equinox.launcher.jar",
+    "-configuration", mason_share .. "/../packages/jdtls/config_mac",
+    "-data", workspace_dir,
   },
 
-  root_dir = root_pattern(".git", "mvnw", "gradlew", "pom.xml", "build.gradle", "build.gradle.kts")(
+  root_dir = lsp_util.root_pattern(".git", "mvnw", "gradlew", "pom.xml", "build.gradle", "build.gradle.kts")(
     vim.api.nvim_buf_get_name(0)
   ),
 
   settings = {
     java = {
       autobuild = { enabled = false },
-      configuration = {
-        updateBuildConfiguration = "interactive",
-      },
+      configuration = { updateBuildConfiguration = "interactive" },
       contentProvider = { preferred = "fernflower" },
       eclipse = { downloadSources = true },
       maven = { downloadSources = true },
@@ -95,38 +87,30 @@ local config = {
 
 local version_patterns = {
   ["pom.xml"] = {
-    patterns = {
-      "<java%.version>([%d.]+)</java%.version>",
-      "<maven%.compiler%.source>([%d.]+)</maven%.compiler%.source>",
-      "<maven%.compiler%.target>([%d.]+)</maven%.compiler%.target>",
-    },
+    "<java%.version>([%d.]+)</java%.version>",
+    "<maven%.compiler%.source>([%d.]+)</maven%.compiler%.source>",
+    "<maven%.compiler%.target>([%d.]+)</maven%.compiler%.target>",
   },
   ["build.gradle"] = {
-    patterns = {
-      "sourceCompatibility%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
-      "targetCompatibility%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
-      "java%.version%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
-    },
+    "sourceCompatibility%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
+    "targetCompatibility%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
+    "java%.version%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
   },
   ["build.gradle.kts"] = {
-    patterns = {
-      "sourceCompatibility%s*=%s*JavaVersion%.VERSION_(%d+%.?%d*)",
-      "targetCompatibility%s*=%s*JavaVersion%.VERSION_(%d+%.?%d*)",
-    },
+    "sourceCompatibility%s*=%s*JavaVersion%.VERSION_(%d+%.?%d*)",
+    "targetCompatibility%s*=%s*JavaVersion%.VERSION_(%d+%.?%d*)",
   },
 }
 
 local function getJavaVersion()
   local root_dir = config.root_dir
-  if not root_dir then
-    return nil
-  end
+  if not root_dir then return nil end
 
-  for filename, conf in pairs(version_patterns) do
+  for filename, patterns in pairs(version_patterns) do
     local path = vim.fs.find(filename, { upward = true, path = root_dir, limit = 1 })[1]
     if path then
       for line in io.lines(path) do
-        for _, pattern in ipairs(conf.patterns) do
+        for _, pattern in ipairs(patterns) do
           local version = line:match(pattern)
           if version then
             return version
@@ -140,19 +124,19 @@ end
 
 config.on_attach = function(client, bufnr)
   local java_version = getJavaVersion()
-
   if java_version then
-    local current_java_home = vim.env.JAVA_HOME
-    local detected_java_home = vim.fn.trim(vim.fn.system("/usr/libexec/java_home -v " .. java_version))
-
-    if detected_java_home ~= "" and current_java_home ~= detected_java_home then
+    local detected_java_home = vim.trim(vim.fn.system("/usr/libexec/java_home -v " .. java_version))
+    if detected_java_home ~= "" and vim.env.JAVA_HOME ~= detected_java_home then
       vim.env.JAVA_HOME = detected_java_home
     end
   end
 
   handlers.on_attach(client, bufnr)
-  jdtls.setup_dap({ hotcodereplace = "auto" })
-  jdtls.setup.add_commands()
+
+  jdtls.setup_dap({
+    hotcodereplace = "auto",
+    config_overrides = {},
+  })
 
   local jdtls_dap = require "jdtls.dap"
   jdtls_dap.setup_dap_main_class_configs()
