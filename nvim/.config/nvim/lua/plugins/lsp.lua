@@ -21,12 +21,12 @@ return {
     "jay-babu/mason-nvim-dap.nvim",
     cmd = { "DapInstall", "DapUninstall" },
     config = function()
-      require("mason-nvim-dap").setup({
+      require "mason-nvim-dap".setup({
         ensure_installed = { "delve", "java-debug-adapter", "java-test" },
         automatic_installation = true,
         handlers = {
           function(config)
-            require("mason-nvim-dap").default_setup(config)
+            require "mason-nvim-dap".default_setup(config)
           end,
         },
       })
@@ -41,10 +41,10 @@ return {
         "neovim/nvim-lspconfig",
         event = "BufReadPost",
         config = function()
-          local handlers = require("config.handlers")
-          local mason = require("mason")
-          local mason_lspconfig = require("mason-lspconfig")
-          local lspconfig = require("lspconfig")
+          local handlers = require "config.handlers"
+          local mason = require "mason"
+          local mason_lspconfig = require "mason-lspconfig"
+          local lspconfig = require "lspconfig"
 
           mason.setup()
 
@@ -99,7 +99,7 @@ return {
             end,
           })
 
-          require("conform").setup({
+          require "conform".setup({
             formatters_by_ft = {
               go = { "goimports", "gofmt" },
               javascript = { "prettierd", "prettier" },

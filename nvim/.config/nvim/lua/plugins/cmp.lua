@@ -15,10 +15,10 @@ return {
       return vim.api.nvim_replace_termcodes(rhs_str, true, true, true)
     end
 
-    local cmp = require("cmp")
-    local has_luasnip, luasnip = pcall(require, "luasnip")
+    local cmp = require "cmp"
+    local luasnip = require "luasnip"
 
-    require("luasnip/loaders/from_vscode").lazy_load()
+    require "luasnip/loaders/from_vscode".lazy_load()
 
     local kind_icons = {
       Text = "󰉿",
@@ -157,9 +157,7 @@ return {
       },
       snippet = {
         expand = function(args)
-          if has_luasnip then
-            luasnip.lsp_expand(args.body)
-          end
+          luasnip.lsp_expand(args.body)
         end,
       },
       mapping = cmp.mapping.preset.insert({
@@ -187,7 +185,7 @@ return {
             else
               cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
             end
-          elseif has_luasnip and luasnip.expand_or_locally_jumpable() then
+          elseif luasnip.expand_or_locally_jumpable() then
             luasnip.expand_or_jump()
           elseif in_whitespace() then
             smart_tab()
@@ -199,7 +197,7 @@ return {
         ["<S-Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
-          elseif has_luasnip and luasnip.in_snippet() and luasnip.jumpable(-1) then
+          elseif luasnip.in_snippet() and luasnip.jumpable(-1) then
             luasnip.jump(-1)
           elseif in_leading_indent() then
             smart_bs(true)
@@ -248,7 +246,7 @@ return {
       },
     })
 
-    require("nvim-autopairs").setup({
+    require "nvim-autopairs".setup({
       check_ts = true,
       disable_filetype = { "TelescopePrompt" },
       ts_config = {

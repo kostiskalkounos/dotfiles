@@ -1,7 +1,7 @@
-local jdtls = require("jdtls")
-local handlers = require("config.handlers")
+local jdtls = require "jdtls"
+local handlers = require "config.handlers"
 local home = os.getenv("HOME")
-local root_pattern = require("lspconfig").util.root_pattern
+local root_pattern = require "lspconfig".util.root_pattern
 local mason_share = home .. "/.local/share/nvim/mason/share"
 
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
@@ -79,7 +79,7 @@ local config = {
     },
   },
 
-  capabilities = require("cmp_nvim_lsp").default_capabilities(),
+  capabilities = require "cmp_nvim_lsp".default_capabilities(),
   flags = {
     allow_incremental_sync = true,
     debounce_text_changes = 150,
@@ -152,7 +152,7 @@ config.on_attach = function(client, bufnr)
   jdtls.setup_dap({ hotcodereplace = "auto" })
   jdtls.setup.add_commands()
 
-  local jdtls_dap = require("jdtls.dap")
+  local jdtls_dap = require "jdtls.dap"
   jdtls_dap.setup_dap_main_class_configs()
 
   local opts = { noremap = true, silent = true, buffer = bufnr }

@@ -6,10 +6,10 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
       { "nvim-treesitter/playground", cmd = "TSHighlightCapturesUnderCursor" },
-      { "windwp/nvim-ts-autotag", opts = {} },
+      { "windwp/nvim-ts-autotag",     opts = {} },
     },
     config = function()
-      require("nvim-treesitter.configs").setup({
+      require "nvim-treesitter.configs".setup({
         ensure_installed = {
           "bash",
           "c",

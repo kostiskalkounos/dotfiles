@@ -5,7 +5,7 @@ return {
   priority = 1000,
   dependencies = { "nvim-lualine/lualine.nvim" },
   config = function()
-    local catppuccin = require("catppuccin")
+    local catppuccin = require "catppuccin"
 
     local highlight_cache = {}
 
@@ -97,7 +97,7 @@ return {
       local colors = lualine_themes[is_light and "light" or "dark"]
       local mode = get_mode_section(colors)
 
-      require("lualine").setup({
+      require "lualine".setup({
         options = {
           icons_enabled = true,
           theme = {

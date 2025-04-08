@@ -8,9 +8,9 @@ return {
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
   },
   config = function()
-    local actions = require("telescope.actions")
+    local actions = require "telescope.actions"
 
-    require("telescope").setup({
+    require "telescope".setup({
       defaults = {
         mappings = {
           i = {
@@ -51,6 +51,6 @@ return {
       },
     })
 
-    require("telescope").load_extension("fzf")
+    require "telescope".load_extension("fzf")
   end,
 }
