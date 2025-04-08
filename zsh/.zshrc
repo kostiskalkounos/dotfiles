@@ -19,10 +19,22 @@ alias kx='kubectx'
 
 alias c='colima'
 alias cn='colima nerdctl'
+alias cc='colima nerdctl compose'
+alias cnn='colima nerdctl network rm $(colima nerdctl network ls -q)'
+alias cnp='colima nerdctl system prune --volumes -af'
+alias cnv='colima nerdctl volume rm $(colima nerdctl volume ls -q)'
+
 alias d='docker'
 alias dc='docker compose'
+alias dn='docker network rm $(docker network ls -q)'
+alias dp='docker system prune --volumes -af'
+alias dv='docker volume rm $(docker volume ls -q)'
+
 alias p='podman'
 alias pc='podman-compose'
+alias pn='podman network rm $(podman network ls -q)'
+alias pp='podman system prune --volumes -af'
+alias pv='podman volume rm $(podman volume ls -q)'
 
 alias la='ls -lah'
 alias ld='lazydocker'
@@ -31,7 +43,7 @@ alias ll='ls -lh'
 alias ls='gls --color=auto --group-directories-first'
 
 alias brewu='brew update && brew upgrade -g && brew cleanup'
-alias mvni='mvn clean install -DskipTests -T 1.5C -U'
+alias mi='mvn clean install -DskipTests -T 1.5C -U'
 alias pip=pip3
 alias python=python3
 alias sudo='sudo '
