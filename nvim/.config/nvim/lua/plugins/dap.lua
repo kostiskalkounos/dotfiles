@@ -78,7 +78,7 @@ return {
 
       dap.configurations.java = {
         {
-          name = "Debug Launch (4GB)",
+          name = "Debug Launch (2GB)",
           type = "java",
           request = "launch",
           vmArgs = "-Xmx4g ",
@@ -257,6 +257,34 @@ return {
 
       local dap_go = require "dap-go"
       dap_go.setup()
+
+      local default = { noremap = true, unique = true, silent = true }
+      local set = vim.keymap.set
+
+      set("n", "<F1>", function()
+        dap.continue()
+      end, default)
+      set("n", "<F2>", function()
+        dap.step_over()
+      end, default)
+      set("n", "<F3>", function()
+        dap.step_into()
+      end, default)
+      set("n", "<F4>", function()
+        dap.step_out()
+      end, default)
+      set("n", "<F5>", function()
+        dap.step_back()
+      end, default)
+      set("n", "<F6>", function()
+        dap.repl.toggle()
+      end, default)
+      set("n", "<F7>", function()
+        dap.toggle_breakpoint()
+      end, default)
+      set("n", "<F8>", function()
+        dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+      end, default)
     end,
   },
 }
