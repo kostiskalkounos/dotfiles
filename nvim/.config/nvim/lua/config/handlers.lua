@@ -1,12 +1,16 @@
 local M = {}
 
-local c = require "cmp_nvim_lsp"
-M.capabilities = c.default_capabilities(vim.lsp.protocol.make_client_capabilities())
+M.capabilities = require("cmp_nvim_lsp").default_capabilities()
 M.capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 function M.setup()
   vim.diagnostic.config({
-    float = { focusable = true, style = "minimal", border = "rounded", source = true },
+    float = {
+      focusable = true,
+      style = "minimal",
+      border = "rounded",
+      source = true
+    },
     signs = {
       active = true,
       text = {
@@ -26,6 +30,7 @@ end
 function M.on_attach(client, bufnr)
   local set = vim.keymap.set
   local opts = { noremap = true, silent = true, buffer = bufnr }
+  local float = { float = true }
 
   set("n", "<leader>Y", vim.diagnostic.setqflist, opts)
   set("n", "<leader>g", vim.lsp.buf.code_action, opts)
@@ -34,14 +39,29 @@ function M.on_attach(client, bufnr)
   set("n", "<leader>r", vim.lsp.buf.rename, opts)
   set("n", "<leader>y", vim.diagnostic.setloclist, opts)
   set("n", "K", vim.lsp.buf.hover, opts)
-  set("n", "[d", vim.diagnostic.goto_prev, opts)
-  set("n", "]d", vim.diagnostic.goto_next, opts)
+
+  set("n", "[d", function()
+    vim.diagnostic.jump({ count = -1, float })
+  end, opts)
+  set("n", "]d", function()
+    vim.diagnostic.jump({ count = 1, float })
+  end, opts)
+
   set("n", "[e", function()
-    vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+    vim.diagnostic.jump({
+      count = -1,
+      severity = vim.diagnostic.severity.ERROR,
+      float
+    })
   end, opts)
   set("n", "]e", function()
-    vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+    vim.diagnostic.jump({
+      count = 1,
+      severity = vim.diagnostic.severity.ERROR,
+      float
+    })
   end, opts)
+
   set("n", "gD", "<cmd>Telescope lsp_definitions<CR>", opts)
   set("n", "gI", "<cmd>Telescope lsp_implementations<CR>", opts)
   set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
