@@ -48,10 +48,11 @@ return {
 
     vim.cmd.colorscheme("catppuccin")
 
+    local fn = vim.fn
     if os.getenv("TMUX") then
       local theme = os.getenv("NVIM_THEME")
       vim.o.background = theme or (
-        vim.fn.system("defaults read -g AppleInterfaceStyle 2>/dev/null"):match("Dark") and "dark" or "light"
+        fn.system("defaults read -g AppleInterfaceStyle 2>/dev/null"):match("Dark") and "dark" or "light"
       )
     end
 
@@ -78,17 +79,18 @@ return {
 
     local function filename_component()
       return function()
-        local fn = vim.fn.expand("%:~:.")
-        if vim.startswith(fn, "jdt://") then
-          fn = fn:match("(.-)%?")
+        local ex = fn.expand("%:~:.")
+        if vim.startswith(ex, "jdt://") then
+          ex = ex:match("(.-)%?")
         end
-        if fn == "" then fn = "[No Name]" end
-        if vim.bo.modified then fn = fn .. " [+]" end
-        if not vim.bo.modifiable or vim.bo.readonly then fn = fn .. " [-]" end
-        if vim.fn.expand("%") ~= "" and vim.bo.buftype == "" and vim.fn.filereadable(vim.fn.expand("%")) == 0 then
-          fn = fn .. " [New]"
+        if ex == "" then ex = "[No Name]" end
+        if vim.bo.modified then ex = ex .. " [+]" end
+        if not vim.bo.modifiable or vim.bo.readonly then ex = ex .. " [-]" end
+        local exp = fn.expand("%")
+        if exp ~= "" and vim.bo.buftype == "" and fn.filereadable(exp) == 0 then
+          ex = ex .. " [New]"
         end
-        return fn
+        return ex
       end
     end
 

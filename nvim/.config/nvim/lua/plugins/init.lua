@@ -1,12 +1,7 @@
 return {
-  {
-    "almo7aya/openingh.nvim",
-    cmd = { "OpenInGHRepo", "OpenInGHFile", "OpenInGHFileLines" },
-  },
-  {
-    "mbbill/undotree",
-    cmd = "UndotreeToggle",
-  },
+  { "almo7aya/openingh.nvim", cmd = { "OpenInGHRepo", "OpenInGHFile", "OpenInGHFileLines" } },
+  { "mbbill/undotree",        cmd = "UndotreeToggle" },
+  { "stevearc/oil.nvim",      cmd = "Oil",                                                  opts = {} },
   {
     "nvim-pack/nvim-spectre",
     dependencies = { "nvim-lua/plenary.nvim", "nvim-lua/popup.nvim" },
@@ -23,11 +18,6 @@ return {
       "DiffviewRefresh",
     },
     dependencies = "nvim-lua/plenary.nvim",
-  },
-  {
-    "stevearc/oil.nvim",
-    cmd = "Oil",
-    opts = {},
   },
   {
     "NeogitOrg/neogit",

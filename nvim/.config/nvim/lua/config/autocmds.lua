@@ -1,9 +1,11 @@
-local api_nvim_create_augroup = vim.api.nvim_create_augroup
-local api_nvim_create_autocmd = vim.api.nvim_create_autocmd
-local api_nvim_create_user_command = vim.api.nvim_create_user_command
-local api_nvim_command = vim.api.nvim_command
-local opt_local = vim.opt_local
+local api = vim.api
 local cmd = vim.cmd
+local opt_local = vim.opt_local
+
+local api_nvim_command = api.nvim_command
+local api_nvim_create_augroup = api.nvim_create_augroup
+local api_nvim_create_autocmd = api.nvim_create_autocmd
+local api_nvim_create_user_command = api.nvim_create_user_command
 
 api_nvim_create_autocmd("TextYankPost", {
   group = api_nvim_create_augroup("highlight_yank", { clear = true }),

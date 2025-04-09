@@ -1,21 +1,15 @@
 return {
   "mfussenegger/nvim-jdtls",
+  { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
+  { "stevearc/conform.nvim",   event = "BufWritePre" },
+  { "towolf/vim-helm",         ft = "helm" },
+  { "j-hui/fidget.nvim",       event = "LspAttach",  opts = {} },
   {
     "folke/lazydev.nvim",
     ft = "lua",
     opts = {
-      library = {
-        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-      },
+      library = { { path = "${3rd}/luv/library", words = { "vim%.uv" } } },
     },
-  },
-  { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
-  { "stevearc/conform.nvim",   event = "BufWritePre" },
-  { "towolf/vim-helm",         ft = "helm" },
-  {
-    "j-hui/fidget.nvim",
-    event = "LspAttach",
-    opts = {},
   },
   {
     "jay-babu/mason-nvim-dap.nvim",
@@ -25,11 +19,7 @@ return {
       m.setup({
         ensure_installed = { "delve", "java-debug-adapter", "java-test" },
         automatic_installation = true,
-        handlers = {
-          function(config)
-            m.default_setup(config)
-          end,
-        },
+        handlers = { function(config) m.default_setup(config) end },
       })
     end,
   },
@@ -81,11 +71,7 @@ return {
             },
           }
 
-          mason_lspconfig.setup({
-            ensure_installed = servers,
-            automatic_installation = true,
-          })
-
+          mason_lspconfig.setup({ ensure_installed = servers, automatic_installation = true })
           handlers.setup()
 
           mason_lspconfig.setup_handlers({
@@ -104,14 +90,12 @@ return {
           c.setup({
             formatters_by_ft = {
               go = { "goimports", "gofmt" },
-              javascript = { "prettierd", "prettier" },
+              javascript = { "prettier" },
               lua = { "stylua" },
-              python = { "isort", "black" },
+              python = { "black" },
             },
             format_on_save = function()
-              if vim.g.disable_autoformat then
-                return
-              end
+              if vim.g.disable_autoformat then return end
               return { timeout_ms = 500, lsp_format = "fallback", quiet = true }
             end,
           })

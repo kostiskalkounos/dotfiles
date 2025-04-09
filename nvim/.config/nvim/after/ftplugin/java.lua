@@ -1,16 +1,16 @@
-local jdtls = require "jdtls"
+local cmp = require "cmp_nvim_lsp"
+local fn = vim.fn
 local handlers = require "config.handlers"
+local jdtls = require "jdtls"
 local lsp_util = require "lspconfig.util"
 local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
-local cmp = require "cmp_nvim_lsp"
-
-local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
+local project_name = fn.fnamemodify(fn.getcwd(), ":t")
 local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name
 
 local Iter = require("vim.iter")
 local bundles = Iter({
-  vim.fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
-  vim.split(vim.fn.glob(mason_share .. "/java-test/*.jar", true), "\n"),
+  fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
+  vim.split(fn.glob(mason_share .. "/java-test/*.jar", true), "\n"),
 }):flatten():totable()
 
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
@@ -122,26 +122,22 @@ local function getJavaVersion()
   return nil
 end
 
-config.on_attach = function(client, bufnr)
+config.on_attach = function()
   local java_version = getJavaVersion()
   if java_version then
-    local detected_java_home = vim.trim(vim.fn.system("/usr/libexec/java_home -v " .. java_version))
+    local detected_java_home = vim.trim(fn.system("/usr/libexec/java_home -v " .. java_version))
     if detected_java_home ~= "" and vim.env.JAVA_HOME ~= detected_java_home then
       vim.env.JAVA_HOME = detected_java_home
     end
   end
 
-  handlers.on_attach(client, bufnr)
-
-  jdtls.setup_dap({
-    hotcodereplace = "auto",
-    config_overrides = {},
-  })
+  handlers.on_attach()
+  jdtls.setup_dap({ hotcodereplace = "auto", config_overrides = {} })
 
   local jdtls_dap = require "jdtls.dap"
   jdtls_dap.setup_dap_main_class_configs()
 
-  local opts = { noremap = true, silent = true, buffer = bufnr }
+  local opts = { noremap = true, silent = true }
   vim.keymap.set("n", "<F9>", jdtls.test_class, opts)
   vim.keymap.set("n", "<F10>", jdtls.test_nearest_method, opts)
 end
