@@ -11,17 +11,19 @@ return {
       "williamboman/mason.nvim",
     },
     config = function()
-      vim.fn.sign_define("DapBreakpoint", { text = " ", texthl = "DiagnosticSignError", linehl = "", numhl = "" })
-      vim.fn.sign_define("DapBreakpointCondition", { text = " ", texthl = "", linehl = "", numhl = "" })
-      vim.fn.sign_define(
+      local fn = vim.fn
+
+      fn.sign_define("DapBreakpoint", { text = " ", texthl = "DiagnosticSignError", linehl = "", numhl = "" })
+      fn.sign_define("DapBreakpointCondition", { text = " ", texthl = "", linehl = "", numhl = "" })
+      fn.sign_define(
         "DapStopped",
         { text = "󰁕 ", texthl = "DiagnosticWarn", linehl = "DapStoppedLine", numhl = "" }
       )
-      vim.fn.sign_define(
+      fn.sign_define(
         "DapBreakpointRejected",
         { text = " ", texthl = "DiagnosticError", linehl = "", numhl = "" }
       )
-      vim.fn.sign_define("DapLogPoint", { text = ".>", texthl = "DiagnosticInfo", linehl = "", numhl = "" })
+      fn.sign_define("DapLogPoint", { text = ".>", texthl = "DiagnosticInfo", linehl = "", numhl = "" })
 
       local virt_text = require "nvim-dap-virtual-text"
       virt_text.setup({
@@ -67,10 +69,10 @@ return {
           request = "attach",
           name = "Neovim attach",
           host = function()
-            return vim.fn.input("Host [127.0.0.1]: ") or "127.0.0.1"
+            return fn.input("Host [127.0.0.1]: ") or "127.0.0.1"
           end,
           port = function()
-            local val = tonumber(vim.fn.input("Port: "))
+            local val = tonumber(fn.input("Port: "))
             assert(val, "Please provide a port number")
             return val
           end,
@@ -156,8 +158,8 @@ return {
           request = "launch",
           program = "${file}",
           args = function()
-            local argument_string = vim.fn.input("Program arg(s): ")
-            return vim.fn.split(argument_string, " ", true)
+            local argument_string = fn.input("Program arg(s): ")
+            return fn.split(argument_string, " ", true)
           end,
         },
         {
@@ -239,21 +241,10 @@ return {
         },
       })
 
-      dap.listeners.before.attach.dapui_config = function()
-        dap_ui.open()
-      end
-
-      dap.listeners.before.launch.dapui_config = function()
-        dap_ui.open()
-      end
-
-      dap.listeners.before.event_terminated.dapui_config = function()
-        dap_ui.close()
-      end
-
-      dap.listeners.before.event_exited.dapui_config = function()
-        dap_ui.close()
-      end
+      dap.listeners.before.attach.dapui_config = function() dap_ui.open() end
+      dap.listeners.before.launch.dapui_config = function() dap_ui.open() end
+      dap.listeners.before.event_terminated.dapui_config = function() dap_ui.close() end
+      dap.listeners.before.event_exited.dapui_config = function() dap_ui.close() end
 
       local dap_go = require "dap-go"
       dap_go.setup()
@@ -261,30 +252,14 @@ return {
       local default = { noremap = true, unique = true, silent = true }
       local set = vim.keymap.set
 
-      set("n", "<F1>", function()
-        dap.continue()
-      end, default)
-      set("n", "<F2>", function()
-        dap.step_over()
-      end, default)
-      set("n", "<F3>", function()
-        dap.step_into()
-      end, default)
-      set("n", "<F4>", function()
-        dap.step_out()
-      end, default)
-      set("n", "<F5>", function()
-        dap.step_back()
-      end, default)
-      set("n", "<F6>", function()
-        dap_repl.toggle()
-      end, default)
-      set("n", "<F7>", function()
-        dap.toggle_breakpoint()
-      end, default)
-      set("n", "<F8>", function()
-        dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
-      end, default)
+      set("n", "<F1>", function() dap.continue() end, default)
+      set("n", "<F2>", function() dap.step_over() end, default)
+      set("n", "<F3>", function() dap.step_into() end, default)
+      set("n", "<F4>", function() dap.step_out() end, default)
+      set("n", "<F5>", function() dap.step_back() end, default)
+      set("n", "<F6>", function() dap_repl.toggle() end, default)
+      set("n", "<F7>", function() dap.toggle_breakpoint() end, default)
+      set("n", "<F8>", function() dap.set_breakpoint(fn.input("Breakpoint condition: ")) end, default)
     end,
   },
 }

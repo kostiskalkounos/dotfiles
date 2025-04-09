@@ -1,10 +1,11 @@
 local M = {}
 
 local nvimApi = vim.api
-local replaceTermcodes = nvimApi.nvim_replace_termcodes
-local getProcess = nvimApi.nvim_get_proc
-local getChildProcesses = nvimApi.nvim_get_proc_children
 local set = vim.keymap.set
+
+local getChildProcesses = nvimApi.nvim_get_proc_children
+local getProcess = nvimApi.nvim_get_proc
+local replaceTermcodes = nvimApi.nvim_replace_termcodes
 local defaultEscapeSequence = replaceTermcodes("<C-\\><C-n>", true, true, true)
 
 local function transformKeySequence(sequence)

@@ -1,10 +1,19 @@
 local M = {}
 
-M.capabilities = require("cmp_nvim_lsp").default_capabilities()
+local cmp = require "cmp_nvim_lsp"
+
+local buf = vim.lsp.buf
+local diagnostic = vim.diagnostic
+local float = { float = true }
+local opts = { noremap = true, silent = true }
+local set = vim.keymap.set
+
+
+M.capabilities = cmp.default_capabilities()
 M.capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 function M.setup()
-  vim.diagnostic.config({
+  diagnostic.config({
     float = {
       focusable = true,
       style = "minimal",
@@ -14,10 +23,10 @@ function M.setup()
     signs = {
       active = true,
       text = {
-        [vim.diagnostic.severity.ERROR] = "",
-        [vim.diagnostic.severity.WARN] = "",
-        [vim.diagnostic.severity.HINT] = "󰌶",
-        [vim.diagnostic.severity.INFO] = "",
+        [diagnostic.severity.ERROR] = "",
+        [diagnostic.severity.WARN] = "",
+        [diagnostic.severity.HINT] = "󰌶",
+        [diagnostic.severity.INFO] = "",
       },
     },
     severity_sort = true,
@@ -27,47 +36,27 @@ function M.setup()
   })
 end
 
-function M.on_attach(client, bufnr)
-  local set = vim.keymap.set
-  local opts = { noremap = true, silent = true, buffer = bufnr }
-  local float = { float = true }
-
-  set("n", "<leader>Y", vim.diagnostic.setqflist, opts)
-  set("n", "<leader>g", vim.lsp.buf.code_action, opts)
+function M.on_attach()
+  set("n", "<leader>Y", diagnostic.setqflist, opts)
+  set("n", "<leader>g", buf.code_action, opts)
   set("n", "<leader>m", "<cmd>Telescope diagnostics<CR>", opts)
-  set("n", "<leader>o", vim.diagnostic.open_float, opts)
-  set("n", "<leader>r", vim.lsp.buf.rename, opts)
-  set("n", "<leader>y", vim.diagnostic.setloclist, opts)
-  set("n", "K", vim.lsp.buf.hover, opts)
+  set("n", "<leader>o", diagnostic.open_float, opts)
+  set("n", "<leader>r", buf.rename, opts)
+  set("n", "<leader>y", diagnostic.setloclist, opts)
+  set("n", "K", buf.hover, opts)
 
-  set("n", "[d", function()
-    vim.diagnostic.jump({ count = -1, float })
-  end, opts)
-  set("n", "]d", function()
-    vim.diagnostic.jump({ count = 1, float })
-  end, opts)
+  set("n", "[d", function() diagnostic.jump({ count = -1, float }) end, opts)
+  set("n", "]d", function() diagnostic.jump({ count = 1, float }) end, opts)
 
-  set("n", "[e", function()
-    vim.diagnostic.jump({
-      count = -1,
-      severity = vim.diagnostic.severity.ERROR,
-      float
-    })
-  end, opts)
-  set("n", "]e", function()
-    vim.diagnostic.jump({
-      count = 1,
-      severity = vim.diagnostic.severity.ERROR,
-      float
-    })
-  end, opts)
+  set("n", "[e", function() diagnostic.jump({ count = -1, severity = diagnostic.severity.ERROR, float }) end, opts)
+  set("n", "]e", function() diagnostic.jump({ count = 1, severity = diagnostic.severity.ERROR, float }) end, opts)
 
   set("n", "gD", "<cmd>Telescope lsp_definitions<CR>", opts)
   set("n", "gI", "<cmd>Telescope lsp_implementations<CR>", opts)
   set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts)
-  set("n", "gd", vim.lsp.buf.definition, opts)
-  set("n", "gi", vim.lsp.buf.implementation, opts)
-  set("n", "gr", vim.lsp.buf.references, opts)
+  set("n", "gd", buf.definition, opts)
+  set("n", "gi", buf.implementation, opts)
+  set("n", "gr", buf.references, opts)
 end
 
 return M

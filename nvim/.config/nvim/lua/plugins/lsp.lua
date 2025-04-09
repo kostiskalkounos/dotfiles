@@ -1,5 +1,9 @@
 return {
   "mfussenegger/nvim-jdtls",
+  { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
+  { "stevearc/conform.nvim",   event = "BufWritePre" },
+  { "towolf/vim-helm",         ft = "helm" },
+  { "j-hui/fidget.nvim",       event = "LspAttach",  opts = {} },
   {
     "folke/lazydev.nvim",
     ft = "lua",
@@ -8,14 +12,6 @@ return {
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },
       },
     },
-  },
-  { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
-  { "stevearc/conform.nvim",   event = "BufWritePre" },
-  { "towolf/vim-helm",         ft = "helm" },
-  {
-    "j-hui/fidget.nvim",
-    event = "LspAttach",
-    opts = {},
   },
   {
     "jay-babu/mason-nvim-dap.nvim",
@@ -109,9 +105,7 @@ return {
               python = { "isort", "black" },
             },
             format_on_save = function()
-              if vim.g.disable_autoformat then
-                return
-              end
+              if vim.g.disable_autoformat then return end
               return { timeout_ms = 500, lsp_format = "fallback", quiet = true }
             end,
           })

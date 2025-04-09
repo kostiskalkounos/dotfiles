@@ -1,13 +1,14 @@
 local M = {}
 
 local api = vim.api
-local get_current_buf = api.nvim_get_current_buf
-local list_bufs = api.nvim_list_bufs
-local buf_is_loaded = api.nvim_buf_is_loaded
-local buf_get_name = api.nvim_buf_get_name
-local get_option_value = api.nvim_get_option_value
-local echo = api.nvim_echo
 local cmd = vim.cmd
+
+local buf_get_name = api.nvim_buf_get_name
+local buf_is_loaded = api.nvim_buf_is_loaded
+local echo = api.nvim_echo
+local get_current_buf = api.nvim_get_current_buf
+local get_option_value = api.nvim_get_option_value
+local list_bufs = api.nvim_list_bufs
 
 M.close_buffer = function()
   local buf = get_current_buf()

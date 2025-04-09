@@ -9,6 +9,8 @@ return {
   },
   config = function(_, o)
     local v, a, r = require "nvim-tree.view", require "nvim-tree.api", vim.api
+    local tw = vim.t.w
+
     r.nvim_create_augroup("s", { clear = true })
     r.nvim_create_autocmd("WinResized", {
       group = "s",
@@ -16,12 +18,12 @@ return {
       callback = function()
         local w = v.get_winnr()
         if w and vim.tbl_contains(vim.v.event.windows, w) then
-          vim.t.w = r.nvim_win_get_width(w)
+          tw = r.nvim_win_get_width(w)
         end
       end
     })
     a.events.subscribe(a.events.Event.TreeOpen, function()
-      if vim.t.w then v.resize(vim.t.w) end
+      if tw then v.resize(tw) end
     end)
     local t = require "nvim-tree"
     t.setup(o)

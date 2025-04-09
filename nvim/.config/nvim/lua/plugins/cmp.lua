@@ -11,8 +11,10 @@ return {
     "windwp/nvim-autopairs",
   },
   config = function()
+    local api = vim.api
+
     local rhs = function(rhs_str)
-      return vim.api.nvim_replace_termcodes(rhs_str, true, true, true)
+      return api.nvim_replace_termcodes(rhs_str, true, true, true)
     end
 
     local cmp = require "cmp"
@@ -50,18 +52,18 @@ return {
     }
 
     local column = function()
-      local _line, col = unpack(vim.api.nvim_win_get_cursor(0))
+      local _line, col = unpack(api.nvim_win_get_cursor(0))
       return col
     end
 
     local in_whitespace = function()
       local col = column()
-      return col == 0 or vim.api.nvim_get_current_line():sub(col, col):match("%s")
+      return col == 0 or api.nvim_get_current_line():sub(col, col):match("%s")
     end
 
     local leading_indent = function()
       local col = column()
-      local line = vim.api.nvim_get_current_line()
+      local line = api.nvim_get_current_line()
       local prefix = line:sub(1, col)
       return prefix:find("^%s*$")
     end
@@ -84,7 +86,7 @@ return {
         end
       else
         local col = column()
-        local line = vim.api.nvim_get_current_line()
+        local line = api.nvim_get_current_line()
         local prefix = line:sub(1, col)
         if leading_indent() then
           keys = rhs("<BS>")
@@ -97,7 +99,7 @@ return {
           end
         end
       end
-      vim.api.nvim_feedkeys(keys, "nt", true)
+      api.nvim_feedkeys(keys, "nt", true)
     end
 
     local smart_tab = function(opts)
@@ -106,7 +108,7 @@ return {
         keys = "<Tab>"
       else
         local col = column()
-        local line = vim.api.nvim_get_current_line()
+        local line = api.nvim_get_current_line()
         local prefix = line:sub(1, col)
         local in_leading_indent = prefix:find("^%s*$")
         if in_leading_indent then
@@ -122,7 +124,7 @@ return {
         end
       end
 
-      vim.api.nvim_feedkeys(rhs(keys), "nt", true)
+      api.nvim_feedkeys(rhs(keys), "nt", true)
     end
 
     -- https://github.com/hrsh7th/nvim-cmp/issues/1716

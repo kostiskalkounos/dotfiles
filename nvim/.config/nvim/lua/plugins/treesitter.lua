@@ -74,8 +74,9 @@ return {
         },
       })
 
-      vim.api.nvim_set_hl(0, "@lsp.type.property", { link = "@variable.member" })
-      vim.api.nvim_set_hl(0, "@lsp.typemod.property.static", { link = "@constant" })
+      local set = vim.api.nvim_set_hl
+      set(0, "@lsp.type.property", { link = "@variable.member" })
+      set(0, "@lsp.typemod.property.static", { link = "@constant" })
     end,
   },
 }
