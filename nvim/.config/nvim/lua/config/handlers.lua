@@ -8,6 +8,11 @@ local float = { float = true }
 local opts = { noremap = true, silent = true }
 local set = vim.keymap.set
 
+local keymap = vim.keymap
+keymap.del('n', 'gra')
+keymap.del('n', 'gri')
+keymap.del('n', 'grn')
+keymap.del('n', 'grr')
 
 M.capabilities = cmp.default_capabilities()
 M.capabilities.textDocument.completion.completionItem.snippetSupport = true
