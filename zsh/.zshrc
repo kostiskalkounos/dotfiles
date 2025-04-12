@@ -119,10 +119,10 @@ j() {
 }
 
 git_branch() {
-  git branch --no-color 2>/dev/null | sed -n 's/^\* \(.*\)/\1 /p'
+  git branch --no-color 2>/dev/null | sed -E -n 's/^\* (.*)/\1 /p'
 }
-
-PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{yellow}* %f.)%(0?;;%F{red}%? %f)'
+line=$'\n'
+PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{yellow}* %f.)%(0?;;%F{red}%? %f)${line}'
 
 export FZF_ALT_C_COMMAND="fd -t d --exclude '{.git,.npm,.cache,.venv,node_modules}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,node_modules}" 2> /dev/null'
