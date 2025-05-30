@@ -28,14 +28,7 @@ return {
             ["<m-l>"] = actions.results_scrolling_right,
           },
         },
-        file_ignore_patterns = {
-          ".DS_Store",
-          ".cache",
-          ".clangd",
-          ".git",
-          ".venv",
-          "node_modules",
-        },
+        file_ignore_patterns = { ".DS_Store", ".cache", ".clangd", ".git", ".venv", "node_modules" },
       },
       extensions = {
         fzf = {
