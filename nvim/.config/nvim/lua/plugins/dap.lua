@@ -19,7 +19,7 @@ return {
       fn.sign_define("DapBreakpointRejected", { text = " ", texthl = "DiagnosticError", linehl = "", numhl = "" })
       fn.sign_define("DapLogPoint", { text = ".>", texthl = "DiagnosticInfo", linehl = "", numhl = "" })
 
-      local virt_text = require "nvim-dap-virtual-text"
+      local virt_text = require("nvim-dap-virtual-text")
       virt_text.setup({
         all_frames = false,
         all_references = false,
@@ -50,8 +50,8 @@ return {
         end,
       })
 
-      local dap = require "dap"
-      local dap_repl = require "dap.repl"
+      local dap = require("dap")
+      local dap_repl = require("dap.repl")
 
       dap.adapters.nlua = function(callback, config)
         callback({ type = "server", host = config.host or "127.0.0.1", port = config.port or 8086 })
@@ -175,17 +175,17 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "dap-repl",
         callback = function()
-          local d = require "dap.ext.autocompl"
+          local d = require("dap.ext.autocompl")
           d.attach()
         end,
       })
 
-      local dap_ui = require "dapui"
+      local dap_ui = require("dapui")
 
       dap_ui.setup({
         icons = { expanded = "", collapsed = "", current_frame = "" },
         mappings = {
-          expand = { "<CR>", "<2-LeftMouse>" },
+          expand = { "<cr>", "<2-LeftMouse>" },
           open = "o",
           remove = "d",
           edit = "e",
@@ -235,25 +235,49 @@ return {
         },
       })
 
-      dap.listeners.before.attach.dapui_config = function() dap_ui.open() end
-      dap.listeners.before.launch.dapui_config = function() dap_ui.open() end
-      dap.listeners.before.event_terminated.dapui_config = function() dap_ui.close() end
-      dap.listeners.before.event_exited.dapui_config = function() dap_ui.close() end
+      dap.listeners.before.attach.dapui_config = function()
+        dap_ui.open()
+      end
+      dap.listeners.before.launch.dapui_config = function()
+        dap_ui.open()
+      end
+      dap.listeners.before.event_terminated.dapui_config = function()
+        dap_ui.close()
+      end
+      dap.listeners.before.event_exited.dapui_config = function()
+        dap_ui.close()
+      end
 
-      local dap_go = require "dap-go"
+      local dap_go = require("dap-go")
       dap_go.setup()
 
       local default = { noremap = true, unique = true, silent = true }
       local set = vim.keymap.set
 
-      set("n", "<F1>", function() dap.continue() end, default)
-      set("n", "<F2>", function() dap.step_over() end, default)
-      set("n", "<F3>", function() dap.step_into() end, default)
-      set("n", "<F4>", function() dap.step_out() end, default)
-      set("n", "<F5>", function() dap.step_back() end, default)
-      set("n", "<F6>", function() dap_repl.toggle() end, default)
-      set("n", "<F7>", function() dap.toggle_breakpoint() end, default)
-      set("n", "<F8>", function() dap.set_breakpoint(fn.input("Breakpoint condition: ")) end, default)
+      set("n", "<F1>", function()
+        dap.continue()
+      end, default)
+      set("n", "<F2>", function()
+        dap.step_over()
+      end, default)
+      set("n", "<F3>", function()
+        dap.step_into()
+      end, default)
+      set("n", "<F4>", function()
+        dap.step_out()
+      end, default)
+      set("n", "<F5>", function()
+        dap.step_back()
+      end, default)
+      set("n", "<F6>", function()
+        dap_repl.toggle()
+      end, default)
+      set("n", "<F7>", function()
+        dap.toggle_breakpoint()
+      end, default)
+      set("n", "<F8>", function()
+        dap.set_breakpoint(fn.input("Breakpoint condition: "))
+      end, default)
     end,
   },
 }

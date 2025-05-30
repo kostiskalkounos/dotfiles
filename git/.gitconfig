@@ -25,6 +25,9 @@
   default = simple
   autoSetupRemote = true
 
+[fetch]
+  prune = true
+
 [branch]
   autosetupmerge = true
   autosetuprebase = always
@@ -39,3 +42,6 @@
 
 [merge]
   conflictstyle = diff3
+
+[advice]
+  skippedCherryPicks = false

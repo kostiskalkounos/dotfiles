@@ -1,8 +1,7 @@
-local cmp = require "cmp_nvim_lsp"
 local fn = vim.fn
-local handlers = require "config.handlers"
-local jdtls = require "jdtls"
-local lsp_util = require "lspconfig.util"
+local handlers = require("config.handlers")
+local jdtls = require("jdtls")
+local lsp_util = require("lspconfig.util")
 local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
 local project_name = fn.fnamemodify(fn.getcwd(), ":t")
 local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name
@@ -27,11 +26,16 @@ local config = {
     "-javaagent:" .. mason_share .. "/jdtls/lombok.jar",
     "-Xmx2g",
     "--add-modules=ALL-SYSTEM",
-    "--add-opens", "java.base/java.util=ALL-UNNAMED",
-    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-    "-jar", mason_share .. "/jdtls/plugins/org.eclipse.equinox.launcher.jar",
-    "-configuration", mason_share .. "/../packages/jdtls/config_mac",
-    "-data", workspace_dir,
+    "--add-opens",
+    "java.base/java.util=ALL-UNNAMED",
+    "--add-opens",
+    "java.base/java.lang=ALL-UNNAMED",
+    "-jar",
+    mason_share .. "/jdtls/plugins/org.eclipse.equinox.launcher.jar",
+    "-configuration",
+    mason_share .. "/../packages/jdtls/config_mac",
+    "-data",
+    workspace_dir,
   },
 
   root_dir = lsp_util.root_pattern(".git", "mvnw", "gradlew", "pom.xml", "build.gradle", "build.gradle.kts")(
@@ -73,7 +77,6 @@ local config = {
     },
   },
 
-  capabilities = cmp.default_capabilities(),
   flags = {
     allow_incremental_sync = true,
     debounce_text_changes = 150,
@@ -104,7 +107,9 @@ local version_patterns = {
 
 local function getJavaVersion()
   local root_dir = config.root_dir
-  if not root_dir then return nil end
+  if not root_dir then
+    return nil
+  end
 
   for filename, patterns in pairs(version_patterns) do
     local path = vim.fs.find(filename, { upward = true, path = root_dir, limit = 1 })[1]
@@ -132,9 +137,13 @@ config.on_attach = function()
   end
 
   handlers.on_attach()
-  jdtls.setup_dap({ hotcodereplace = "auto", config_overrides = {} })
 
-  local jdtls_dap = require "jdtls.dap"
+  jdtls.setup_dap({
+    hotcodereplace = "auto",
+    config_overrides = {},
+  })
+
+  local jdtls_dap = require("jdtls.dap")
   jdtls_dap.setup_dap_main_class_configs()
 
   local opts = { noremap = true, silent = true }

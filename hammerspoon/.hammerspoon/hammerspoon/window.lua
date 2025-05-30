@@ -146,24 +146,8 @@ Hyper:bind({ "alt" }, "1", function() moveWindowToDisplay(1) end)
 Hyper:bind({ "alt" }, "2", function() moveWindowToDisplay(2) end)
 Hyper:bind({ "alt" }, "3", function() moveWindowToDisplay(3) end)
 
-Hyper:bind({ "alt" }, "[",
-  function()
-    if window.focusedWindow():moveOneScreenWest() then
-      window.focusedWindow():moveOneScreenWest()
-    else
-      window
-          .focusedWindow():moveOneScreenEast()
-    end
-  end)
-Hyper:bind({ "alt" }, "]",
-  function()
-    if window.focusedWindow():moveOneScreenEast() then
-      window.focusedWindow():moveOneScreenEast()
-    else
-      window
-          .focusedWindow():moveOneScreenWest()
-    end
-  end)
+Hyper:bind({ "alt" }, "[", function() if window.focusedWindow():moveOneScreenWest() then window.focusedWindow():moveOneScreenWest() else window.focusedWindow():moveOneScreenEast() end end)
+Hyper:bind({ "alt" }, "]", function() if window.focusedWindow():moveOneScreenEast() then window.focusedWindow():moveOneScreenEast() else window.focusedWindow():moveOneScreenWest() end end)
 
 Hyper:bind({}, "h", function() focusWindowInDirection("west") end)
 Hyper:bind({}, "j", function() focusWindowInDirection("south") end)

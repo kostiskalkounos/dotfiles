@@ -4,23 +4,23 @@ return {
     keys = { "gc", "gb", "gcc", "gbc", "v", "V", "<C-v>" },
     dependencies = "JoosepAlviste/nvim-ts-context-commentstring",
     config = function()
-      local c = require "Comment"
+      local c = require("Comment")
       c.setup({
         padding = true,
         sticky = true,
         ignore = nil,
         toggler = {
-          line = 'gcc',
-          block = 'gbc',
+          line = "gcc",
+          block = "gbc",
         },
         opleader = {
-          line = 'gc',
-          block = 'gb',
+          line = "gc",
+          block = "gb",
         },
         extra = {
-          above = 'gcO',
-          below = 'gco',
-          eol = 'gcA',
+          above = "gcO",
+          below = "gco",
+          eol = "gcA",
         },
         mappings = {
           basic = true,
@@ -29,9 +29,9 @@ return {
         post_hook = nil,
 
         pre_hook = function(ctx)
-          local U = require "Comment.utils"
-          local ts_utils = require "ts_context_commentstring.utils"
-          local ts_internal = require "ts_context_commentstring.internal"
+          local U = require("Comment.utils")
+          local ts_utils = require("ts_context_commentstring.utils")
+          local ts_internal = require("ts_context_commentstring.internal")
 
           local ctype = ctx.ctype == U.ctype.blockwise and "__multiline" or "__default"
           local location = nil
@@ -49,7 +49,7 @@ return {
         end,
       })
 
-      local t = require "ts_context_commentstring"
+      local t = require("ts_context_commentstring")
       t.setup({ enable_autocmd = false })
     end,
   },

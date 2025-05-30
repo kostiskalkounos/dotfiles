@@ -1,10 +1,7 @@
 .DS_Store
+.cache
+.git
 .netrwhist
-autoload/
-build
+.npm
+.venv
 node_modules
-package-lock.json
-plugged/
-undodir/
-vendor
-yarn.lock
