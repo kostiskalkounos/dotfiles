@@ -12,7 +12,7 @@ vim.o.ruler = true
 vim.o.scrollback = 10000
 vim.o.signcolumn = "no"
 
-set("n", "q", "<cmd>qa!<CR>", default)
+set("n", "q", "<cmd>qa!<cr>", default)
 set("n", "y", [["+y]], default)
 set("v", "y", [["+y]], default)
 

@@ -1,13 +1,8 @@
 return {
   { "almo7aya/openingh.nvim", cmd = { "OpenInGHRepo", "OpenInGHFile", "OpenInGHFileLines" } },
-  { "mbbill/undotree",        cmd = "UndotreeToggle" },
-  { "stevearc/oil.nvim",      cmd = "Oil",                                                  opts = {} },
-  {
-    "nvim-pack/nvim-spectre",
-    dependencies = { "nvim-lua/plenary.nvim", "nvim-lua/popup.nvim" },
-    cmd = "Spectre",
-    opts = {}
-  },
+  { "mbbill/undotree", cmd = "UndotreeToggle" },
+  { "stevearc/oil.nvim", cmd = "Oil", opts = {} },
+  { "MagicDuck/grug-far.nvim", cmd = { "GrugFar", "GrugFarWithin" } },
   {
     "sindrets/diffview.nvim",
     cmd = {
