@@ -1,41 +1,47 @@
 return {
   "mfussenegger/nvim-jdtls",
   { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
-  { "stevearc/conform.nvim",   event = "BufWritePre" },
-  { "towolf/vim-helm",         ft = "helm" },
-  { "j-hui/fidget.nvim",       event = "LspAttach",  opts = {} },
+  { "stevearc/conform.nvim", event = "BufWritePre" },
+  { "towolf/vim-helm", ft = "helm" },
+  { "j-hui/fidget.nvim", event = "LspAttach", opts = {} },
   {
     "folke/lazydev.nvim",
     ft = "lua",
     opts = {
-      library = { { path = "${3rd}/luv/library", words = { "vim%.uv" } } },
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
     },
   },
   {
     "jay-babu/mason-nvim-dap.nvim",
     cmd = { "DapInstall", "DapUninstall" },
     config = function()
-      local m = require "mason-nvim-dap"
+      local m = require("mason-nvim-dap")
       m.setup({
         ensure_installed = { "delve", "java-debug-adapter", "java-test" },
         automatic_installation = true,
-        handlers = { function(config) m.default_setup(config) end },
+        handlers = {
+          function(config)
+            m.default_setup(config)
+          end,
+        },
       })
     end,
   },
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     cmd = "Mason",
     dependencies = {
-      "williamboman/mason-lspconfig.nvim",
+      "mason-org/mason-lspconfig.nvim",
       {
         "neovim/nvim-lspconfig",
         event = "BufReadPost",
         config = function()
-          local handlers = require "config.handlers"
-          local mason = require "mason"
-          local mason_lspconfig = require "mason-lspconfig"
-          local lspconfig = require "lspconfig"
+          local handlers = require("config.handlers")
+          local mason = require("mason")
+          local mason_lspconfig = require("mason-lspconfig")
+          local lspconfig = require("lspconfig")
 
           mason.setup()
 
@@ -62,40 +68,50 @@ return {
           }
 
           local servers_settings = {
+            bashls = {
+              filetypes = { "bash", "sh", "zsh" },
+            },
             lua_ls = {
-              Lua = {
-                diagnostics = { globals = { "hs", "jit", "require", "vim" } },
-                telemetry = { enable = false },
-                workspace = { checkThirdParty = false },
+              settings = {
+                Lua = {
+                  diagnostics = { globals = { "hs", "jit", "require", "vim" } },
+                  telemetry = { enable = false },
+                  workspace = { checkThirdParty = false },
+                },
               },
             },
           }
 
-          mason_lspconfig.setup({ ensure_installed = servers, automatic_installation = true })
-          handlers.setup()
-
-          mason_lspconfig.setup_handlers({
-            function(server_name)
-              if server_name ~= "jdtls" then
-                lspconfig[server_name].setup({
-                  capabilities = handlers.capabilities,
-                  on_attach = handlers.on_attach,
-                  settings = servers_settings[server_name] or {},
-                })
-              end
-            end,
+          mason_lspconfig.setup({
+            automatic_enable = false,
+            ensure_installed = servers,
           })
 
-          local c = require "conform"
-          c.setup({
+          handlers.setup()
+
+          for _, server_name in ipairs(servers) do
+            if server_name ~= "jdtls" then
+              local opts = {
+                capabilities = handlers.capabilities,
+                on_attach = handlers.on_attach,
+                settings = servers_settings[server_name] and servers_settings[server_name].settings or nil,
+              }
+              lspconfig[server_name].setup(opts)
+            end
+          end
+
+          local conform = require("conform")
+          conform.setup({
             formatters_by_ft = {
               go = { "goimports", "gofmt" },
-              javascript = { "prettier" },
+              javascript = { "prettierd", "prettier" },
               lua = { "stylua" },
-              python = { "black" },
+              python = { "isort", "black" },
             },
             format_on_save = function()
-              if vim.g.disable_autoformat then return end
+              if vim.g.disable_autoformat then
+                return
+              end
               return { timeout_ms = 500, lsp_format = "fallback", quiet = true }
             end,
           })

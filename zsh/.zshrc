@@ -30,22 +30,24 @@ alias dn='docker network rm $(docker network ls -q)'
 alias dp='docker system prune --volumes -af'
 alias dv='docker volume rm $(docker volume ls -q)'
 
-alias p='podman'
-alias pc='podman-compose'
-alias pn='podman network rm $(podman network ls -q)'
-alias pp='podman system prune --volumes -af'
-alias pv='podman volume rm $(podman volume ls -q)'
-
 alias la='ls -lah'
 alias ld='lazydocker'
 alias lg='lazygit'
 alias ll='ls -lh'
 alias ls='gls --color=auto --group-directories-first'
 
-alias brewu='brew update && brew upgrade -g && brew cleanup'
-alias mi='mvn clean install -DskipTests -T 1.5C -U'
+alias bu='brew update && brew upgrade -g && brew cleanup'
+alias mdd='mvnd dependency:tree -P Symphony,SharedResources'
+alias mdi='mvnd clean install -U -P Symphony,SharedResources -Dbuild.rpm=false -DskipTests -DsymphonySkipUnitTests=true -DsymphonySkipIntegrationTests=true'
+alias mdp='mvnd --stop'
+alias mds='mvnd --status'
+alias mdt='mvnd clean install -U -P Symphony,SharedResources -Dbuild.rpm=false'
+alias mdeps='mvn dependency:tree -P Symphony,SharedResources'
+alias mi='mvn clean install -P Symphony,SharedResources, -Dbuild.rpm=false -DskipTests -DsymphonySkipUnitTests=true -DsymphonySkipIntegrationTests=true -T 1.5C -U'
+alias mt='mvn clean install -P Symphony,SharedResources, -T 1.5C -U'
 alias pip=pip3
 alias python=python3
+alias snykt='snyk test --maven-aggregate-project -- -P Symphony'
 alias sudo='sudo '
 alias v=vi
 alias vi=vim
@@ -98,40 +100,14 @@ setopt PUSHD_MINUS
 setopt PUSHD_SILENT
 setopt SHARE_HISTORY
 
-man() {
-  LESS_TERMCAP_md=$'\e[00;34m' \
-  LESS_TERMCAP_me=$'\e[0m' \
-  LESS_TERMCAP_se=$'\e[0m' \
-  LESS_TERMCAP_ue=$'\e[0m' \
-  LESS_TERMCAP_us=$'\e[00;32m' \
-  command man "$@"
-}
-
-j() {
-  # sudo ln -sfn /usr/local/opt/openjdk@<number>/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-<number>.jdk
-  unset JAVA_HOME
-  if [ -n "$1" ]; then
-    export JAVA_HOME=$(/usr/libexec/java_home -v "$1")
-  else
-    export JAVA_HOME=$(/usr/libexec/java_home)
-  fi
-  java -version
-}
-
-git_branch() {
-  git branch --no-color 2>/dev/null | sed -E -n 's/^\* (.*)/\1 /p'
-}
-line=$'\n'
-PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f %F{green}$(git_branch)%f%(1j.%F{yellow}* %f.)%(0?;;%F{red}%? %f)${line}'
-
 export FZF_ALT_C_COMMAND="fd -t d --exclude '{.git,.npm,.cache,.venv,node_modules}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,node_modules}" 2> /dev/null'
 export FZF_DEFAULT_COMMAND=$FZF_CTRL_T_COMMAND
 export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow=33:st=34"
 
-DARK_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
-LIGHT_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=light --color=fg:-1,bg:-1,hl:magenta,fg+:black,bg+:#ccd0da,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
+DARK_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,gutter:-1'
+LIGHT_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=light --color=fg:-1,bg:-1,hl:magenta,fg+:black,bg+:#ccd0da,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,gutter:-1'
 
 case "$FZF_THEME" in
   dark) export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" ;;
@@ -160,7 +136,37 @@ zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)
 
 export HOMEBREW_NO_ANALYTICS=1
 export JAVA_HOME=$(/usr/libexec/java_home)
+export MANPAGER='nvim +Man!'
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/.ripgreprc"
+
+man() {
+  LESS_TERMCAP_md=$'\e[00;34m' \
+  LESS_TERMCAP_me=$'\e[0m' \
+  LESS_TERMCAP_se=$'\e[0m' \
+  LESS_TERMCAP_ue=$'\e[0m' \
+  LESS_TERMCAP_us=$'\e[00;32m' \
+  command man "$@"
+}
+
+j() {
+  # sudo ln -sfn /usr/local/opt/openjdk@<number>/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-<number>.jdk
+  unset JAVA_HOME
+  if [ -n "$1" ]; then
+    export JAVA_HOME=$(/usr/libexec/java_home -v "$1")
+  else
+    export JAVA_HOME=$(/usr/libexec/java_home)
+  fi
+  java -version
+}
+
+git_branch() {
+  git branch --no-color 2>/dev/null | sed -E -n "s/^\* (.*)/%F{magenta}%f %F{green}\1%f /p"
+}
+
+line=$'\n'
+#PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f $(git_branch)%(1j.%F{yellow}* %f.)${line}%(0?;%F{magenta}➜%f;%F{red}➜%f) '
+#PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f $(git_branch)%(1j.%F{yellow}* %f.)%(0?;;%F{red}[!] %? %f)${line}'
+PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f $(git_branch)%(1j.%F{yellow}* %f.)%(0?;;%F{red} %f)${line}'
 
 eval "$(zoxide init zsh)"
 

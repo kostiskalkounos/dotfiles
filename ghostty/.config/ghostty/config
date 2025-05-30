@@ -1,0 +1,11 @@
+theme = dark:catppuccin-macchiato,light:catppuccin-latte
+font-size = 14
+
+adjust-cursor-thickness = 150%
+cursor-style = bar
+cursor-style-blink = false
+
+macos-option-as-alt = true
+macos-titlebar-style = tabs
+mouse-hide-while-typing = true
+shell-integration-features = no-cursor

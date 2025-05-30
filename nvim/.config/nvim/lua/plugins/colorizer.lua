@@ -1,8 +1,8 @@
 return {
-  "NvChad/nvim-colorizer.lua",
+  "catgoose/nvim-colorizer.lua",
   event = "BufReadPre",
   config = function()
-    local c = require "colorizer"
+    local c = require("colorizer")
     c.setup({
       filetypes = { "*" },
       user_default_options = {
