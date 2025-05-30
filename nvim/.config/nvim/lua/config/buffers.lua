@@ -16,15 +16,14 @@ M.close_buffer = function()
   if get_option_value("modified", { buf = buf }) then
     local name = buf_get_name(buf)
     echo({
-      { "Unsaved changes in " .. (name ~= "" and name or "buffer" .. buf), "Title" }
+      { "Unsaved changes in " .. (name ~= "" and name or "buffer" .. buf), "Title" },
     }, true, {})
     return
   end
 
   local normal_buf_count = 0
   for _, buf_id in ipairs(list_bufs()) do
-    if buf_is_loaded(buf_id) and
-        get_option_value("buftype", { buf = buf_id }) == "" then
+    if buf_is_loaded(buf_id) and get_option_value("buftype", { buf = buf_id }) == "" then
       normal_buf_count = normal_buf_count + 1
     end
   end

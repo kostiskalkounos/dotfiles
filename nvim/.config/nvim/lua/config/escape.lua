@@ -29,9 +29,8 @@ local function hasExcludedProcess(processId, excludedProcesses)
 end
 
 function M.smartEscape(processId)
-  return hasExcludedProcess(processId, M.excludedProcesses)
-      and transformKeySequence(M.escapeKey)
-      or defaultEscapeSequence
+  return hasExcludedProcess(processId, M.excludedProcesses) and transformKeySequence(M.escapeKey)
+    or defaultEscapeSequence
 end
 
 local function createExclusionSet(processNames)
@@ -44,13 +43,9 @@ end
 
 function M.setup(config)
   M.escapeKey = config and config.key or "<Esc>"
-  M.excludedProcesses = config and config.except
-      and createExclusionSet(config.except)
-      or { nvim = true }
+  M.excludedProcesses = config and config.except and createExclusionSet(config.except) or { nvim = true }
   _G.termesc = M
-  set("t", M.escapeKey,
-    "v:lua.termesc.smartEscape(b:terminal_job_pid)",
-    { noremap = true, expr = true })
+  set("t", M.escapeKey, "v:lua.termesc.smartEscape(b:terminal_job_pid)", { noremap = true, expr = true })
 end
 
 return M
