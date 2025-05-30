@@ -8,7 +8,9 @@ return {
     "folke/lazydev.nvim",
     ft = "lua",
     opts = {
-      library = { { path = "${3rd}/luv/library", words = { "vim%.uv" } } },
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
     },
   },
   {
@@ -19,7 +21,11 @@ return {
       m.setup({
         ensure_installed = { "delve", "java-debug-adapter", "java-test" },
         automatic_installation = true,
-        handlers = { function(config) m.default_setup(config) end },
+        handlers = {
+          function(config)
+            m.default_setup(config)
+          end,
+        },
       })
     end,
   },
@@ -98,12 +104,14 @@ return {
           conform.setup({
             formatters_by_ft = {
               go = { "goimports", "gofmt" },
-              javascript = { "prettier" },
+              javascript = { "prettierd", "prettier" },
               lua = { "stylua" },
-              python = { "black" },
+              python = { "isort", "black" },
             },
             format_on_save = function()
-              if vim.g.disable_autoformat then return end
+              if vim.g.disable_autoformat then
+                return
+              end
               return { timeout_ms = 500, lsp_format = "fallback", quiet = true }
             end,
           })

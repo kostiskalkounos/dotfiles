@@ -15,10 +15,14 @@ end
 local function hasExcludedProcess(processId, excludedProcesses)
   local processInfo = getProcess(processId)
   if processInfo then
-    if excludedProcesses[processInfo.name] then return true end
+    if excludedProcesses[processInfo.name] then
+      return true
+    end
     local childProcessIds = getChildProcesses(processId)
     for _, childProcessId in ipairs(childProcessIds) do
-      if hasExcludedProcess(childProcessId, excludedProcesses) then return true end
+      if hasExcludedProcess(childProcessId, excludedProcesses) then
+        return true
+      end
     end
   end
   return false

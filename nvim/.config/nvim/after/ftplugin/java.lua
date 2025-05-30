@@ -2,7 +2,6 @@ local fn = vim.fn
 local handlers = require("config.handlers")
 local jdtls = require("jdtls")
 local lsp_util = require("lspconfig.util")
-
 local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
 local project_name = fn.fnamemodify(fn.getcwd(), ":t")
 local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name

@@ -7,7 +7,6 @@ local opts = { noremap = true, silent = true }
 local set = vim.keymap.set
 
 local keymap = vim.keymap
-
 keymap.del("n", "gra")
 keymap.del("n", "gri")
 keymap.del("n", "grn")
