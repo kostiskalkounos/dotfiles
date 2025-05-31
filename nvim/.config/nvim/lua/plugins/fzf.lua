@@ -11,6 +11,9 @@ return {
         gutter = "-1",
       },
       fzf_opts = { ["--cycle"] = true },
+      grep = {
+        hidden = true
+      },
       keymap = {
         builtin = {
           ["<C-/>"] = "toggle-help",
