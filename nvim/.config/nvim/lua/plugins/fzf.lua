@@ -7,12 +7,20 @@ return {
     f.setup({
       { "border-fused" },
       defaults = { git_icons = false },
+      files = {
+        actions = {
+          ["ctrl-q"] = { fn = require("fzf-lua").actions.file_sel_to_qf, prefix = "select-all" },
+        },
+      },
       fzf_colors = {
         gutter = "-1",
       },
       fzf_opts = { ["--cycle"] = true },
       grep = {
-        hidden = true
+        hidden = true,
+        actions = {
+          ["ctrl-q"] = { fn = require("fzf-lua").actions.file_sel_to_qf, prefix = "select-all" },
+        },
       },
       keymap = {
         builtin = {
