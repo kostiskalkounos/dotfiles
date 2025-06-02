@@ -6,14 +6,17 @@ return {
     local f = require("fzf-lua")
     f.setup({
       { "border-fused" },
-      defaults = { git_icons = false },
+      defaults = {
+        git_icons = false,
+        hidden = true,
+        actions = {
+          ["ctrl-q"] = { fn = f.actions.file_sel_to_qf, prefix = "select-all" },
+        },
+      },
       fzf_colors = {
         gutter = "-1",
       },
       fzf_opts = { ["--cycle"] = true },
-      grep = {
-        hidden = true
-      },
       keymap = {
         builtin = {
           ["<C-/>"] = "toggle-help",
