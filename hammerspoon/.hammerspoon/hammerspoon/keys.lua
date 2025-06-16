@@ -6,6 +6,7 @@ Hyper:bind({}, "d", function() application.launchOrFocus("Spotify") end)
 Hyper:bind({}, "e", function() application.launchOrFocus("Mail") end)
 Hyper:bind({}, "f", function() application.launchOrFocus("Finder") end)
 Hyper:bind({}, "g", function() application.launchOrFocus("System Preferences") end)
+Hyper:bind({}, "q", function() application.launchOrFocus("Signal") end)
 Hyper:bind({}, "r", function() application.launchOrFocus("Notes") end)
 Hyper:bind({}, "s", function() application.launchOrFocus("Safari") end)
 Hyper:bind({}, "t", function() application.launchOrFocus("Calculator") end)
@@ -16,7 +17,6 @@ Hyper:bind({}, "z", function() application.launchOrFocus("Activity Monitor") end
 
 Hyper:bind({ "cmd" }, "g", function() application.launchOrFocus("App Store") end)
 Hyper:bind({ "cmd" }, "r", function() application.launchOrFocus("Reminders") end)
-Hyper:bind({ "cmd" }, "w", function() application.launchOrFocus("Signal") end)
 
 Hyper:bind({ "cmd", "ctrl" }, "r", function() hs.reload() end)
 Hyper:bind({ "cmd", "shift" }, "r", function() hs.reload() end)
