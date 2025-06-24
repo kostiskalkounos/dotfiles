@@ -75,17 +75,31 @@ return {
 
       dap.configurations.java = {
         {
-          name = "Debug Launch (2GB)",
+          name = "Debug Launch (4GB)",
           type = "java",
           request = "launch",
           vmArgs = "-Xmx4g ",
         },
         {
-          name = "Debug Attach (5005)",
+          name = "Debug Attach (8000)",
           type = "java",
           request = "attach",
           hostName = "127.0.0.1",
-          port = 5005,
+          port = 8000,
+        },
+        {
+          name = "Debug Attach (8001)",
+          type = "java",
+          request = "attach",
+          hostName = "127.0.0.1",
+          port = 8001,
+        },
+        {
+          name = "Debug Attach (8002)",
+          type = "java",
+          request = "attach",
+          hostName = "127.0.0.1",
+          port = 8002,
         },
         {
           name = "Debug Non-Project class",
