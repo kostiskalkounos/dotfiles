@@ -11,6 +11,7 @@ keymap.del("n", "gra")
 keymap.del("n", "gri")
 keymap.del("n", "grn")
 keymap.del("n", "grr")
+keymap.del("n", "grt")
 
 function M.setup()
   diagnostic.config({
