@@ -4,6 +4,8 @@ return {
   dependencies = { "nvim-tree/nvim-web-devicons" },
   config = function()
     local f = require("fzf-lua")
+    vim.cmd("FzfLua register_ui_select")
+
     f.setup({
       { "border-fused" },
       defaults = {
