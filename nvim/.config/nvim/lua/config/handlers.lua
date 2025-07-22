@@ -63,6 +63,7 @@ function M.on_attach()
   set("n", "<leader>r", buf.rename, opts)
   set("n", "<leader>y", diagnostic.setloclist, opts)
 
+  set("n", "<M-cr>", "<cmd>FzfLua lsp_code_actions<cr>", opts)
   set("n", "<leader>M", "<cmd>FzfLua diagnostics_workspace<cr>", opts)
   set("n", "<leader>g", "<cmd>FzfLua lsp_code_actions<cr>", opts)
   set("n", "<leader>m", "<cmd>FzfLua diagnostics_document<cr>", opts)
