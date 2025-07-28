@@ -38,6 +38,7 @@ return {
       flavour = "auto",
       background = { light = "latte", dark = "macchiato" },
       color_overrides = {
+        latte = { pink = "#ed5bb9" },
         macchiato = { blue = "#89b4fa", lavender = "#b4befe", sapphire = "#74c7ec" },
       },
       highlight_overrides = {
