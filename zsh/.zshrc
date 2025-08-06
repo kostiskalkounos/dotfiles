@@ -149,7 +149,7 @@ man() {
 }
 
 j() {
-  # sudo ln -sfn /usr/local/opt/openjdk@<number>/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-<number>.jdk
+  # sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk.jdk
   unset JAVA_HOME
   if [ -n "$1" ]; then
     export JAVA_HOME=$(/usr/libexec/java_home -v "$1")
