@@ -17,7 +17,7 @@ return {
         max_items = 10,
       },
       menu = {
-        auto_show = false,
+        auto_show = true,
         border = "rounded",
         winhighlight = "Normal:BlinkCmpLabel",
       },
