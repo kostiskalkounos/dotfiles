@@ -6,7 +6,7 @@ return {
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
       { "nvim-treesitter/playground", cmd = "TSHighlightCapturesUnderCursor" },
-      { "windwp/nvim-ts-autotag", opts = {} },
+      { "windwp/nvim-ts-autotag",     opts = {} },
     },
     config = function()
       local ts_config = require("nvim-treesitter.configs")
@@ -73,10 +73,6 @@ return {
           },
         },
       })
-
-      local set = vim.api.nvim_set_hl
-      set(0, "@lsp.type.property", { link = "@variable.member" })
-      set(0, "@lsp.typemod.property.static", { link = "@constant" })
     end,
   },
 }
