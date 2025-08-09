@@ -64,3 +64,30 @@ api_nvim_create_user_command("Vterm", function(o)
   api_nvim_command("vsplit")
   api_nvim_command("terminal " .. o.args)
 end, { nargs = "*", complete = "file" })
+
+local boost = {
+  { treesitter = "constant", priority = 200 },
+}
+
+vim.api.nvim_create_autocmd("LspTokenUpdate", {
+  callback = function(args)
+    local token = args.data.token
+    local captures = vim.treesitter.get_captures_at_pos(args.buf, token.line, token.start_col)
+
+    for _, tt in pairs(boost) do
+      if tt.treesitter then
+        for _, capture in pairs(captures) do
+          if capture.capture == tt.treesitter then
+            vim.lsp.semantic_tokens.highlight_token(
+              token,
+              args.buf,
+              args.data.client_id,
+              "@" .. tt.treesitter,
+              { priority = tt.priority or 105 }
+            )
+          end
+        end
+      end
+    end
+  end,
+})

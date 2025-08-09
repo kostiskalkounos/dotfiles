@@ -25,6 +25,7 @@ return {
         ["@lsp.type.annotationMember"] = { fg = palette.flamingo },
         ["@lsp.type.parameter"] = { fg = palette.text },
         ["@module"] = { fg = palette.sapphire },
+        ["@property"] = { fg = is_light and palette.pink or palette.lavender },
         ["@variable.builtin"] = { fg = palette.mauve },
         ["@variable.member"] = { fg = is_light and palette.pink or palette.lavender },
         ["@variable.parameter"] = { fg = palette.text },
@@ -57,7 +58,7 @@ return {
     if os.getenv("TMUX") then
       local theme = os.getenv("NVIM_THEME")
       vim.o.background = theme
-        or (fn.system("defaults read -g AppleInterfaceStyle 2>/dev/null"):match("Dark") and "dark" or "light")
+          or (fn.system("defaults read -g AppleInterfaceStyle 2>/dev/null"):match("Dark") and "dark" or "light")
     end
 
     local lualine_themes = {
