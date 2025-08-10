@@ -15,6 +15,16 @@ return {
           ["ctrl-q"] = { fn = f.actions.file_sel_to_qf, prefix = "select-all" },
         },
       },
+      files = {
+        fzf_opts = {
+          ['--history'] = vim.fn.stdpath("data") .. '/fzf-lua-files-history',
+        },
+      },
+      grep = {
+        fzf_opts = {
+          ['--history'] = vim.fn.stdpath("data") .. '/fzf-lua-grep-history',
+        },
+      },
       fzf_colors = {
         gutter = "-1",
       },
