@@ -1,9 +1,9 @@
 return {
   "mfussenegger/nvim-jdtls",
   { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
-  { "stevearc/conform.nvim", event = "BufWritePre" },
-  { "towolf/vim-helm", ft = "helm" },
-  { "j-hui/fidget.nvim", event = "LspAttach", opts = {} },
+  { "stevearc/conform.nvim",   event = "BufWritePre" },
+  { "towolf/vim-helm",         ft = "helm" },
+  { "j-hui/fidget.nvim",       event = "LspAttach",  opts = {} },
   {
     "folke/lazydev.nvim",
     ft = "lua",
@@ -14,34 +14,21 @@ return {
     },
   },
   {
-    "jay-babu/mason-nvim-dap.nvim",
-    cmd = { "DapInstall", "DapUninstall" },
-    config = function()
-      local m = require("mason-nvim-dap")
-      m.setup({
-        ensure_installed = { "delve", "java-debug-adapter", "java-test" },
-        automatic_installation = true,
-        handlers = {
-          function(config)
-            m.default_setup(config)
-          end,
-        },
-      })
-    end,
-  },
-  {
     "mason-org/mason.nvim",
     cmd = "Mason",
     dependencies = {
       "mason-org/mason-lspconfig.nvim",
+      "jay-babu/mason-nvim-dap.nvim",
       {
         "neovim/nvim-lspconfig",
         event = "BufReadPost",
         config = function()
+          local conform = require("conform")
           local handlers = require("config.handlers")
+          local lspconfig = require("lspconfig")
           local mason = require("mason")
           local mason_lspconfig = require("mason-lspconfig")
-          local lspconfig = require("lspconfig")
+          local mason_nvim_dap = require("mason-nvim-dap")
 
           mason.setup()
 
@@ -87,6 +74,11 @@ return {
             ensure_installed = servers,
           })
 
+          mason_nvim_dap.setup({
+            ensure_installed = { "delve", "javadbg", "javatest" },
+            automatic_installation = true,
+          })
+
           handlers.setup()
 
           for _, server_name in ipairs(servers) do
@@ -100,7 +92,6 @@ return {
             end
           end
 
-          local conform = require("conform")
           conform.setup({
             formatters_by_ft = {
               go = { "goimports", "gofmt" },
