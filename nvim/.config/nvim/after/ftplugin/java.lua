@@ -144,11 +144,13 @@ config.on_attach = function()
   })
 
   local jdtls_dap = require("jdtls.dap")
+  local jdtls_tests = require("jdtls.tests")
   jdtls_dap.setup_dap_main_class_configs()
 
   local opts = { noremap = true, silent = true }
   vim.keymap.set("n", "<F9>", jdtls.test_class, opts)
   vim.keymap.set("n", "<F10>", jdtls.test_nearest_method, opts)
+  vim.keymap.set("n", "<leader><Tab>", jdtls_tests.goto_subjects, opts)
 end
 
 jdtls.start_or_attach(config)
