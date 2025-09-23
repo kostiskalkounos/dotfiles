@@ -19,7 +19,6 @@ vim.o.list = true
 vim.o.makeprg = "make -j4 -w"
 vim.o.mouse = "a"
 vim.o.number = true
-vim.o.path = "$PWD/**"
 vim.o.pumheight = 15
 vim.o.relativenumber = true
 vim.o.ruler = false
@@ -56,11 +55,10 @@ vim.opt.diffopt:append("foldcolumn:0")
 vim.opt.directory:append(".")
 vim.opt.isfname:append("@-@")
 vim.opt.listchars:append("tab:  ,extends:>,precedes:<,trail:·,nbsp:⎵")
+vim.opt.path:append("**")
 vim.opt.shortmess:append("c")
 vim.opt.suffixes:remove(".h")
-vim.opt.wildignore:append(
-  "*.o,*.rej,*.so,.cache/*,.clangd/*,.venv/*,build/*,node_modules/*,vendor/*,package-lock.json,yarn.lock"
-)
+vim.opt.wildignore:append("*.o,*.rej,*.so,.cache/*,.clangd/*,.venv/*,node_modules/*,package-lock.json,yarn.lock")
 
 if vim.fn.filereadable("/usr/local/bin/python3") == 1 then
   vim.g.python3_host_prog = "/usr/local/bin/python3"

@@ -1,9 +1,8 @@
 local fn = vim.fn
 local handlers = require("config.handlers")
 local jdtls = require("jdtls")
-local lsp_util = require("lspconfig.util")
 local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
-local project_name = fn.fnamemodify(fn.getcwd(), ":t")
+local project_name = fn.fnamemodify(fn.getcwd(), ":p:h:t")
 local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name
 
 local Iter = require("vim.iter")
@@ -24,7 +23,7 @@ local config = {
     "-Dlog.protocol=true",
     "-Dlog.level=WARNING",
     "-javaagent:" .. mason_share .. "/jdtls/lombok.jar",
-    "-Xmx2g",
+    "-Xmx4g",
     "--add-modules=ALL-SYSTEM",
     "--add-opens",
     "java.base/java.util=ALL-UNNAMED",
@@ -37,15 +36,23 @@ local config = {
     "-data",
     workspace_dir,
   },
-
-  root_dir = lsp_util.root_pattern(".git", "mvnw", "gradlew", "pom.xml", "build.gradle", "build.gradle.kts")(
-    vim.api.nvim_buf_get_name(0)
-  ),
-
+  root_dir = vim.fs.root(0, { ".git", "mvnw", "gradlew" }),
   settings = {
     java = {
       autobuild = { enabled = false },
-      configuration = { updateBuildConfiguration = "interactive" },
+      configuration = {
+        updateBuildConfiguration = "interactive",
+        runtimes = {
+          { name = "JavaSE-1.8", path = "/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home" },
+          { name = "JavaSE-17", path = "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home" },
+          { name = "JavaSE-21", path = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home" },
+          {
+            name = "JavaSE-24",
+            path = "/Library/Java/JavaVirtualMachines/temurin-24.jdk/Contents/Home",
+            default = true,
+          },
+        },
+      },
       contentProvider = { preferred = "fernflower" },
       eclipse = { downloadSources = true },
       maven = { downloadSources = true },
@@ -88,54 +95,7 @@ local config = {
   },
 }
 
-local version_patterns = {
-  ["pom.xml"] = {
-    "<java%.version>([%d.]+)</java%.version>",
-    "<maven%.compiler%.source>([%d.]+)</maven%.compiler%.source>",
-    "<maven%.compiler%.target>([%d.]+)</maven%.compiler%.target>",
-  },
-  ["build.gradle"] = {
-    "sourceCompatibility%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
-    "targetCompatibility%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
-    "java%.version%s*=%s*['\"]?(%d+%.?%d*)['\"]?",
-  },
-  ["build.gradle.kts"] = {
-    "sourceCompatibility%s*=%s*JavaVersion%.VERSION_(%d+%.?%d*)",
-    "targetCompatibility%s*=%s*JavaVersion%.VERSION_(%d+%.?%d*)",
-  },
-}
-
-local function getJavaVersion()
-  local root_dir = config.root_dir
-  if not root_dir then
-    return nil
-  end
-
-  for filename, patterns in pairs(version_patterns) do
-    local path = vim.fs.find(filename, { upward = true, path = root_dir, limit = 1 })[1]
-    if path then
-      for line in io.lines(path) do
-        for _, pattern in ipairs(patterns) do
-          local version = line:match(pattern)
-          if version then
-            return version
-          end
-        end
-      end
-    end
-  end
-  return nil
-end
-
 config.on_attach = function()
-  local java_version = getJavaVersion()
-  if java_version then
-    local detected_java_home = vim.trim(fn.system("/usr/libexec/java_home -v " .. java_version))
-    if detected_java_home ~= "" and vim.env.JAVA_HOME ~= detected_java_home then
-      vim.env.JAVA_HOME = detected_java_home
-    end
-  end
-
   handlers.on_attach()
 
   jdtls.setup_dap({
@@ -150,7 +110,9 @@ config.on_attach = function()
   local opts = { noremap = true, silent = true }
   vim.keymap.set("n", "<F9>", jdtls.test_class, opts)
   vim.keymap.set("n", "<F10>", jdtls.test_nearest_method, opts)
+
   vim.keymap.set("n", "<leader><Tab>", jdtls_tests.goto_subjects, opts)
+  vim.keymap.set("n", "<leader><S-Tab>", jdtls_tests.generate, opts)
 end
 
 jdtls.start_or_attach(config)

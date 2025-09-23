@@ -4,15 +4,24 @@ return {
   { "stevearc/oil.nvim", cmd = "Oil", opts = {} },
   { "MagicDuck/grug-far.nvim", cmd = { "GrugFar", "GrugFarWithin" } },
   {
-    "sindrets/diffview.nvim",
-    cmd = {
-      "DiffviewOpen",
-      "DiffviewClose",
-      "DiffviewToggleFiles",
-      "DiffviewFocusFiles",
-      "DiffviewRefresh",
-    },
-    dependencies = "nvim-lua/plenary.nvim",
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    ft = { "markdown", "quarto" },
+    config = function()
+      require("render-markdown").setup({
+        file_types = { "markdown" },
+        code = {
+          sign = false,
+          width = "block",
+          right_pad = 4,
+          position = "right",
+        },
+        heading = {
+          -- width = "block",
+          sign = false,
+        },
+      })
+    end,
   },
   {
     "NeogitOrg/neogit",
@@ -27,5 +36,16 @@ return {
       },
       integrations = { diffview = true },
     },
+  },
+  {
+    "sindrets/diffview.nvim",
+    cmd = {
+      "DiffviewOpen",
+      "DiffviewClose",
+      "DiffviewToggleFiles",
+      "DiffviewFocusFiles",
+      "DiffviewRefresh",
+    },
+    dependencies = "nvim-lua/plenary.nvim",
   },
 }

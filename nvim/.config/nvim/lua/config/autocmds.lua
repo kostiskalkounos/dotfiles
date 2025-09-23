@@ -1,5 +1,4 @@
 local api = vim.api
-local cmd = vim.cmd
 local opt_local = vim.opt_local
 
 local api_nvim_command = api.nvim_command
@@ -22,6 +21,14 @@ api_nvim_create_autocmd({ "BufEnter", "BufFilePost" }, {
   end,
 })
 
+api_nvim_create_autocmd({ "BufEnter", "BufFilePost" }, {
+  group = api_nvim_create_augroup("Dockerfile", { clear = true }),
+  pattern = "Dockerfile*",
+  callback = function()
+    vim.bo.filetype = "dockerfile"
+  end,
+})
+
 local g = api_nvim_create_augroup("CursorLineControl", { clear = true })
 api_nvim_create_autocmd("WinLeave", {
   group = g,
@@ -40,17 +47,6 @@ api_nvim_create_autocmd("FileType", {
   pattern = "TelescopePrompt",
   callback = function()
     opt_local.cursorline = false
-  end,
-})
-
-local t = api_nvim_create_augroup("Terminal", { clear = true })
-api_nvim_create_autocmd("TermOpen", {
-  group = t,
-  pattern = "*",
-  callback = function()
-    opt_local.number = false
-    opt_local.relativenumber = false
-    cmd("startinsert!")
   end,
 })
 
