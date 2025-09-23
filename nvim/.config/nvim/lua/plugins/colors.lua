@@ -6,16 +6,11 @@ return {
   dependencies = { "nvim-lualine/lualine.nvim" },
   config = function()
     local catppuccin = require("catppuccin")
+    local fn = vim.fn
 
-    local highlight_cache = {}
-
-    local function generate_highlights(palette, is_light)
-      local key = tostring(palette) .. tostring(is_light)
-      if highlight_cache[key] then
-        return highlight_cache[key]
-      end
-
-      local highlights = {
+    local function generate_highlights(palette, flavor)
+      local is_light = flavor == "latte"
+      return {
         ["@attribute"] = { fg = palette.sapphire },
         ["@constant"] = { fg = palette.teal },
         ["@constructor"] = { fg = palette.peach },
@@ -31,9 +26,17 @@ return {
         ["@variable.parameter"] = { fg = palette.text },
         ["CurSearch"] = { bg = palette.mauve },
       }
-      highlight_cache[key] = highlights
-      return highlights
     end
+
+    local function detect_theme()
+      if os.getenv("TMUX") then
+        local theme = os.getenv("NVIM_THEME")
+        vim.o.background = theme
+          or (fn.system("defaults read -g AppleInterfaceStyle 2>/dev/null"):match("Dark") and "dark" or "light")
+      end
+    end
+
+    detect_theme()
 
     catppuccin.setup({
       flavour = "auto",
@@ -42,108 +45,91 @@ return {
         latte = { pink = "#ed5bb9" },
         macchiato = { blue = "#89b4fa", lavender = "#b4befe", sapphire = "#74c7ec" },
       },
-      highlight_overrides = {
-        latte = function(latte)
-          return generate_highlights(latte, true)
-        end,
-        macchiato = function(macchiato)
-          return generate_highlights(macchiato, false)
-        end,
+      custom_highlights = function(colors)
+        local flavor = require("catppuccin").flavour
+        return generate_highlights(colors, flavor)
+      end,
+      float = {
+        enabled = false,
+        border = "rounded",
+        transparent = false,
+        solid = false,
       },
     })
 
     vim.cmd.colorscheme("catppuccin")
 
-    local fn = vim.fn
-    if os.getenv("TMUX") then
-      local theme = os.getenv("NVIM_THEME")
-      vim.o.background = theme
-          or (fn.system("defaults read -g AppleInterfaceStyle 2>/dev/null"):match("Dark") and "dark" or "light")
-    end
-
-    local lualine_themes = {
-      light = {
-        bg = "#eff1f5",
-        fg = "#4c4f69",
-        inactive = "#8c8fa1",
-      },
-      dark = {
-        bg = "#24273a",
-        fg = "#cad3f5",
-        inactive = "#6e738d",
-      },
+    local lualine_colors = {
+      light = { bg = "#eff1f5", fg = "#4c4f69", inactive = "#8c8fa1" },
+      dark = { bg = "#24273a", fg = "#cad3f5", inactive = "#6e738d" },
     }
 
-    local function get_mode_section(colors)
-      return {
-        a = { fg = colors.fg, bg = colors.bg },
-        b = { fg = colors.fg, bg = colors.bg },
-        c = { fg = colors.fg, bg = colors.bg },
-      }
+    local function get_filename_display()
+      local parts = {}
+      local ex = fn.expand("%:~:.")
+
+      if vim.startswith(ex, "jdt://") then
+        ex = ex:match("(.-)%?")
+      end
+
+      parts[1] = ex ~= "" and ex or "[No Name]"
+
+      if vim.bo.modified then
+        parts[#parts + 1] = " [+]"
+      end
+
+      if not vim.bo.modifiable or vim.bo.readonly then
+        parts[#parts + 1] = " [-]"
+      end
+
+      local exp = fn.expand("%")
+      if exp ~= "" and vim.bo.buftype == "" and fn.filereadable(exp) == 0 then
+        parts[#parts + 1] = " [New]"
+      end
+
+      return table.concat(parts)
     end
 
-    local function filename_component()
-      return function()
-        local ex = fn.expand("%:~:.")
-        if vim.startswith(ex, "jdt://") then
-          ex = ex:match("(.-)%?")
-        end
-        if ex == "" then
-          ex = "[No Name]"
-        end
-        if vim.bo.modified then
-          ex = ex .. " [+]"
-        end
-        if not vim.bo.modifiable or vim.bo.readonly then
-          ex = ex .. " [-]"
-        end
-        local exp = fn.expand("%")
-        if exp ~= "" and vim.bo.buftype == "" and fn.filereadable(exp) == 0 then
-          ex = ex .. " [New]"
-        end
-        return ex
-      end
+    local function create_lualine_theme(colors)
+      local section = { fg = colors.fg, bg = colors.bg }
+      local inactive_section = { fg = colors.inactive, bg = colors.bg }
+
+      return {
+        normal = { a = section, b = section, c = section },
+        command = { a = section, b = section, c = section },
+        insert = { a = section, b = section, c = section },
+        visual = { a = section, b = section, c = section },
+        terminal = { a = section, b = section, c = section },
+        replace = { a = section, b = section, c = section },
+        inactive = { a = inactive_section, b = inactive_section, c = inactive_section },
+      }
     end
 
     local function setup_lualine()
       local is_light = vim.o.background == "light"
-      local colors = lualine_themes[is_light and "light" or "dark"]
-      local mode = get_mode_section(colors)
+      local colors = lualine_colors[is_light and "light" or "dark"]
 
-      local l = require("lualine")
-      l.setup({
+      require("lualine").setup({
         options = {
           icons_enabled = true,
-          theme = {
-            normal = mode,
-            command = mode,
-            insert = mode,
-            visual = mode,
-            terminal = mode,
-            replace = mode,
-            inactive = {
-              a = { fg = colors.inactive, bg = colors.bg },
-              b = { fg = colors.inactive, bg = colors.bg },
-              c = { fg = colors.inactive, bg = colors.bg },
-            },
-          },
+          theme = create_lualine_theme(colors),
           component_separators = "",
           section_separators = "",
           always_divide_middle = true,
         },
         sections = {
-          lualine_a = { filename_component() },
+          lualine_a = { get_filename_display },
           lualine_b = { "diff" },
           lualine_c = {},
           lualine_x = {
             { "diagnostics", update_in_insert = false },
-            { "branch", icon = "", padding = { left = 2 } },
+            { "branch", icon = "", padding = { left = 2 } },
           },
           lualine_y = { "location" },
           lualine_z = { "progress" },
         },
         inactive_sections = {
-          lualine_a = { filename_component() },
+          lualine_a = { get_filename_display },
           lualine_b = {},
           lualine_c = {},
           lualine_x = { { "branch", padding = { left = 2 } } },
@@ -154,43 +140,47 @@ return {
     end
 
     setup_lualine()
+
     vim.api.nvim_create_autocmd("OptionSet", {
       pattern = "background",
-      callback = function()
-        vim.schedule(setup_lualine)
-      end,
+      callback = vim.schedule_wrap(function()
+        vim.cmd.colorscheme("catppuccin")
+        setup_lualine()
+      end),
     })
 
     vim.api.nvim_create_user_command("ToggleTheme", function()
       vim.o.background = vim.o.background == "light" and "dark" or "light"
     end, {})
 
-    local groups = {
+    local lsp_token_lookup = {}
+    local lsp_token_groups = {
       { type = "property", highlight = "@variable.member", priority = 105 },
-      { type = "property", modifier = "static",            highlight = "@constant", priority = 125 },
+      { type = "property", modifier = "static", highlight = "@constant", priority = 125 },
     }
+
+    for _, group in ipairs(lsp_token_groups) do
+      if not lsp_token_lookup[group.type] then
+        lsp_token_lookup[group.type] = {}
+      end
+      table.insert(lsp_token_lookup[group.type], group)
+    end
 
     vim.api.nvim_create_autocmd("LspTokenUpdate", {
       callback = function(args)
         local token = args.data.token
+        local groups = lsp_token_lookup[token.type]
 
-        for _, tt in pairs(groups) do
-          if token.type == tt.type then
-            if tt.modifier and token.modifiers[tt.modifier] then
+        if groups then
+          for _, group in ipairs(groups) do
+            local should_highlight = not group.modifier or token.modifiers[group.modifier]
+            if should_highlight then
               vim.lsp.semantic_tokens.highlight_token(
                 token,
                 args.buf,
                 args.data.client_id,
-                tt.highlight,
-                { priority = tt.priority or 105 }
-              )
-            elseif not tt.modifier then
-              vim.lsp.semantic_tokens.highlight_token(
-                token,
-                args.buf,
-                args.data.client_id,
-                tt.highlight,
-                { priority = tt.priority or 105 }
+                group.highlight,
+                { priority = group.priority }
               )
             end
           end

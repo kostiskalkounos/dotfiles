@@ -1,9 +1,9 @@
 return {
   "mfussenegger/nvim-jdtls",
   { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
-  { "stevearc/conform.nvim",   event = "BufWritePre" },
-  { "towolf/vim-helm",         ft = "helm" },
-  { "j-hui/fidget.nvim",       event = "LspAttach",  opts = {} },
+  { "stevearc/conform.nvim", event = "BufWritePre" },
+  { "towolf/vim-helm", ft = "helm" },
+  { "j-hui/fidget.nvim", event = "LspAttach", opts = {} },
   {
     "folke/lazydev.nvim",
     ft = "lua",
@@ -15,22 +15,21 @@ return {
   },
   {
     "mason-org/mason.nvim",
-    cmd = "Mason",
+    cmd = { "Mason", "MasonUpdate" },
     dependencies = {
       "mason-org/mason-lspconfig.nvim",
       "jay-babu/mason-nvim-dap.nvim",
       {
         "neovim/nvim-lspconfig",
-        event = "BufReadPost",
+        event = { "BufReadPre", "BufNewFile" },
         config = function()
           local conform = require("conform")
           local handlers = require("config.handlers")
-          local lspconfig = require("lspconfig")
           local mason = require("mason")
           local mason_lspconfig = require("mason-lspconfig")
           local mason_nvim_dap = require("mason-nvim-dap")
 
-          mason.setup()
+          handlers.setup()
 
           local servers = {
             "bashls",
@@ -55,9 +54,7 @@ return {
           }
 
           local servers_settings = {
-            bashls = {
-              filetypes = { "bash", "sh", "zsh" },
-            },
+            bashls = { filetypes = { "bash", "sh", "zsh" } },
             lua_ls = {
               settings = {
                 Lua = {
@@ -69,35 +66,41 @@ return {
             },
           }
 
+          for _, server_name in ipairs(servers) do
+            if server_name ~= "jdtls" then
+              local config = {
+                capabilities = handlers.capabilities,
+                on_attach = handlers.on_attach,
+              }
+              if servers_settings[server_name] then
+                config = vim.tbl_deep_extend("force", config, servers_settings[server_name])
+              end
+              vim.lsp.config[server_name] = config
+            end
+          end
+
+          mason.setup()
+
           mason_lspconfig.setup({
-            automatic_enable = false,
+            automatic_enable = true,
             ensure_installed = servers,
           })
 
           mason_nvim_dap.setup({
-            ensure_installed = { "delve", "javadbg", "javatest" },
             automatic_installation = true,
+            ensure_installed = { "delve", "javadbg", "javatest" },
           })
-
-          handlers.setup()
-
-          for _, server_name in ipairs(servers) do
-            if server_name ~= "jdtls" then
-              local opts = {
-                capabilities = handlers.capabilities,
-                on_attach = handlers.on_attach,
-                settings = servers_settings[server_name] and servers_settings[server_name].settings or nil,
-              }
-              lspconfig[server_name].setup(opts)
-            end
-          end
 
           conform.setup({
             formatters_by_ft = {
               go = { "goimports", "gofmt" },
-              javascript = { "prettierd", "prettier" },
               lua = { "stylua" },
-              python = { "isort", "black" },
+              python = { "black" },
+              css = { "prettier", "prettierd", stop_after_first = true },
+              html = { "prettier", "prettierd", stop_after_first = true },
+              yaml = { "prettier", "prettierd", stop_after_first = true },
+              jsonc = { "prettier", "prettierd", stop_after_first = true },
+              javascript = { "prettier", "prettierd", stop_after_first = true },
             },
             format_on_save = function()
               if vim.g.disable_autoformat then
