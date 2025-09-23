@@ -1,0 +1,93 @@
+#!/usr/bin/env zsh
+
+local -A MONGO_CONFIG=(
+  ["dev us 1"]="replace_me"
+)
+
+local -A PROJECT_MAP=(
+  ["dev us"]="replace_me"
+)
+
+function _get_gcloud_secret() {
+  local secret_name="$1"
+  local project="$2"
+  local secret_value
+  secret_value=$(gcloud secrets versions access latest --secret "$secret_name" --project "$project")
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to access secret '$secret_name' in project '$project'." >&2
+    return 1
+  fi
+  echo "$secret_value"
+}
+
+function _construct_mongo_uri() {
+  local secret_prefix="$1"
+  local project="$2"
+  local username
+  local password
+  local short_hostname_prefix
+  local domain_suffix
+
+  case "$project" in
+    "sym-dev-use4-data-01")
+      domain_suffix="replace_me"
+      ;;
+    *)
+      echo "Warning: Unknown project '$project', using default domain 'gfazi.mongodb.net'" >&2
+      echo "Known projects: ${(k)PROJECT_MAP}" >&2
+      ;;
+  esac
+
+  short_hostname_prefix=$(echo "$secret_prefix" | sed 's/-[^-]*-[^-]*$//')
+
+  username="$(_get_gcloud_secret "${secret_prefix}-mongouser" "$project")"
+  password="$(_get_gcloud_secret "${secret_prefix}-mongopassword" "$project")"
+
+  if [[ -n "$username" && -n "$password" ]]; then
+    echo "mongodb+srv://${username}:${password}@${short_hostname_prefix}-pri.${domain_suffix}/?proxyHost=localhost&proxyPort=54321&authMechanism=DEFAULT"
+  else
+    echo "Error: Could not retrieve username or password for prefix: $secret_prefix in project: $project" >&2
+    return 1
+  fi
+}
+
+mongo() {
+  local env="$1"
+  local region="$2"
+  local sdu="$3"
+
+  if [[ -z "$env" || -z "$region" || -z "$sdu" ]]; then
+    echo "Usage: mongo <env> <region> <sdu>"
+    echo "Available env/region/sdu combinations (check MONGO_CONFIG):"
+    for key in "${(@k)MONGO_CONFIG}"; do
+      echo "  $key"
+    done
+    return 1
+  fi
+
+  local config_key="$env $region $sdu"
+  local secret_prefix="${MONGO_CONFIG[$config_key]}"
+  local project_key="$env $region"
+  local project="${PROJECT_MAP[$project_key]}"
+
+  if [[ -z "$secret_prefix" ]]; then
+    echo "Error: No MongoDB configuration found for env '$env', region '$region', and sdu '$sdu'."
+    echo "Please check the MONGO_CONFIG array for valid combinations."
+    return 1
+  fi
+
+  if [[ -z "$project" ]]; then
+    echo "Error: No project mapping found for env '$env' and region '$region'."
+    echo "Please check the PROJECT_MAP array for valid env/region combinations."
+    return 1
+  fi
+
+  mongo_uri="$(_construct_mongo_uri "$secret_prefix" "$project")"
+
+  if [[ $? -ne 0 || -z "$mongo_uri" ]]; then
+    echo "Error: Failed to construct MongoDB URI."
+    return 1
+  fi
+
+  mongosh "$mongo_uri"
+}

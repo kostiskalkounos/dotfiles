@@ -1,5 +1,9 @@
 bindkey -e
 
+source ~/.bastion
+source ~/.gclone
+source ~/.mongo
+
 alias ga='git add'
 alias gb='git branch'
 alias gc='git commit'
@@ -13,7 +17,7 @@ alias gt='git checkout'
 alias gu='git pull'
 gll() { git log --graph --topo-order --abbrev-commit --date=short --decorate --all --boundary --pretty=format:"%Cgreen%ad %C(yellow)%h%Creset%C(red)%d%Creset %s %Cblue[%cn]%Creset" "$@"; }
 
-alias k='kubectl'
+alias k='kubecolor'
 alias ks='kubens'
 alias kx='kubectx'
 
@@ -109,6 +113,8 @@ export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow
 DARK_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,gutter:-1'
 LIGHT_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=light --color=fg:-1,bg:-1,hl:magenta,fg+:black,bg+:#ccd0da,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,gutter:-1'
 
+compdef kubecolor=kubectl
+
 case "$FZF_THEME" in
   dark) export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" ;;
   light) export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" ;;
@@ -116,9 +122,11 @@ case "$FZF_THEME" in
     if defaults read -g AppleInterfaceStyle 2>/dev/null | grep -q Dark; then
       export FZF_THEME=Dark
       export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"
+      export KUBECOLOR_PRESET=dark
     else
       export FZF_THEME=Light
       export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"
+      export KUBECOLOR_PRESET=light
     fi
     ;;
 esac
@@ -149,7 +157,6 @@ man() {
 }
 
 j() {
-  # sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk.jdk
   unset JAVA_HOME
   if [ -n "$1" ]; then
     export JAVA_HOME=$(/usr/libexec/java_home -v "$1")

@@ -1,0 +1,47 @@
+#!/usr/bin/env zsh
+
+check_gcloud_auth() {
+  if ! gcloud auth list --quiet 2>/dev/null | grep -q "@"; then
+    echo "Error: You are not currently authenticated with gcloud."
+    echo "Please run 'gcloud auth login' to authenticate."
+    return 1
+  fi
+  return 0
+}
+
+bastion() {
+  if ! check_gcloud_auth; then
+    return 1
+  fi
+
+  local env="$1"
+  local region="$2"
+
+  local -A PROJECT_MAP=(
+    ["dev us"]="replace_me"
+  )
+
+  local key="$env $region"
+  local project="${PROJECT_MAP[$key]}"
+
+  if [[ -z "$project" ]]; then
+    echo "Usage: bastion <env> <region>"
+    echo "Available environments/regions (check PROJECT_MAP):"
+    for key in "${(@k)PROJECT_MAP}"; do
+      echo "  $key"
+    done
+    return 1
+  fi
+
+  local bastion_host
+  bastion_host=$(gcloud compute instances list --project "$project" --filter="name~'bastion'" --format="value(name)")
+
+  if [[ -z "$bastion_host" ]]; then
+    echo "Error: No bastion host found in project '$project'."
+    return 1
+  fi
+
+  echo "Connecting to bastion host '$bastion_host' in project '$project'..."
+
+  gcloud compute ssh "$bastion_host" --project "$project" -- -D 54321 -N
+}
