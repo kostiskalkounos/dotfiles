@@ -66,6 +66,18 @@ return {
             },
           }
 
+          mason.setup()
+
+          mason_lspconfig.setup({
+            automatic_enable = false,
+            ensure_installed = servers,
+          })
+
+          mason_nvim_dap.setup({
+            automatic_installation = true,
+            ensure_installed = { "delve", "javadbg", "javatest" },
+          })
+
           for _, server_name in ipairs(servers) do
             if server_name ~= "jdtls" then
               local config = {
@@ -76,20 +88,9 @@ return {
                 config = vim.tbl_deep_extend("force", config, servers_settings[server_name])
               end
               vim.lsp.config[server_name] = config
+              vim.lsp.enable(server_name)
             end
           end
-
-          mason.setup()
-
-          mason_lspconfig.setup({
-            automatic_enable = true,
-            ensure_installed = servers,
-          })
-
-          mason_nvim_dap.setup({
-            automatic_installation = true,
-            ensure_installed = { "delve", "javadbg", "javatest" },
-          })
 
           conform.setup({
             formatters_by_ft = {
