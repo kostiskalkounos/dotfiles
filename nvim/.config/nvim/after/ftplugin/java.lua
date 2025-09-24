@@ -1,15 +1,21 @@
 local fn = vim.fn
 local handlers = require("config.handlers")
 local jdtls = require("jdtls")
+local jdtls_dap = require("jdtls.dap")
+local jdtls_tests = require("jdtls.tests")
+local opts = { noremap = true, silent = true }
+
 local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
 local project_name = fn.fnamemodify(fn.getcwd(), ":p:h:t")
 local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name
 
-local Iter = require("vim.iter")
-local bundles = Iter({
-  fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
-  vim.split(fn.glob(mason_share .. "/java-test/*.jar", true), "\n"),
-}):flatten():totable()
+local bundles = vim
+  .iter({
+    fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
+    vim.split(fn.glob(mason_share .. "/java-test/*.jar", true), "\n"),
+  })
+  :flatten()
+  :totable()
 
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
@@ -47,8 +53,8 @@ local config = {
           { name = "JavaSE-17", path = "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home" },
           { name = "JavaSE-21", path = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home" },
           {
-            name = "JavaSE-24",
-            path = "/Library/Java/JavaVirtualMachines/temurin-24.jdk/Contents/Home",
+            name = "JavaSE-25",
+            path = "/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home",
             default = true,
           },
         },
@@ -103,14 +109,10 @@ config.on_attach = function()
     config_overrides = {},
   })
 
-  local jdtls_dap = require("jdtls.dap")
-  local jdtls_tests = require("jdtls.tests")
   jdtls_dap.setup_dap_main_class_configs()
 
-  local opts = { noremap = true, silent = true }
   vim.keymap.set("n", "<F9>", jdtls.test_class, opts)
   vim.keymap.set("n", "<F10>", jdtls.test_nearest_method, opts)
-
   vim.keymap.set("n", "<leader><Tab>", jdtls_tests.goto_subjects, opts)
   vim.keymap.set("n", "<leader><S-Tab>", jdtls_tests.generate, opts)
 end

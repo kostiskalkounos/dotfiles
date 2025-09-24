@@ -14,7 +14,6 @@ return {
     },
   },
   config = function(_, o)
-    local t = require("nvim-tree")
-    t.setup(o)
+    require("nvim-tree").setup(o)
   end,
 }
