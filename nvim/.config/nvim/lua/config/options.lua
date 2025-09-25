@@ -1,70 +1,74 @@
-vim.o.autoindent = true
-vim.o.backup = false
-vim.o.belloff = "all"
-vim.o.breakindent = true
-vim.o.cindent = true
-vim.o.cursorline = true
-vim.o.expandtab = true
-vim.o.ff = "unix"
-vim.o.foldlevelstart = 99
-vim.o.foldmethod = "indent"
-vim.o.hidden = true
-vim.o.ignorecase = true
-vim.o.inccommand = "split"
-vim.o.joinspaces = false
-vim.o.laststatus = 2
-vim.o.lazyredraw = true
-vim.o.linebreak = true
-vim.o.list = true
-vim.o.makeprg = "make -j4 -w"
-vim.o.mouse = "a"
-vim.o.number = true
-vim.o.pumheight = 15
-vim.o.relativenumber = true
-vim.o.ruler = false
-vim.o.scrolloff = 0
-vim.o.shiftround = true
-vim.o.shiftwidth = 2
-vim.o.showmatch = true
-vim.o.showmode = false
-vim.o.sidescroll = 0
-vim.o.sidescrolloff = 0
-vim.o.signcolumn = "yes"
-vim.o.smartcase = true
-vim.o.smartindent = true
-vim.o.smarttab = true
-vim.o.softtabstop = 2
-vim.o.spellcapcheck = ""
-vim.o.splitbelow = true
-vim.o.splitright = true
-vim.o.swapfile = false
-vim.o.tabstop = 2
-vim.o.termguicolors = true
-vim.o.timeout = false
-vim.o.undofile = true
-vim.o.updatetime = 300
-vim.o.virtualedit = "block"
-vim.o.wildignorecase = true
-vim.o.wildmenu = true
-vim.o.wildmode = "longest:full,full"
-vim.o.wrap = false
+local g = vim.g
+local o = vim.o
+local opt = vim.opt
 
-vim.opt.complete:append("kspell")
-vim.opt.completeopt = { "fuzzy", "menuone", "noinsert", "preview" }
-vim.opt.diffopt:append("foldcolumn:0")
-vim.opt.directory:append(".")
-vim.opt.isfname:append("@-@")
-vim.opt.listchars:append("tab:  ,extends:>,precedes:<,trail:·,nbsp:⎵")
-vim.opt.path:append("**")
-vim.opt.shortmess:append("c")
-vim.opt.suffixes:remove(".h")
-vim.opt.wildignore:append("*.o,*.rej,*.so,.cache/*,.clangd/*,.venv/*,node_modules/*,package-lock.json,yarn.lock")
+o.autoindent = true
+o.backup = false
+o.belloff = "all"
+o.breakindent = true
+o.cindent = true
+o.cursorline = true
+o.expandtab = true
+o.ff = "unix"
+o.foldlevelstart = 99
+o.foldmethod = "indent"
+o.hidden = true
+o.ignorecase = true
+o.inccommand = "split"
+o.joinspaces = false
+o.laststatus = 2
+o.lazyredraw = true
+o.linebreak = true
+o.list = true
+o.makeprg = "make -j4 -w"
+o.mouse = "a"
+o.number = true
+o.pumheight = 15
+o.relativenumber = true
+o.ruler = false
+o.scrolloff = 0
+o.shiftround = true
+o.shiftwidth = 2
+o.showmatch = true
+o.showmode = false
+o.sidescroll = 0
+o.sidescrolloff = 0
+o.signcolumn = "yes"
+o.smartcase = true
+o.smartindent = true
+o.smarttab = true
+o.softtabstop = 2
+o.spellcapcheck = ""
+o.splitbelow = true
+o.splitright = true
+o.swapfile = false
+o.tabstop = 2
+o.termguicolors = true
+o.timeout = false
+o.undofile = true
+o.updatetime = 300
+o.virtualedit = "block"
+o.wildignorecase = true
+o.wildmenu = true
+o.wildmode = "longest:full,full"
+o.wrap = false
+
+opt.complete:append("kspell")
+opt.completeopt = { "fuzzy", "menuone", "noinsert", "preview" }
+opt.diffopt:append("foldcolumn:0")
+opt.directory:append(".")
+opt.isfname:append("@-@")
+opt.listchars:append("tab:  ,extends:>,precedes:<,trail:·,nbsp:⎵")
+opt.path:append("**")
+opt.shortmess:append("c")
+opt.suffixes:remove(".h")
+opt.wildignore:append("*.o,*.rej,*.so,.cache/*,.clangd/*,.venv/*,node_modules/*,package-lock.json,yarn.lock")
 
 if vim.fn.filereadable("/usr/local/bin/python3") == 1 then
-  vim.g.python3_host_prog = "/usr/local/bin/python3"
+  g.python3_host_prog = "/usr/local/bin/python3"
 end
 
-vim.g.skip_ts_context_commenstring_module = true
-vim.g.undotree_HighlightChangedText = 0
-vim.g.undotree_SetFocusWhenToggle = 1
-vim.g.undotree_WindowLayout = 2
+g.skip_ts_context_commenstring_module = true
+g.undotree_HighlightChangedText = 0
+g.undotree_SetFocusWhenToggle = 1
+g.undotree_WindowLayout = 2

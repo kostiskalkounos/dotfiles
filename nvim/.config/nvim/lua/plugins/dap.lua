@@ -21,6 +21,8 @@ return {
       local dap = require("dap")
       local dapui = require("dapui")
       local default = { noremap = true, unique = true, silent = true }
+
+      local api = vim.api
       local fn = vim.fn
       local set = vim.keymap.set
 
@@ -30,11 +32,10 @@ return {
       fn.sign_define("DapBreakpointRejected", { text = "", texthl = "DiagnosticError", linehl = "", numhl = "" })
       fn.sign_define("DapLogPoint", { text = "󰁕 ", texthl = "DiagnosticInfo", linehl = "", numhl = "" })
 
-      vim.api.nvim_create_autocmd("FileType", {
+      api.nvim_create_autocmd("FileType", {
         pattern = "dap-repl",
         callback = function()
-          local d = require("dap.ext.autocompl")
-          d.attach()
+          require("dap.ext.autocompl").attach()
         end,
       })
 
@@ -101,12 +102,12 @@ return {
       })
 
       local function find_window_by_filetype(element)
-        for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-          local buf = vim.api.nvim_win_get_buf(win)
+        for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
+          local buf = api.nvim_win_get_buf(win)
           local filetype = vim.bo[buf].filetype
 
           if filetype == element or (element == "editor" and dap.configurations[filetype]) then
-            vim.api.nvim_set_current_win(win)
+            api.nvim_set_current_win(win)
             return
           end
         end
@@ -180,7 +181,7 @@ return {
       set({ "n", "v" }, "<leader>:", function()
         dapui.eval(nil, { enter = true })
         vim.defer_fn(function()
-          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+          api.nvim_feedkeys(api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
         end, 50)
       end, default)
 

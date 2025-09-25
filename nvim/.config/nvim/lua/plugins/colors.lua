@@ -6,7 +6,11 @@ return {
   dependencies = { "nvim-lualine/lualine.nvim" },
   config = function()
     local catppuccin = require("catppuccin")
+    local api = vim.api
+    local bo = vim.bo
+    local cmd = vim.cmd
     local fn = vim.fn
+    local o = vim.o
 
     local function generate_highlights(palette, flavor)
       local is_light = flavor == "latte"
@@ -31,7 +35,7 @@ return {
     local function detect_theme()
       if os.getenv("TMUX") then
         local theme = os.getenv("NVIM_THEME")
-        vim.o.background = theme
+        o.background = theme
           or (fn.system("defaults read -g AppleInterfaceStyle 2>/dev/null"):match("Dark") and "dark" or "light")
       end
     end
@@ -57,7 +61,7 @@ return {
       },
     })
 
-    vim.cmd.colorscheme("catppuccin")
+    cmd.colorscheme("catppuccin")
 
     local lualine_colors = {
       light = { bg = "#eff1f5", fg = "#4c4f69", inactive = "#8c8fa1" },
@@ -74,16 +78,16 @@ return {
 
       parts[1] = ex ~= "" and ex or "[No Name]"
 
-      if vim.bo.modified then
+      if bo.modified then
         parts[#parts + 1] = " [+]"
       end
 
-      if not vim.bo.modifiable or vim.bo.readonly then
+      if not bo.modifiable or bo.readonly then
         parts[#parts + 1] = " [-]"
       end
 
       local exp = fn.expand("%")
-      if exp ~= "" and vim.bo.buftype == "" and fn.filereadable(exp) == 0 then
+      if exp ~= "" and bo.buftype == "" and fn.filereadable(exp) == 0 then
         parts[#parts + 1] = " [New]"
       end
 
@@ -106,7 +110,7 @@ return {
     end
 
     local function setup_lualine()
-      local is_light = vim.o.background == "light"
+      local is_light = o.background == "light"
       local colors = lualine_colors[is_light and "light" or "dark"]
 
       require("lualine").setup({
@@ -141,16 +145,16 @@ return {
 
     setup_lualine()
 
-    vim.api.nvim_create_autocmd("OptionSet", {
+    api.nvim_create_autocmd("OptionSet", {
       pattern = "background",
       callback = vim.schedule_wrap(function()
-        vim.cmd.colorscheme("catppuccin")
+        cmd.colorscheme("catppuccin")
         setup_lualine()
       end),
     })
 
-    vim.api.nvim_create_user_command("ToggleTheme", function()
-      vim.o.background = vim.o.background == "light" and "dark" or "light"
+    api.nvim_create_user_command("ToggleTheme", function()
+      o.background = o.background == "light" and "dark" or "light"
     end, {})
 
     local lsp_token_lookup = {}
@@ -166,7 +170,7 @@ return {
       table.insert(lsp_token_lookup[group.type], group)
     end
 
-    vim.api.nvim_create_autocmd("LspTokenUpdate", {
+    api.nvim_create_autocmd("LspTokenUpdate", {
       callback = function(args)
         local token = args.data.token
         local groups = lsp_token_lookup[token.type]
