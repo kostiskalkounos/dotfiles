@@ -10,7 +10,6 @@ return {
           return require("ts_context_commentstring.internal").calculate_commentstring(ctx) or vim.bo.commentstring
         end,
       })
-
       require("Comment").setup({
         padding = true,
         sticky = true,

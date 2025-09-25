@@ -4,6 +4,7 @@ return {
   dependencies = { "nvim-tree/nvim-web-devicons" },
   config = function()
     local f = require("fzf-lua")
+    local fn = vim.fn
     vim.cmd("FzfLua register_ui_select")
 
     f.setup({
@@ -19,12 +20,12 @@ return {
       },
       files = {
         fzf_opts = {
-          ["--history"] = vim.fn.stdpath("data") .. "/fzf-lua-files-history",
+          ["--history"] = fn.stdpath("data") .. "/fzf-lua-files-history",
         },
       },
       grep = {
         fzf_opts = {
-          ["--history"] = vim.fn.stdpath("data") .. "/fzf-lua-grep-history",
+          ["--history"] = fn.stdpath("data") .. "/fzf-lua-grep-history",
         },
       },
       fzf_colors = {
