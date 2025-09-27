@@ -37,9 +37,9 @@ function M.setup()
   })
 end
 
-local hover = vim.lsp.buf.hover
+local hover = buf.hover
 ---@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.buf.hover = function()
+buf.hover = function()
   return hover({
     border = "rounded",
     max_width = math.floor(vim.o.columns * 0.7),
@@ -47,9 +47,9 @@ vim.lsp.buf.hover = function()
   })
 end
 
-local signature = vim.lsp.buf.signature_help
+local signature = buf.signature_help
 ---@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.buf.signature_help = function()
+buf.signature_help = function()
   return signature({
     border = "rounded",
     max_width = math.floor(vim.o.columns * 0.4),

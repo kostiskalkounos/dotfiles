@@ -1,11 +1,9 @@
 local M = {}
 
-local nvimApi = vim.api
+local api = vim.api
 local set = vim.keymap.set
 
-local getChildProcesses = nvimApi.nvim_get_proc_children
-local getProcess = nvimApi.nvim_get_proc
-local replaceTermcodes = nvimApi.nvim_replace_termcodes
+local replaceTermcodes = api.nvim_replace_termcodes
 local defaultEscapeSequence = replaceTermcodes("<C-\\><C-n>", true, true, true)
 
 local function transformKeySequence(sequence)
@@ -13,12 +11,12 @@ local function transformKeySequence(sequence)
 end
 
 local function hasExcludedProcess(processId, excludedProcesses)
-  local processInfo = getProcess(processId)
+  local processInfo = api.nvim_get_proc(processId)
   if processInfo then
     if excludedProcesses[processInfo.name] then
       return true
     end
-    local childProcessIds = getChildProcesses(processId)
+    local childProcessIds = api.nvim_get_proc_children(processId)
     for _, childProcessId in ipairs(childProcessIds) do
       if hasExcludedProcess(childProcessId, excludedProcesses) then
         return true
