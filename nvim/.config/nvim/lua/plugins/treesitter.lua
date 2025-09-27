@@ -9,8 +9,7 @@ return {
       { "windwp/nvim-ts-autotag", opts = {} },
     },
     config = function()
-      local ts_config = require("nvim-treesitter.configs")
-      ts_config.setup({
+      require("nvim-treesitter.configs").setup({
         auto_install = false,
         autopairs = { enable = true },
         highlight = { enable = not vim.g.vscode },
