@@ -5,7 +5,7 @@ return {
   config = function()
     local f = require("fzf-lua")
     local fn = vim.fn
-    vim.cmd("FzfLua register_ui_select")
+    vim.api.nvim_command("FzfLua register_ui_select")
 
     f.setup({
       fzf_opts = {

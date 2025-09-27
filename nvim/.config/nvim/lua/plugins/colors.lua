@@ -7,8 +7,8 @@ return {
   config = function()
     local catppuccin = require("catppuccin")
     local api = vim.api
+    local api_nvim_command = api.nvim_command
     local bo = vim.bo
-    local cmd = vim.cmd
     local fn = vim.fn
     local o = vim.o
 
@@ -61,7 +61,7 @@ return {
       },
     })
 
-    cmd.colorscheme("catppuccin")
+    api_nvim_command("colorscheme catppuccin")
 
     local lualine_colors = {
       light = { bg = "#eff1f5", fg = "#4c4f69", inactive = "#8c8fa1" },
@@ -148,7 +148,7 @@ return {
     api.nvim_create_autocmd("OptionSet", {
       pattern = "background",
       callback = vim.schedule_wrap(function()
-        cmd.colorscheme("catppuccin")
+        api_nvim_command("colorscheme catppuccin")
         setup_lualine()
       end),
     })
