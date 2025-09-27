@@ -2,8 +2,7 @@ return {
   "catgoose/nvim-colorizer.lua",
   event = "BufReadPre",
   config = function()
-    local c = require("colorizer")
-    c.setup({
+    require("colorizer").setup({
       filetypes = { "*" },
       user_default_options = {
         RGB = true,
