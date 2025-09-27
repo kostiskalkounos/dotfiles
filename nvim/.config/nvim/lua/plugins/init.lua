@@ -26,7 +26,20 @@ return {
   {
     "NeogitOrg/neogit",
     cmd = "Neogit",
-    dependencies = "nvim-lua/plenary.nvim",
+    dependencies = {
+      "ibhagwan/fzf-lua",
+      "nvim-lua/plenary.nvim",
+      {
+        "sindrets/diffview.nvim",
+        cmd = {
+          "DiffviewOpen",
+          "DiffviewClose",
+          "DiffviewToggleFiles",
+          "DiffviewFocusFiles",
+          "DiffviewRefresh",
+        },
+      },
+    },
     opts = {
       kind = "split",
       signs = {
@@ -36,16 +49,5 @@ return {
       },
       integrations = { diffview = true },
     },
-  },
-  {
-    "sindrets/diffview.nvim",
-    cmd = {
-      "DiffviewOpen",
-      "DiffviewClose",
-      "DiffviewToggleFiles",
-      "DiffviewFocusFiles",
-      "DiffviewRefresh",
-    },
-    dependencies = "nvim-lua/plenary.nvim",
   },
 }
