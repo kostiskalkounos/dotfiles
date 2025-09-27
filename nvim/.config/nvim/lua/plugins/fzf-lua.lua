@@ -20,12 +20,12 @@ return {
       },
       files = {
         fzf_opts = {
-          ["--history"] = fn.stdpath("data") .. "/fzf-lua-files-history",
+          ["--history"] = vim.fn.expand("/") .. "tmp/fzf-lua-files-history",
         },
       },
       grep = {
         fzf_opts = {
-          ["--history"] = fn.stdpath("data") .. "/fzf-lua-grep-history",
+          ["--history"] = vim.fn.expand("/") .. "tmp/fzf-lua-grep-history",
         },
       },
       fzf_colors = {
