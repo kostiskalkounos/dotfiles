@@ -30,10 +30,14 @@ api_nvim_create_autocmd("VimEnter", {
   group = group,
   once = true,
   callback = function(ev)
-    local lines = api.nvim_buf_get_lines(ev.buf, 0, -1, false)
-    if #lines > 0 then
+    api.nvim_win_set_cursor(0, { vim.fn.line("$"), 0 })
+    local last_line_nr = vim.fn.search("\\S", "bnW")
+
+    if last_line_nr > 0 then
+      local lines = api.nvim_buf_get_lines(ev.buf, 0, last_line_nr, false)
       api.nvim_chan_send(term_io, table.concat(lines, "\r\n") .. "\r\n")
     end
+
     api.nvim_win_set_buf(0, term_buf)
     api.nvim_buf_delete(ev.buf, { force = true })
     api.nvim_command("normal! A")
