@@ -27,7 +27,6 @@ return {
     "NeogitOrg/neogit",
     cmd = "Neogit",
     dependencies = {
-      "ibhagwan/fzf-lua",
       "nvim-lua/plenary.nvim",
       {
         "sindrets/diffview.nvim",
