@@ -1,20 +1,21 @@
 return {
   { "mfussenegger/nvim-jdtls", ft = "java" },
-  { "lewis6991/gitsigns.nvim", event = "BufReadPre", opts = {} },
+  { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = {} },
   {
     "stevearc/conform.nvim",
     event = "BufWritePre",
     config = function()
+      local prettier = { "prettier", "prettierd", stop_after_first = true }
       require("conform").setup({
         formatters_by_ft = {
           go = { "goimports", "gofmt" },
           lua = { "stylua" },
           python = { "black" },
-          css = { "prettier", "prettierd", stop_after_first = true },
-          html = { "prettier", "prettierd", stop_after_first = true },
-          yaml = { "prettier", "prettierd", stop_after_first = true },
-          jsonc = { "prettier", "prettierd", stop_after_first = true },
-          javascript = { "prettier", "prettierd", stop_after_first = true },
+          css = prettier,
+          html = prettier,
+          yaml = prettier,
+          jsonc = prettier,
+          javascript = prettier,
         },
         format_on_save = function()
           if vim.g.disable_autoformat then
@@ -51,7 +52,7 @@ return {
       "jay-babu/mason-nvim-dap.nvim",
       {
         "neovim/nvim-lspconfig",
-        event = { "BufReadPre", "BufNewFile" },
+        event = "VeryLazy",
         config = function()
           local handlers = require("config.handlers")
           handlers.setup()
