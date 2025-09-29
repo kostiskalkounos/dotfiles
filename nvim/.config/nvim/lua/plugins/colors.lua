@@ -3,7 +3,7 @@ return {
   name = "catppuccin",
   lazy = false,
   priority = 1000,
-  dependencies = { "nvim-lualine/lualine.nvim" },
+  dependencies = "nvim-lualine/lualine.nvim",
   config = function()
     local catppuccin = require("catppuccin")
     local api = vim.api
