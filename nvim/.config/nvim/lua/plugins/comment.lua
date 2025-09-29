@@ -1,7 +1,7 @@
 return {
   {
     "numToStr/Comment.nvim",
-    keys = { "gc", "gb", "gcc", "gbc", "gcA", "gcO", "gco" },
+    event = "VeryLazy",
     dependencies = "JoosepAlviste/nvim-ts-context-commentstring",
     config = function()
       require("ts_context_commentstring").setup({
