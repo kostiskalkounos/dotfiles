@@ -1,7 +1,7 @@
 return {
   "ibhagwan/fzf-lua",
-  cmd = "FzfLua",
-  dependencies = { "nvim-tree/nvim-web-devicons" },
+  event = "VeryLazy",
+  dependencies = "nvim-tree/nvim-web-devicons",
   config = function()
     local f = require("fzf-lua")
     vim.api.nvim_command("FzfLua register_ui_select")
