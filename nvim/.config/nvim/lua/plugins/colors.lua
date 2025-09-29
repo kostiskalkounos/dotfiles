@@ -12,6 +12,11 @@ return {
     local fn = vim.fn
     local o = vim.o
 
+    local theme = os.getenv("NVIM_THEME")
+    if theme then
+      o.background = theme
+    end
+
     local function generate_highlights(palette, flavor)
       local is_light = flavor == "latte"
       return {
@@ -32,16 +37,6 @@ return {
       }
     end
 
-    local function detect_theme()
-      if os.getenv("TMUX") then
-        local theme = os.getenv("NVIM_THEME")
-        o.background = theme
-          or (fn.system("defaults read -g AppleInterfaceStyle 2>/dev/null"):match("Dark") and "dark" or "light")
-      end
-    end
-
-    detect_theme()
-
     catppuccin.setup({
       flavour = "auto",
       background = { light = "latte", dark = "macchiato" },
@@ -59,6 +54,9 @@ return {
         transparent = false,
         solid = false,
       },
+      integrations = {
+        lualine = true,
+      },
     })
 
     api_nvim_command("colorscheme catppuccin")
@@ -71,33 +69,26 @@ return {
     local function get_filename_display()
       local parts = {}
       local ex = fn.expand("%:~:.")
-
       if vim.startswith(ex, "jdt://") then
         ex = ex:match("(.-)%?")
       end
-
       parts[1] = ex ~= "" and ex or "[No Name]"
-
       if bo.modified then
         parts[#parts + 1] = " [+]"
       end
-
       if not bo.modifiable or bo.readonly then
         parts[#parts + 1] = " [-]"
       end
-
       local exp = fn.expand("%")
       if exp ~= "" and bo.buftype == "" and fn.filereadable(exp) == 0 then
         parts[#parts + 1] = " [New]"
       end
-
       return table.concat(parts)
     end
 
     local function create_lualine_theme(colors)
       local section = { fg = colors.fg, bg = colors.bg }
       local inactive_section = { fg = colors.inactive, bg = colors.bg }
-
       return {
         normal = { a = section, b = section, c = section },
         command = { a = section, b = section, c = section },
@@ -109,53 +100,33 @@ return {
       }
     end
 
-    local function setup_lualine()
-      local is_light = o.background == "light"
-      local colors = lualine_colors[is_light and "light" or "dark"]
-
-      require("lualine").setup({
-        options = {
-          icons_enabled = true,
-          theme = create_lualine_theme(colors),
-          component_separators = "",
-          section_separators = "",
-          always_divide_middle = true,
-        },
-        sections = {
-          lualine_a = { get_filename_display },
-          lualine_b = { "diff" },
-          lualine_c = {},
-          lualine_x = {
-            { "diagnostics", update_in_insert = false },
-            { "branch", icon = "", padding = { left = 2 } },
-          },
-          lualine_y = { "location" },
-          lualine_z = { "progress" },
-        },
-        inactive_sections = {
-          lualine_a = { get_filename_display },
-          lualine_b = {},
-          lualine_c = {},
-          lualine_x = { { "branch", padding = { left = 2 } } },
-          lualine_y = { "location" },
-          lualine_z = { "progress" },
-        },
-      })
-    end
-
-    setup_lualine()
-
-    api.nvim_create_autocmd("OptionSet", {
-      pattern = "background",
-      callback = vim.schedule_wrap(function()
-        api_nvim_command("colorscheme catppuccin")
-        setup_lualine()
-      end),
+    local is_light = o.background == "light"
+    local colors = lualine_colors[is_light and "light" or "dark"]
+    require("lualine").setup({
+      options = {
+        icons_enabled = true,
+        theme = create_lualine_theme(colors),
+        component_separators = "",
+        section_separators = "",
+        always_divide_middle = true,
+      },
+      sections = {
+        lualine_a = { get_filename_display },
+        lualine_b = { "diff" },
+        lualine_c = {},
+        lualine_x = { { "diagnostics", update_in_insert = false }, { "branch", icon = "", padding = { left = 2 } } },
+        lualine_y = { "location" },
+        lualine_z = { "progress" },
+      },
+      inactive_sections = {
+        lualine_a = { get_filename_display },
+        lualine_b = {},
+        lualine_c = {},
+        lualine_x = { { "branch", padding = { left = 2 } } },
+        lualine_y = { "location" },
+        lualine_z = { "progress" },
+      },
     })
-
-    api.nvim_create_user_command("ToggleTheme", function()
-      o.background = o.background == "light" and "dark" or "light"
-    end, {})
 
     local lsp_token_lookup = {}
     local lsp_token_groups = {
@@ -174,7 +145,6 @@ return {
       callback = function(args)
         local token = args.data.token
         local groups = lsp_token_lookup[token.type]
-
         if groups then
           for _, group in ipairs(groups) do
             local should_highlight = not group.modifier or token.modifiers[group.modifier]
