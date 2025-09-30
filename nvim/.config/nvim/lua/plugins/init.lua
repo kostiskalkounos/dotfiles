@@ -5,8 +5,8 @@ return {
   { "MagicDuck/grug-far.nvim", event = { "VeryLazy" } },
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
     event = "VeryLazy",
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
     config = function()
       require("render-markdown").setup({
         file_types = { "markdown" },
@@ -47,6 +47,9 @@ return {
       require("orgmode").setup({
         org_agenda_files = "~/Documents/Orgfiles/**/*",
         org_default_notes_file = "~/Documents/Orgfiles/refile.org",
+        mappings = {
+          disable_all = true,
+        },
       })
     end,
   },
