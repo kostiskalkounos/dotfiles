@@ -121,10 +121,12 @@ case "$FZF_THEME" in
       export FZF_THEME=Dark
       export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"
       export KUBECOLOR_PRESET=dark
+      export NVIM_THEME=dark
     else
       export FZF_THEME=Light
       export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"
       export KUBECOLOR_PRESET=light
+      export NVIM_THEME=light
     fi
     ;;
 esac
