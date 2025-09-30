@@ -115,6 +115,33 @@ return {
           lsp.enable(server_name)
         end
       end
+
+      local lsp_token_lookup = {
+        property = {
+          { type = "property", highlight = "@variable.member", priority = 105 },
+          { type = "property", modifier = "static", highlight = "@constant", priority = 125 },
+        },
+      }
+
+      vim.api.nvim_create_autocmd("LspTokenUpdate", {
+        callback = function(args)
+          local token = args.data.token
+          local groups = lsp_token_lookup[token.type]
+          if groups then
+            for _, group in ipairs(groups) do
+              if not group.modifier or token.modifiers[group.modifier] then
+                vim.lsp.semantic_tokens.highlight_token(
+                  token,
+                  args.buf,
+                  args.data.client_id,
+                  group.highlight,
+                  { priority = group.priority }
+                )
+              end
+            end
+          end
+        end,
+      })
     end,
   },
 }
