@@ -9,13 +9,10 @@ local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
 local project_name = fn.fnamemodify(fn.getcwd(), ":p:h:t")
 local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name
 
-local bundles = vim
-  .iter({
-    fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
-    vim.split(fn.glob(mason_share .. "/java-test/*.jar", true), "\n"),
-  })
-  :flatten()
-  :totable()
+local bundles = vim.iter({
+  fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
+  fn.glob(mason_share .. "/java-test/com.microsoft.java.test.plugin.jar", true),
+}):flatten():totable()
 
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
@@ -50,13 +47,9 @@ local config = {
         updateBuildConfiguration = "interactive",
         runtimes = {
           { name = "JavaSE-1.8", path = "/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home" },
-          { name = "JavaSE-17", path = "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home" },
-          { name = "JavaSE-21", path = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home" },
-          {
-            name = "JavaSE-25",
-            path = "/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home",
-            default = true,
-          },
+          { name = "JavaSE-17",  path = "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home" },
+          { name = "JavaSE-21",  path = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home" },
+          { name = "JavaSE-25",  path = "/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home", default = true },
         },
       },
       contentProvider = { preferred = "fernflower" },
@@ -89,12 +82,10 @@ local config = {
       },
     },
   },
-
   flags = {
     allow_incremental_sync = true,
     debounce_text_changes = 150,
   },
-
   init_options = {
     bundles = bundles,
     extendedClientCapabilities = extendedClientCapabilities,
