@@ -1,7 +1,7 @@
 return {
   "nvim-lualine/lualine.nvim",
   lazy = false,
-  priority = 1000,
+  priority = 999,
   config = function()
     local lualine_colors = {
       light = { bg = "#eff1f5", fg = "#4c4f69", inactive = "#8c8fa1" },
