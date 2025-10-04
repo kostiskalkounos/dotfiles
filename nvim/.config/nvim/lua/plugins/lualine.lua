@@ -1,6 +1,7 @@
 return {
   "nvim-lualine/lualine.nvim",
   lazy = false,
+  priority = 1000,
   config = function()
     local lualine_colors = {
       light = { bg = "#eff1f5", fg = "#4c4f69", inactive = "#8c8fa1" },
@@ -62,7 +63,7 @@ return {
         lualine_c = {},
         lualine_x = {
           { "diagnostics", update_in_insert = false },
-          { "branch", icon = "", padding = { left = 2 } },
+          { "branch",      icon = "",               padding = { left = 2 } },
         },
         lualine_y = { "location" },
         lualine_z = { "progress" },

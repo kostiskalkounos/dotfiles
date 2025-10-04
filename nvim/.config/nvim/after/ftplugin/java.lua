@@ -9,10 +9,10 @@ local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
 local project_name = fn.fnamemodify(fn.getcwd(), ":p:h:t")
 local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name
 
-local bundles = vim.iter({
+local bundles = {
   fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
   fn.glob(mason_share .. "/java-test/com.microsoft.java.test.plugin.jar", true),
-}):flatten():totable()
+}
 
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
@@ -28,16 +28,12 @@ local config = {
     "-javaagent:" .. mason_share .. "/jdtls/lombok.jar",
     "-Xmx4g",
     "--add-modules=ALL-SYSTEM",
-    "--add-opens",
-    "java.base/java.util=ALL-UNNAMED",
-    "--add-opens",
-    "java.base/java.lang=ALL-UNNAMED",
+    "--add-opens", "java.base/java.util=ALL-UNNAMED",
+    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
     "-jar",
     mason_share .. "/jdtls/plugins/org.eclipse.equinox.launcher.jar",
-    "-configuration",
-    mason_share .. "/../packages/jdtls/config_mac",
-    "-data",
-    workspace_dir,
+    "-configuration", mason_share .. "/../packages/jdtls/config_mac",
+    "-data", workspace_dir,
   },
   root_dir = vim.fs.root(0, { ".git", "mvnw", "gradlew" }),
   settings = {
