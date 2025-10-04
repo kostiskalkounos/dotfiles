@@ -57,17 +57,17 @@ return {
             position = "left",
             size = 0.30,
             elements = {
-              { id = "scopes", size = 0.38 },
-              { id = "watches", size = 0.16 },
+              { id = "scopes",      size = 0.38 },
+              { id = "watches",     size = 0.16 },
               { id = "breakpoints", size = 0.18 },
-              { id = "stacks", size = 0.28 },
+              { id = "stacks",      size = 0.28 },
             },
           },
           {
             position = "bottom",
             size = 0.30,
             elements = {
-              { id = "repl", size = 0.50 },
+              { id = "repl",    size = 0.50 },
               { id = "console", size = 0.50 },
             },
           },
