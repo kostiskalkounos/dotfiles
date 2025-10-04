@@ -4,8 +4,6 @@ local default = { noremap = true, unique = true, silent = true }
 local api_nvim_create_autocmd = api.nvim_create_autocmd
 local set = vim.keymap.set
 
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
 vim.o.laststatus = 0
 vim.o.number = false
 vim.o.relativenumber = false
@@ -42,12 +40,5 @@ api_nvim_create_autocmd("VimEnter", {
     api.nvim_win_set_buf(0, term_buf)
     api.nvim_buf_delete(ev.buf, { force = true })
     api.nvim_command("normal! A")
-  end,
-})
-
-api_nvim_create_autocmd("TextYankPost", {
-  group = vim.api.nvim_create_augroup("highlight_yank", { clear = true }),
-  callback = function()
-    vim.highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = true })
   end,
 })
