@@ -1,7 +1,7 @@
 return {
-  { "almo7aya/openingh.nvim",  event = "VeryLazy" },
-  { "mbbill/undotree",         event = "VeryLazy" },
-  { "stevearc/oil.nvim",       event = "VeryLazy",    opts = {} },
+  { "almo7aya/openingh.nvim", event = "VeryLazy" },
+  { "mbbill/undotree", event = "VeryLazy" },
+  { "stevearc/oil.nvim", event = "VeryLazy", opts = {} },
   { "MagicDuck/grug-far.nvim", event = { "VeryLazy" } },
   {
     "MeanderingProgrammer/render-markdown.nvim",

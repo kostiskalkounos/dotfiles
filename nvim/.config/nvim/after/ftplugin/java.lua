@@ -5,27 +5,22 @@ local jdtls_dap = require("jdtls.dap")
 local jdtls_tests = require("jdtls.tests")
 local opts = { noremap = true, silent = true }
 
-local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
+local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share/"
 local project_name = fn.fnamemodify(fn.getcwd(), ":p:h:t")
 local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name
 
 local bundles = {}
-local debug_jar = fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar")
-if debug_jar ~= "" then
-  table.insert(bundles, debug_jar)
+local debug_jar_path = mason_share .. "java-debug-adapter/com.microsoft.java.debug.plugin.jar"
+if vim.uv.fs_stat(debug_jar_path) then
+  table.insert(bundles, debug_jar_path)
 end
 
-local exclude = {
-  ["com.microsoft.java.test.runner-jar-with-dependencies.jar"] = true,
-  ["jacocoagent.jar"] = true,
-}
-
-local test_jars = fn.glob(mason_share .. "/java-test/*.jar", true, true)
-for _, jar in ipairs(test_jars) do
-  local name = string.match(jar, "([^/\\]+)$")
-
-  if name and not exclude[name] then
-    table.insert(bundles, jar)
+local exclude_set = { ["com.microsoft.java.test.runner-jar-with-dependencies.jar"] = true, ["jacocoagent.jar"] = true }
+local test_jars = vim.fn.glob(mason_share .. "java-test/*.jar", true, true)
+for _, jar_path in ipairs(test_jars) do
+  local jar_name = vim.fs.basename(jar_path)
+  if not exclude_set[jar_name] then
+    table.insert(bundles, jar_path)
   end
 end
 
@@ -40,15 +35,19 @@ local config = {
     "-Declipse.product=org.eclipse.jdt.ls.core.product",
     "-Dlog.protocol=true",
     "-Dlog.level=WARNING",
-    "-javaagent:" .. mason_share .. "/jdtls/lombok.jar",
+    "-javaagent:" .. mason_share .. "jdtls/lombok.jar",
     "-Xmx4g",
     "--add-modules=ALL-SYSTEM",
-    "--add-opens", "java.base/java.util=ALL-UNNAMED",
-    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+    "--add-opens",
+    "java.base/java.util=ALL-UNNAMED",
+    "--add-opens",
+    "java.base/java.lang=ALL-UNNAMED",
     "-jar",
-    mason_share .. "/jdtls/plugins/org.eclipse.equinox.launcher.jar",
-    "-configuration", mason_share .. "/../packages/jdtls/config_mac",
-    "-data", workspace_dir,
+    mason_share .. "jdtls/plugins/org.eclipse.equinox.launcher.jar",
+    "-configuration",
+    mason_share .. "../packages/jdtls/config_mac",
+    "-data",
+    workspace_dir,
   },
   root_dir = vim.fs.root(0, { ".git", "mvnw", "gradlew" }),
   settings = {
@@ -58,9 +57,13 @@ local config = {
         updateBuildConfiguration = "interactive",
         runtimes = {
           { name = "JavaSE-1.8", path = "/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home" },
-          { name = "JavaSE-17",  path = "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home" },
-          { name = "JavaSE-21",  path = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home" },
-          { name = "JavaSE-25",  path = "/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home", default = true },
+          { name = "JavaSE-17", path = "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home" },
+          { name = "JavaSE-21", path = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home" },
+          {
+            name = "JavaSE-25",
+            path = "/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home",
+            default = true,
+          },
         },
       },
       contentProvider = { preferred = "fernflower" },
