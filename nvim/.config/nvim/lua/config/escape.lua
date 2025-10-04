@@ -28,7 +28,7 @@ end
 
 function M.smartEscape(processId)
   return hasExcludedProcess(processId, M.excludedProcesses) and transformKeySequence(M.escapeKey)
-    or defaultEscapeSequence
+      or defaultEscapeSequence
 end
 
 local function createExclusionSet(processNames)

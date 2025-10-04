@@ -12,6 +12,7 @@ vim.o.relativenumber = false
 vim.o.ruler = true
 vim.o.scrollback = 10000
 vim.o.signcolumn = "no"
+vim.opt.termguicolors = false
 
 set("n", "q", "<cmd>qa!<cr>", default)
 set({ "n", "v" }, "y", [["+y]], default)
@@ -41,5 +42,12 @@ api_nvim_create_autocmd("VimEnter", {
     api.nvim_win_set_buf(0, term_buf)
     api.nvim_buf_delete(ev.buf, { force = true })
     api.nvim_command("normal! A")
+  end,
+})
+
+api_nvim_create_autocmd("TextYankPost", {
+  group = vim.api.nvim_create_augroup("highlight_yank", { clear = true }),
+  callback = function()
+    vim.highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = true })
   end,
 })

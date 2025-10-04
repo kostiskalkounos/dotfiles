@@ -33,7 +33,7 @@ return {
       end, {})
     end,
   },
-  { "towolf/vim-helm", event = "VeryLazy" },
+  { "towolf/vim-helm",   event = "VeryLazy" },
   { "j-hui/fidget.nvim", event = "VeryLazy", opts = {} },
   {
     "folke/lazydev.nvim",
@@ -119,7 +119,7 @@ return {
       local lsp_token_lookup = {
         property = {
           { type = "property", highlight = "@variable.member", priority = 105 },
-          { type = "property", modifier = "static", highlight = "@constant", priority = 125 },
+          { type = "property", modifier = "static",            highlight = "@constant", priority = 125 },
         },
       }
 
