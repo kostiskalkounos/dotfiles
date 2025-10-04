@@ -9,10 +9,25 @@ local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
 local project_name = fn.fnamemodify(fn.getcwd(), ":p:h:t")
 local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name
 
-local bundles = {
-  fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
-  fn.glob(mason_share .. "/java-test/com.microsoft.java.test.plugin.jar", true),
+local bundles = {}
+local debug_jar = fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar")
+if debug_jar ~= "" then
+  table.insert(bundles, debug_jar)
+end
+
+local exclude = {
+  ["com.microsoft.java.test.runner-jar-with-dependencies.jar"] = true,
+  ["jacocoagent.jar"] = true,
 }
+
+local test_jars = fn.glob(mason_share .. "/java-test/*.jar", true, true)
+for _, jar in ipairs(test_jars) do
+  local name = string.match(jar, "([^/\\]+)$")
+
+  if name and not exclude[name] then
+    table.insert(bundles, jar)
+  end
+end
 
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
