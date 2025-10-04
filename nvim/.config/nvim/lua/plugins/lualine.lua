@@ -63,7 +63,7 @@ return {
         lualine_c = {},
         lualine_x = {
           { "diagnostics", update_in_insert = false },
-          { "branch",      icon = "",               padding = { left = 2 } },
+          { "branch", icon = "", padding = { left = 2 } },
         },
         lualine_y = { "location" },
         lualine_z = { "progress" },

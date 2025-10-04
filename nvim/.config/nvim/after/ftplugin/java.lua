@@ -1,18 +1,34 @@
+local env = vim.env
 local fn = vim.fn
+local fs = vim.fs
+local keymap = vim.keymap
+
 local handlers = require("config.handlers")
 local jdtls = require("jdtls")
 local jdtls_dap = require("jdtls.dap")
 local jdtls_tests = require("jdtls.tests")
 local opts = { noremap = true, silent = true }
 
-local mason_share = vim.env.HOME .. "/.local/share/nvim/mason/share"
+local mason = env.HOME .. "/.local/share/nvim/mason"
 local project_name = fn.fnamemodify(fn.getcwd(), ":p:h:t")
-local workspace_dir = vim.env.HOME .. "/.local/share/eclipse/" .. project_name
+local workspace_dir = env.HOME .. "/.local/share/eclipse/" .. project_name
 
-local bundles = {
-  fn.glob(mason_share .. "/java-debug-adapter/com.microsoft.java.debug.plugin.jar", true),
-  fn.glob(mason_share .. "/java-test/com.microsoft.java.test.plugin.jar", true),
+local bundles = {}
+local debug_jar = mason .. "/share/java-debug-adapter/com.microsoft.java.debug.plugin.jar"
+if vim.uv.fs_stat(debug_jar) then
+  table.insert(bundles, debug_jar)
+end
+
+local exclude = {
+  ["com.microsoft.java.test.runner-jar-with-dependencies.jar"] = true,
+  ["jacocoagent.jar"] = true,
 }
+
+for _, jar in ipairs(fn.glob(mason .. "/share/java-test/*.jar", true, true)) do
+  if not exclude[fs.basename(jar)] then
+    table.insert(bundles, jar)
+  end
+end
 
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
@@ -25,27 +41,32 @@ local config = {
     "-Declipse.product=org.eclipse.jdt.ls.core.product",
     "-Dlog.protocol=true",
     "-Dlog.level=WARNING",
-    "-javaagent:" .. mason_share .. "/jdtls/lombok.jar",
+    "-javaagent:" .. mason .. "/share/jdtls/lombok.jar",
     "-Xmx4g",
     "--add-modules=ALL-SYSTEM",
-    "--add-opens", "java.base/java.util=ALL-UNNAMED",
-    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+    "--add-opens",
+    "java.base/java.util=ALL-UNNAMED",
+    "--add-opens",
+    "java.base/java.lang=ALL-UNNAMED",
     "-jar",
-    mason_share .. "/jdtls/plugins/org.eclipse.equinox.launcher.jar",
-    "-configuration", mason_share .. "/../packages/jdtls/config_mac",
-    "-data", workspace_dir,
+    mason .. "/share/jdtls/plugins/org.eclipse.equinox.launcher.jar",
+    "-configuration",
+    mason .. "/packages/jdtls/config_mac",
+    "-data",
+    workspace_dir,
   },
-  root_dir = vim.fs.root(0, { ".git", "mvnw", "gradlew" }),
+  root_dir = fs.root(0, { ".git", "mvnw", "gradlew" }),
   settings = {
     java = {
       autobuild = { enabled = false },
       configuration = {
         updateBuildConfiguration = "interactive",
         runtimes = {
-          { name = "JavaSE-1.8", path = "/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home" },
-          { name = "JavaSE-17",  path = "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home" },
-          { name = "JavaSE-21",  path = "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home" },
-          { name = "JavaSE-25",  path = "/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home", default = true },
+          {
+            name = "JavaSE-25",
+            path = "/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home",
+            default = true,
+          },
         },
       },
       contentProvider = { preferred = "fernflower" },
@@ -98,10 +119,10 @@ config.on_attach = function()
 
   jdtls_dap.setup_dap_main_class_configs()
 
-  vim.keymap.set("n", "<F9>", jdtls.test_class, opts)
-  vim.keymap.set("n", "<F10>", jdtls.test_nearest_method, opts)
-  vim.keymap.set("n", "<leader><Tab>", jdtls_tests.goto_subjects, opts)
-  vim.keymap.set("n", "<leader><S-Tab>", jdtls_tests.generate, opts)
+  keymap.set("n", "<F9>", jdtls.test_class, opts)
+  keymap.set("n", "<F10>", jdtls.test_nearest_method, opts)
+  keymap.set("n", "<leader><Tab>", jdtls_tests.goto_subjects, opts)
+  keymap.set("n", "<leader><S-Tab>", jdtls_tests.generate, opts)
 end
 
 jdtls.start_or_attach(config)
