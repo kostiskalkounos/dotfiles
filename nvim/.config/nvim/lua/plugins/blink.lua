@@ -5,11 +5,12 @@ return {
   version = "*",
   opts = {
     keymap = {
-      ["<cr>"] = { "accept", "fallback" },
+      ["<C-Space>"] = { "show" },
       ["<C-b>"] = { "scroll_documentation_up", "fallback" },
       ["<C-f>"] = { "scroll_documentation_down", "fallback" },
-      ["<Tab>"] = { "select_next", "snippet_forward", "show", "fallback" },
       ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+      ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+      ["<cr>"] = { "accept", "fallback" },
     },
     completion = {
       list = {
