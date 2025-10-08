@@ -37,12 +37,6 @@ return {
           ["CurSearch"] = { bg = colors.mauve },
         }
       end,
-      float = {
-        enabled = false,
-        border = "rounded",
-        transparent = false,
-        solid = false,
-      },
       integrations = { lualine = true },
     })
 
