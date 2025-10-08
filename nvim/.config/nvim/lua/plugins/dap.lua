@@ -191,10 +191,20 @@ return {
 
       dap.configurations.java = {
         {
-          name = "Debug Launch (4GB)",
+          name = "Debug Launch",
           type = "java",
           request = "launch",
           vmArgs = "-Xmx4g ",
+        },
+        {
+          name = "Debug Attach (port)",
+          type = "java",
+          request = "attach",
+          hostName = "127.0.0.1",
+          port = function()
+            local port_str = vim.fn.input("Enter debug port: ")
+            return tonumber(port_str)
+          end,
         },
         {
           name = "Debug Attach (8000)",
