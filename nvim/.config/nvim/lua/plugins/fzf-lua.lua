@@ -27,9 +27,6 @@ return {
           ["--history"] = "/tmp/fzf-lua-grep-history",
         },
       },
-      fzf_colors = {
-        gutter = "-1",
-      },
       keymap = {
         builtin = {
           ["<C-/>"] = "toggle-help",
