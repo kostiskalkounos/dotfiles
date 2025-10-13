@@ -112,6 +112,7 @@ export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow
 
 DARK_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,gutter:"#24273A"'
 LIGHT_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=light --color=fg:-1,bg:-1,hl:magenta,fg+:black,bg+:#ccd0da,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,gutter:"#eff1f5"'
+K9S_CONFIG_FILE="$HOME/Library/Application Support/k9s/config.yaml"
 
 case "$FZF_THEME" in
   dark) export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" ;;
@@ -133,17 +134,10 @@ case "$FZF_THEME" in
     ;;
 esac
 
-GEMINI_SETTINGS="$HOME/.gemini/settings.json"
-K9S_CONFIG_FILE="$HOME/Library/Application Support/k9s/config.yaml"
-
-trap 'export KUBECOLOR_PRESET=dark; \
-      export FZF_THEME=dark FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" NVIM_THEME=dark; \
-      plutil -replace ui.theme -string "Default" "$GEMINI_SETTINGS"; \
+trap 'export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" FZF_THEME=dark KUBECOLOR_PRESET=dark NVIM_THEME=dark; \
       yq -i ".k9s.ui.skin = \"dark\"" "$K9S_CONFIG_FILE"' USR1
 
-trap 'export KUBECOLOR_PRESET=light; \
-      export FZF_THEME=light FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" NVIM_THEME=light; \
-      plutil -replace ui.theme -string "Default Light" "$GEMINI_SETTINGS"; \
+trap ' export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" FZF_THEME=light KUBECOLOR_PRESET=light NVIM_THEME=light; \
       yq -i ".k9s.ui.skin = \"light\"" "$K9S_CONFIG_FILE"' USR2
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
