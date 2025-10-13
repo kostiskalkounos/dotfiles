@@ -1,5 +1,5 @@
 #!/bin/bash
-if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]; then
+if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "dark" ]]; then
     delta --syntax-theme "Catppuccin Macchiato" "$@"
 else
     delta --syntax-theme "Catppuccin Latte" "$@"

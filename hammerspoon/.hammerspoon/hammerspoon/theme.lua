@@ -15,7 +15,7 @@ Hyper:bind({}, "/", function()
   end
 
   local newMode = not darkMode
-  local theme = newMode and "Dark" or "Light"
+  local theme = newMode and "dark" or "light"
   local wallpaper = newMode and darkWallpaper or lightWallpaper
   local signal = newMode and "USR1" or "USR2"
 
