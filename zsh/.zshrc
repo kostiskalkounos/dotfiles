@@ -118,21 +118,33 @@ case "$FZF_THEME" in
   light) export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" ;;
   *)
     if defaults read -g AppleInterfaceStyle 2>/dev/null | grep -q Dark; then
-      export FZF_THEME=Dark
       export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"
+      export FZF_THEME=dark
+      export K9S_THEME=dark
       export KUBECOLOR_PRESET=dark
       export NVIM_THEME=dark
     else
-      export FZF_THEME=Light
       export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"
+      export FZF_THEME=light
+      export K9S_THEME=light
       export KUBECOLOR_PRESET=light
       export NVIM_THEME=light
     fi
     ;;
 esac
 
-trap 'export FZF_THEME=dark FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" NVIM_THEME=dark' USR1
-trap 'export FZF_THEME=light FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" NVIM_THEME=light' USR2
+GEMINI_SETTINGS="$HOME/.gemini/settings.json"
+K9S_CONFIG_FILE="$HOME/Library/Application Support/k9s/config.yaml"
+
+trap 'export KUBECOLOR_PRESET=dark; \
+      export FZF_THEME=dark FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" NVIM_THEME=dark; \
+      plutil -replace ui.theme -string "Default" "$GEMINI_SETTINGS"; \
+      yq -i ".k9s.ui.skin = \"dark\"" "$K9S_CONFIG_FILE"' USR1
+
+trap 'export KUBECOLOR_PRESET=light; \
+      export FZF_THEME=light FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" NVIM_THEME=light; \
+      plutil -replace ui.theme -string "Default Light" "$GEMINI_SETTINGS"; \
+      yq -i ".k9s.ui.skin = \"light\"" "$K9S_CONFIG_FILE"' USR2
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
