@@ -41,14 +41,9 @@ alias ll='ls -lh'
 alias ls='gls --color=auto --group-directories-first'
 
 alias bu='brew update && brew upgrade -g && brew cleanup'
-alias mdd='mvnd dependency:tree -P Symphony,SharedResources'
-alias mdi='mvnd clean install -U -P Symphony,SharedResources -Dbuild.rpm=false -DskipTests -DsymphonySkipUnitTests=true -DsymphonySkipIntegrationTests=true'
-alias mdp='mvnd --stop'
-alias mds='mvnd --status'
-alias mdt='mvnd clean install -U -P Symphony,SharedResources -Dbuild.rpm=false'
-alias mdeps='mvn dependency:tree -P Symphony,SharedResources'
-alias mi='mvn clean install -P Symphony,SharedResources, -Dbuild.rpm=false -DskipTests -DsymphonySkipUnitTests=true -DsymphonySkipIntegrationTests=true -T 1.5C -U'
-alias mt='mvn clean install -P Symphony,SharedResources, -T 1.5C -U'
+alias md='mvn dependency:tree'
+alias mi='mvn clean install -am -T 0.5C -U -DskipTests'
+alias mt='mvn clean test -am -T 0.5C -U'
 alias pip=pip3
 alias python=python3
 alias snykt='snyk test --maven-aggregate-project -- -P Symphony'
@@ -165,7 +160,11 @@ man() {
 j() {
   unset JAVA_HOME
   if [ -n "$1" ]; then
-    export JAVA_HOME=$(/usr/libexec/java_home -v "$1")
+    local version="$1"
+    if [ "$version" = "8" ]; then
+      version="1.8"
+    fi
+    export JAVA_HOME=$(/usr/libexec/java_home -v "$version")
   else
     export JAVA_HOME=$(/usr/libexec/java_home)
   fi
