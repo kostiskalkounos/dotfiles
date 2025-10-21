@@ -16,7 +16,7 @@ return {
       color_overrides = {
         -- latte = { pink = "#cc5092" },
         -- latte = { pink = "#c72c91" },
-        latte = { pink = "#c72c91" },
+        latte = { pink = "#d154a5" },
         macchiato = { blue = "#89b4fa", lavender = "#b4befe", sapphire = "#74c7ec" },
       },
       custom_highlights = function(colors)
