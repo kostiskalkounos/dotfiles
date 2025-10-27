@@ -61,13 +61,13 @@ local config = {
       autobuild = { enabled = false },
       configuration = {
         updateBuildConfiguration = "interactive",
-        runtimes = {
-          {
-            name = "JavaSE-25",
-            path = "/Library/Java/JavaVirtualMachines/temurin-25.jdk/Contents/Home",
-            default = true,
-          },
-        },
+        -- runtimes = {
+        --   {
+        --     name = "JavaSE-25",
+        --     path = "/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home",
+        --     default = true,
+        --   },
+        -- },
       },
       contentProvider = { preferred = "fernflower" },
       eclipse = { downloadSources = true },
