@@ -4,6 +4,7 @@ local default = { noremap = true, unique = true, silent = true }
 local api_nvim_create_autocmd = api.nvim_create_autocmd
 local set = vim.keymap.set
 
+vim.o.background = "dark"
 vim.o.laststatus = 0
 vim.o.number = false
 vim.o.relativenumber = false
@@ -11,6 +12,8 @@ vim.o.ruler = true
 vim.o.scrollback = 10000
 vim.o.signcolumn = "no"
 vim.opt.termguicolors = false
+
+api.nvim_set_hl(0, "Search", { ctermfg = 0, ctermbg = 7 })
 
 set("n", "q", "<cmd>qa!<cr>", default)
 set({ "n", "v" }, "y", [["+y]], default)
@@ -20,22 +23,22 @@ local term_io = api.nvim_open_term(term_buf, {})
 local group = api.nvim_create_augroup("opt", { clear = true })
 
 api_nvim_create_autocmd("ModeChanged", {
-  group = group,
-  buffer = term_buf,
-  command = "stopinsert",
+	group = group,
+	buffer = term_buf,
+	command = "stopinsert",
 })
 
 api_nvim_create_autocmd("VimEnter", {
-  group = group,
-  once = true,
-  callback = function(ev)
-    local lines = api.nvim_buf_get_lines(ev.buf, 0, -1, false)
-    if #lines > 0 then
-      api.nvim_chan_send(term_io, table.concat(lines, "\r\n") .. "\r\n")
-    end
+	group = group,
+	once = true,
+	callback = function(ev)
+		local lines = api.nvim_buf_get_lines(ev.buf, 0, -1, false)
+		if #lines > 0 then
+			api.nvim_chan_send(term_io, table.concat(lines, "\r\n") .. "\r\n")
+		end
 
-    api.nvim_win_set_buf(0, term_buf)
-    api.nvim_buf_delete(ev.buf, { force = true })
-    api.nvim_command("normal! A")
-  end,
+		api.nvim_win_set_buf(0, term_buf)
+		api.nvim_buf_delete(ev.buf, { force = true })
+		api.nvim_command("normal! A")
+	end,
 })
