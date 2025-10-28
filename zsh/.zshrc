@@ -1,9 +1,5 @@
 bindkey -e
 
-source ~/.bastion
-source ~/.gclone
-source ~/.mongo
-
 alias ga='git add'
 alias gb='git branch'
 alias gc='git commit'
