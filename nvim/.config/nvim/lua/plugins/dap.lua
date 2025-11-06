@@ -185,7 +185,7 @@ return {
         end, 50)
       end, default)
 
-      set({ "n", "v" }, "<leader>O", function()
+      set({ "n", "v" }, '<leader>"', function()
         require("dapui").elements.watches.add()
       end, default)
 
