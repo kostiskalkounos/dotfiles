@@ -103,7 +103,19 @@ export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow
 
 DARK_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,gutter:"#24273A"'
 LIGHT_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=light --color=fg:-1,bg:-1,hl:magenta,fg+:black,bg+:#ccd0da,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,gutter:"#eff1f5"'
+
+BTOP_DARK_THEME="tokyo-storm"
+BTOP_LIGHT_THEME="kanagawa-lotus"
+
+BTOP_CONFIG_FILE="$HOME/.config/btop/btop.conf"
 K9S_CONFIG_FILE="$HOME/Library/Application Support/k9s/config.yaml"
+
+update_btop_theme() {
+  local theme=$1
+  sed -i '' "s/^color_theme = \".*\"/color_theme = \"$theme\"/" "$BTOP_CONFIG_FILE" 2>/dev/null
+  sed -i '' "s/^theme_background = .*/theme_background = False/" "$BTOP_CONFIG_FILE" 2>/dev/null
+  sed -i '' "s/^vim_keys = .*/vim_keys = True/" "$BTOP_CONFIG_FILE" 2>/dev/null
+}
 
 case "$FZF_THEME" in
   dark) export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" ;;
@@ -115,12 +127,14 @@ case "$FZF_THEME" in
       export K9S_THEME=dark
       export KUBECOLOR_PRESET=dark
       export NVIM_THEME=dark
+      update_btop_theme "$BTOP_DARK_THEME"
     else
       export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"
       export FZF_THEME=light
       export K9S_THEME=light
       export KUBECOLOR_PRESET=light
       export NVIM_THEME=light
+      update_btop_theme "$BTOP_LIGHT_THEME"
     fi
     ;;
 esac
