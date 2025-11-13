@@ -1,13 +1,13 @@
 {
-  "title": "Caps Lock",
+  "title": "Slash",
   "rules": [
     {
-      "description": "Change Caps Lock to Control when held, and Escape when tapped",
+      "description": "Change slash to Right Shift when held",
       "manipulators": [
         {
           "type": "basic",
           "from": {
-            "key_code": "caps_lock",
+            "key_code": "slash",
             "modifiers": {
               "optional": [
                 "any"
@@ -16,12 +16,12 @@
           },
           "to": [
             {
-              "key_code": "left_control"
+              "key_code": "right_shift"
             }
           ],
           "to_if_alone": [
             {
-              "key_code": "escape"
+              "key_code": "slash"
             }
           ]
         }

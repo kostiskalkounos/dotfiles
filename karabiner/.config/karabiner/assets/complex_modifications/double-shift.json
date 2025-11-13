@@ -2,30 +2,45 @@
   "title": "Double Shift",
   "rules": [
     {
-      "description": "Toggle Caps Lock by pressing Left Shift + Right Shift at the same time",
+      "description": "Toggle Caps Lock by holding Left Shift + Right Shift at the same time",
       "manipulators": [
         {
+          "type": "basic",
           "from": {
+            "key_code": "right_shift",
             "modifiers": {
+              "mandatory": [
+                "left_shift"
+              ],
               "optional": [
-                "any"
+                "caps_lock"
               ]
-            },
-            "simultaneous": [
-              {
-                "key_code": "left_shift"
-              },
-              {
-                "key_code": "right_shift"
-              }
-            ]
+            }
           },
           "to": [
             {
               "key_code": "caps_lock"
             }
-          ],
-          "type": "basic"
+          ]
+        },
+        {
+          "type": "basic",
+          "from": {
+            "key_code": "left_shift",
+            "modifiers": {
+              "mandatory": [
+                "right_shift"
+              ],
+              "optional": [
+                "caps_lock"
+              ]
+            }
+          },
+          "to": [
+            {
+              "key_code": "caps_lock"
+            }
+          ]
         }
       ]
     }
