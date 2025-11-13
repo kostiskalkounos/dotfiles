@@ -7,9 +7,33 @@
         {
           "type": "basic",
           "from": {
+            "key_code": "left_command",
+            "modifiers": {
+              "mandatory": [
+                "shift"
+              ],
+              "optional": [
+                "caps_lock"
+              ]
+            }
+          },
+          "to": [
+            {
+              "key_code": "delete_forward"
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "from": {
             "key_code": "delete_or_backspace",
             "modifiers": {
-              "mandatory": ["left_shift"]
+              "mandatory": [
+                "shift"
+              ],
+              "optional": [
+                "caps_lock"
+              ]
             }
           },
           "to": [
