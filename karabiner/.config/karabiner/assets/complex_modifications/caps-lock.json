@@ -2,7 +2,7 @@
   "title": "Caps Lock",
   "rules": [
     {
-      "description": "Change Caps Lock to Control when held, and Escape when tapped",
+      "description": "Caps Lock -> Control when held, Escape when tapped",
       "manipulators": [
         {
           "type": "basic",

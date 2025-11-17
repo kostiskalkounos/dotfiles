@@ -2,7 +2,7 @@
   "title": "Delete Word",
   "rules": [
     {
-      "description": "Ctrl-Backspace to delete-backward-word",
+      "description": "Ctrl-Backspace -> delete-backward-word",
       "manipulators": [
         {
           "type": "basic",

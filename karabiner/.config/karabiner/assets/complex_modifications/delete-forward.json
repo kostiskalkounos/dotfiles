@@ -2,7 +2,7 @@
   "title": "Delete Forward",
   "rules": [
     {
-      "description": "Shift-Backspace to delete_forward",
+      "description": "Shift-Backspace -> delete_forward",
       "manipulators": [
         {
           "type": "basic",

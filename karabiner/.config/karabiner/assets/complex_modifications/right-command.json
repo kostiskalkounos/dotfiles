@@ -2,10 +2,11 @@
   "title": "Right Command",
   "rules": [
     {
-      "description": "Change Right Command to f18 if held and return if tapped",
+      "description": "Right Command -> F18 when held and Return when tapped",
       "manipulators": [
         {
           "type": "basic",
+          "description": "Right Command + Shift + Control -> Return + Shift + Control",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -30,6 +31,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Shift + Option -> Return + Shift + Option",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -54,6 +56,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Control + Option -> Return + Control + Option",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -78,6 +81,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Left Command + Option -> Return + Command + Option",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -102,6 +106,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Shift + Control + Option -> Return + Shift + Control + Option",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -128,6 +133,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Shift + Control + Left Command -> Return + Shift + Control + Command",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -154,6 +160,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Shift + Option + Left Command -> Return + Shift + Option + Command",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -180,6 +187,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Control + Option + Left Command -> Return + Control + Option + Command",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -206,6 +214,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Shift + Control + Option + Left Command -> Return + All Modifiers",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -234,6 +243,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Shift + Left Command -> Return + Shift + Command",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -258,6 +268,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Control + Left Command -> Return + Control + Command",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -282,6 +293,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Left Command -> Return + Command",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -304,6 +316,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Shift -> Return + Shift",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -326,6 +339,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Control -> Return + Control",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -348,6 +362,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command + Option -> Right Command + Option when held, Return + Option when tapped",
           "from": {
             "key_code": "right_command",
             "modifiers": {
@@ -378,6 +393,7 @@
         },
         {
           "type": "basic",
+          "description": "Right Command (alone) -> F18/Hyper when held (sets right_command_held), Return when tapped",
           "from": {
             "key_code": "right_command",
             "modifiers": {

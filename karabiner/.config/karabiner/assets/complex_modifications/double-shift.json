@@ -2,7 +2,7 @@
   "title": "Double Shift",
   "rules": [
     {
-      "description": "Toggle Caps Lock by holding Left Shift + Right Shift at the same time",
+      "description": "Toggle Caps Lock by holding Left Shift + Right Shift",
       "manipulators": [
         {
           "type": "basic",

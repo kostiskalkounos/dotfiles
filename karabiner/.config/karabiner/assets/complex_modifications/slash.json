@@ -2,7 +2,7 @@
   "title": "Slash",
   "rules": [
     {
-      "description": "Change slash to Right Shift when held",
+      "description": "Slash -> Right Shift when held, Slash when tapped",
       "manipulators": [
         {
           "type": "basic",

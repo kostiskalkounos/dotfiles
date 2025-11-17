@@ -12,8 +12,64 @@
                 },
                 "rules": [
                     {
-                        "description": "Change Left Command to Left Command if held and backspace if tapped",
+                        "description": "Left Command -> Left Command when held and Backspace when tapped",
                         "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "name": "right_command_held",
+                                        "type": "variable_if",
+                                        "value": 1
+                                    },
+                                    {
+                                        "name": "left_command_tapped_once",
+                                        "type": "variable_if",
+                                        "value": 1
+                                    }
+                                ],
+                                "description": "Right Command + Left Command (double tap & hold) -> Repeat Option+Delete (delete word backward)",
+                                "from": {
+                                    "key_code": "left_command",
+                                    "modifiers": { "optional": ["caps_lock"] }
+                                },
+                                "to": [
+                                    {
+                                        "set_variable": {
+                                            "name": "repeat_delete",
+                                            "value": 1
+                                        }
+                                    },
+                                    { "key_code": "left_command" }
+                                ],
+                                "to_after_key_up": [
+                                    {
+                                        "set_variable": {
+                                            "name": "repeat_delete",
+                                            "value": 0
+                                        }
+                                    },
+                                    {
+                                        "set_variable": {
+                                            "name": "left_command_tapped_once",
+                                            "value": 0
+                                        }
+                                    }
+                                ],
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "delete_or_backspace",
+                                        "modifiers": ["right_option"]
+                                    }
+                                ],
+                                "to_if_held_down": [
+                                    {
+                                        "key_code": "delete_or_backspace",
+                                        "modifiers": ["right_option"],
+                                        "repeat": true
+                                    }
+                                ],
+                                "type": "basic"
+                            },
                             {
                                 "conditions": [
                                     {
@@ -22,12 +78,30 @@
                                         "value": 1
                                     }
                                 ],
+                                "description": "Right Command + Left Command (first tap) -> Option+Delete once, set double-tap detection",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": { "optional": ["caps_lock"] }
                                 },
                                 "to": [{ "key_code": "left_command" }],
+                                "to_delayed_action": {
+                                    "to_if_canceled": [],
+                                    "to_if_invoked": [
+                                        {
+                                            "set_variable": {
+                                                "name": "left_command_tapped_once",
+                                                "value": 0
+                                            }
+                                        }
+                                    ]
+                                },
                                 "to_if_alone": [
+                                    {
+                                        "set_variable": {
+                                            "name": "left_command_tapped_once",
+                                            "value": 1
+                                        }
+                                    },
                                     {
                                         "key_code": "delete_or_backspace",
                                         "modifiers": ["right_option"]
@@ -36,6 +110,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Left Command + Right Option -> Cmd+Delete (delete word forward)",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": {
@@ -52,6 +127,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Left Command + Control -> Option+Delete (delete word backward)",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": {
@@ -68,6 +144,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Left Command (alone) -> Left Command when held, Backspace when tapped",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": { "optional": ["caps_lock"] }
@@ -79,50 +156,10 @@
                         ]
                     },
                     {
-                        "description": "Toggle Caps Lock by holding Left Shift + Right Shift at the same time",
+                        "description": "Right Command -> F18 when held and Return when tapped",
                         "manipulators": [
                             {
-                                "from": {
-                                    "key_code": "right_shift",
-                                    "modifiers": {
-                                        "mandatory": ["left_shift"],
-                                        "optional": ["caps_lock"]
-                                    }
-                                },
-                                "to": [{ "key_code": "caps_lock" }],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "left_shift",
-                                    "modifiers": {
-                                        "mandatory": ["right_shift"],
-                                        "optional": ["caps_lock"]
-                                    }
-                                },
-                                "to": [{ "key_code": "caps_lock" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Change Caps Lock to Control when held, and Escape when tapped",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "caps_lock",
-                                    "modifiers": { "optional": ["any"] }
-                                },
-                                "to": [{ "key_code": "left_control" }],
-                                "to_if_alone": [{ "key_code": "escape" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Change Right Command to f18 if held and return if tapped",
-                        "manipulators": [
-                            {
+                                "description": "Right Command + Shift + Control -> Return + Shift + Control",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -139,6 +176,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Shift + Option -> Return + Shift + Option",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -155,6 +193,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Control + Option -> Return + Control + Option",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -171,6 +210,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Left Command + Option -> Return + Command + Option",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -187,6 +227,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Shift + Control + Option -> Return + Shift + Control + Option",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -203,6 +244,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Shift + Control + Left Command -> Return + Shift + Control + Command",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -219,6 +261,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Shift + Option + Left Command -> Return + Shift + Option + Command",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -235,6 +278,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Control + Option + Left Command -> Return + Control + Option + Command",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -251,6 +295,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Shift + Control + Option + Left Command -> Return + All Modifiers",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -267,6 +312,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Shift + Left Command -> Return + Shift + Command",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -283,6 +329,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Control + Left Command -> Return + Control + Command",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -299,6 +346,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Left Command -> Return + Command",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -315,6 +363,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Shift -> Return + Shift",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -331,6 +380,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Control -> Return + Control",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -347,6 +397,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command + Option -> Right Command + Option when held, Return + Option when tapped",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -369,6 +420,7 @@
                                 "type": "basic"
                             },
                             {
+                                "description": "Right Command (alone) -> F18/Hyper when held (sets right_command_held), Return when tapped",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": { "optional": ["caps_lock"] }
@@ -396,7 +448,62 @@
                         ]
                     },
                     {
-                        "description": "Ctrl-Backspace to delete-backward-word",
+                        "description": "Caps Lock -> Control when held, Escape when tapped",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "caps_lock",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [{ "key_code": "left_control" }],
+                                "to_if_alone": [{ "key_code": "escape" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Toggle Caps Lock by holding Left Shift + Right Shift",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "right_shift",
+                                    "modifiers": {
+                                        "mandatory": ["left_shift"],
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [{ "key_code": "caps_lock" }],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "left_shift",
+                                    "modifiers": {
+                                        "mandatory": ["right_shift"],
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [{ "key_code": "caps_lock" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Slash -> Right Shift when held, Slash when tapped",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "slash",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [{ "key_code": "right_shift" }],
+                                "to_if_alone": [{ "key_code": "slash" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Ctrl-Backspace -> delete-backward-word",
                         "manipulators": [
                             {
                                 "from": {
@@ -417,21 +524,34 @@
                         ]
                     },
                     {
-                        "description": "Change slash to Right Shift when held",
+                        "description": "Shift-Backspace -> delete_forward",
                         "manipulators": [
                             {
                                 "from": {
-                                    "key_code": "slash",
-                                    "modifiers": { "optional": ["any"] }
+                                    "key_code": "left_command",
+                                    "modifiers": {
+                                        "mandatory": ["shift"],
+                                        "optional": ["caps_lock"]
+                                    }
                                 },
-                                "to": [{ "key_code": "right_shift" }],
-                                "to_if_alone": [{ "key_code": "slash" }],
+                                "to": [{ "key_code": "delete_forward" }],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "delete_or_backspace",
+                                    "modifiers": {
+                                        "mandatory": ["shift"],
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [{ "key_code": "delete_forward" }],
                                 "type": "basic"
                             }
                         ]
                     },
                     {
-                        "description": "Change Left Option + h/j/k/l to Arrows",
+                        "description": "Left Option + h/j/k/l -> Arrows",
                         "manipulators": [
                             {
                                 "from": {
@@ -475,33 +595,6 @@
                                     }
                                 },
                                 "to": [{ "key_code": "right_arrow" }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Shift-Backspace to delete_forward",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "left_command",
-                                    "modifiers": {
-                                        "mandatory": ["shift"],
-                                        "optional": ["caps_lock"]
-                                    }
-                                },
-                                "to": [{ "key_code": "delete_forward" }],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "delete_or_backspace",
-                                    "modifiers": {
-                                        "mandatory": ["shift"],
-                                        "optional": ["caps_lock"]
-                                    }
-                                },
-                                "to": [{ "key_code": "delete_forward" }],
                                 "type": "basic"
                             }
                         ]
