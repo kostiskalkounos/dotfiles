@@ -167,7 +167,50 @@
         },
         {
           "type": "basic",
-          "description": "Left Command (alone) -> Left Command when held, Backspace when tapped",
+          "description": "Left Command (double tap & hold alone) -> Repeat Backspace",
+          "from": {
+            "key_code": "left_command",
+            "modifiers": {
+              "optional": [
+                "caps_lock"
+              ]
+            }
+          },
+          "conditions": [
+            {
+              "type": "variable_if",
+              "name": "left_command_alone_tapped_once",
+              "value": 1
+            }
+          ],
+          "to": [
+            {
+              "key_code": "left_command"
+            }
+          ],
+          "to_if_alone": [
+            {
+              "key_code": "delete_or_backspace"
+            }
+          ],
+          "to_if_held_down": [
+            {
+              "key_code": "delete_or_backspace",
+              "repeat": true
+            }
+          ],
+          "to_after_key_up": [
+            {
+              "set_variable": {
+                "name": "left_command_alone_tapped_once",
+                "value": 0
+              }
+            }
+          ]
+        },
+        {
+          "type": "basic",
+          "description": "Left Command (first tap alone) -> Backspace, set double-tap detection",
           "from": {
             "key_code": "left_command",
             "modifiers": {
@@ -183,9 +226,26 @@
           ],
           "to_if_alone": [
             {
+              "set_variable": {
+                "name": "left_command_alone_tapped_once",
+                "value": 1
+              }
+            },
+            {
               "key_code": "delete_or_backspace"
             }
-          ]
+          ],
+          "to_delayed_action": {
+            "to_if_invoked": [
+              {
+                "set_variable": {
+                  "name": "left_command_alone_tapped_once",
+                  "value": 0
+                }
+              }
+            ],
+            "to_if_canceled": []
+          }
         }
       ]
     }
