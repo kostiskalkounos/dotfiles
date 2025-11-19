@@ -1,0 +1,100 @@
+(deffakekeys
+  to-base (layer-switch base)
+)
+
+(defalias
+  tap (multi
+    (layer-switch nomods)
+    (on-idle-fakekey to-base tap 20)
+)
+
+  meh (tap-hold $tap-time $hold-time spc lsft)
+  fn (tap-hold $tap-time $hold-time fn (layer-toggle fn))
+  mc C-up ;; Mission Control
+  sls M-spc ;; Spotlight Search
+  dtn S-C-A-M-f5 ;; Dictation
+  dnd S-C-A-M-f6 ;; Do Not Disturb
+
+  lmet (tap-hold $tap-time $hold-time (fork bspc del (lsft rsft)) lmet)
+  rmet (tap-hold $tap-time $hold-time ret f18)
+
+  lay (layer-toggle arrows)
+  lalt (tap-hold $tap-time $hold-time lalt @lay)
+
+  lsft (fork lsft caps (rsft))
+  rsft (fork rsft caps (lsft))
+
+  grv (fork lsft caps (rsft))
+  ibs grv
+
+  ;; / (tap-hold-release-keys $tap-time $hold-time (multi / @tap) rsft $right-hand-keys)
+  ;; z (tap-hold-release-keys $tap-time $hold-time (multi z @tap) rsft $left-hand-keys)
+
+  caps (tap-hold-release-keys $tap-time $hold-time (multi esc @tap) rctl $right-hand-keys)
+)
+
+(defcfg
+  process-unmapped-keys yes
+)
+
+(defsrc
+  esc   f1    f2    f3    f4    f5    f6    f7    f8    f9    f10   f11   f12
+  IntlBackslash  1    2    3    4    5       6    7    8    9    0       -    =    bspc
+  tab            q    w    e    r    t       y    u    i    o    p       [    ]    ret
+  caps           a    s    d    f    g       h    j    k    l    ;       '    \
+  lsft   `       z    x    c    v    b       n    m    ,    .    /       rsft
+  fn       lctl      lalt lmet          spc            rmet ralt
+)
+
+(defvar
+  tap-time 200
+  hold-time 150
+
+  left-hand-keys (
+    q w e r t
+    a s d f g
+    z x c v b
+  )
+
+  right-hand-keys (
+    y u i o p
+    h j k l ;
+    n m , . /
+  )
+)
+
+(deflayer base
+  esc   f1    f2    f3    f4    f5    f6    f7    f8    f9    f10   f11   f12
+  @ibs  1    2    3    4    5       6    7    8    9    0       -    =    bspc
+  tab   q    w    e    r    t       y    u    i    o    p       [    ]    ret
+  @caps a    s    d    f    g       h    j    k    l    ;       '    \
+  @lsft   @grv   z    x    c    v    b       n    m    ,    .    /   @rsft
+  @fn   lctl          @lalt @lmet          @meh            @rmet ralt
+)
+
+(deflayer nomods
+  esc   f1    f2    f3    f4    f5    f6    f7    f8    f9    f10   f11   f12
+  @ibs  1    2    3    4    5       6    7    8    9    0       -    =    bspc
+  tab   q    w    e    r    t       y    u    i    o    p       [    ]    ret
+  @caps a    s    d    f    g       h    j    k    l    ;       '    \
+  lsft   @grv       z    x    c    v    b       n    m    ,    .    /       rsft
+  @fn    lctl           lalt lmet          spc            rmet ralt
+)
+
+(deflayer arrows
+  esc     f1    f2    f3    f4    f5    f6    f7    f8    f9    f10   f11   f12
+  @ibs    1     2     3     4     5    6      7     8     9     0     -     =    bspc
+  tab     q     w     e     r     t    y      u     i     o     p     [     ]    ret
+  @caps   a     s     d     f     g    left   down  up    right ;     '     \
+  @lsft   @grv        z     x     c    v      b     n     m     ,     .     /   @rsft
+  @fn     lctl           @lalt @lmet          @meh            rmet ralt
+)
+
+(deflayer fn
+  esc     🔅    🔆    @mc   @sls  @dtn  @dnd  ◀◀    ▶⏸    ▶▶    🔇    🔉    🔊
+  @ibs    1     2     3     4     5    6      7     8     9     0     -     =    bspc
+  tab     q     w     e     r     t    y      u     i     o     p     [     ]    ret
+  @caps a    s    d    f    g       h    j    k    l    ;       '    \
+  @lsft   @grv        z     x     c    v      b     n     m     ,     .     /   @rsft
+  @fn    lctl           @lalt @lmet          @meh            rmet ralt
+)
