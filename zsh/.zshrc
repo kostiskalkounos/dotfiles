@@ -46,6 +46,7 @@ alias snykt='snyk test --maven-aggregate-project -- -P Symphony'
 alias sudo='sudo '
 alias v=vi
 alias vi=vim
+alias y=yazi
 
 if type nvim >/dev/null 2>&1; then
   alias vim=nvim
