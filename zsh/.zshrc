@@ -37,6 +37,7 @@ alias ll='ls -lh'
 alias ls='gls --color=auto --group-directories-first'
 
 alias bu='brew update && brew upgrade -g && brew cleanup'
+alias f=yazi
 alias md='mvn dependency:tree'
 alias mi='mvn clean install -am -T 0.5C -U -DskipTests'
 alias mt='mvn clean test -am -T 0.5C -U'
