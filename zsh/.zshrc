@@ -1,6 +1,7 @@
 bindkey -e
 
 alias ga='git add'
+alias gap='git add --patch'
 alias gb='git branch'
 alias gc='git commit'
 alias gd='git diff'
