@@ -404,9 +404,8 @@
           },
           "conditions": [
             {
-              "type": "variable_if",
-              "name": "right_command_alone_tapped_once",
-              "value": 1
+              "type": "expression_if",
+              "expression": "right_command_alone_tapped_once_expiration > system.now.milliseconds"
             }
           ],
           "to": [
@@ -440,7 +439,7 @@
             },
             {
               "set_variable": {
-                "name": "right_command_alone_tapped_once",
+                "name": "right_command_alone_tapped_once_expiration",
                 "value": 0
               }
             }
@@ -471,8 +470,8 @@
           "to_if_alone": [
             {
               "set_variable": {
-                "name": "right_command_alone_tapped_once",
-                "value": 1
+                "name": "right_command_alone_tapped_once_expiration",
+                "expression": "system.now.milliseconds + 300"
               }
             },
             {
@@ -486,18 +485,7 @@
                 "value": 0
               }
             }
-          ],
-          "to_delayed_action": {
-            "to_if_invoked": [
-              {
-                "set_variable": {
-                  "name": "right_command_alone_tapped_once",
-                  "value": 0
-                }
-              }
-            ],
-            "to_if_canceled": []
-          }
+          ]
         }
       ]
     }
