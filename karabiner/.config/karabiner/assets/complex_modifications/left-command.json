@@ -6,7 +6,7 @@
       "manipulators": [
         {
           "type": "basic",
-          "description": "Right Command + Left Command (double tap & hold) -> Repeat Option+Delete (delete word backward)",
+          "description": "Right Command + Left Command (double tap & hold) -> Repeat Option+Delete",
           "from": {
             "key_code": "left_command",
             "modifiers": {
@@ -22,9 +22,8 @@
               "value": 1
             },
             {
-              "type": "variable_if",
-              "name": "left_command_tapped_once",
-              "value": 1
+              "type": "expression_if",
+              "expression": "left_command_tapped_once_expiration > system.now.milliseconds"
             }
           ],
           "to": [
@@ -64,7 +63,7 @@
             },
             {
               "set_variable": {
-                "name": "left_command_tapped_once",
+                "name": "left_command_tapped_once_expiration",
                 "value": 0
               }
             }
@@ -72,7 +71,7 @@
         },
         {
           "type": "basic",
-          "description": "Right Command + Left Command (first tap) -> Option+Delete once, set double-tap detection",
+          "description": "Right Command + Left Command (first tap) -> Option+Delete",
           "from": {
             "key_code": "left_command",
             "modifiers": {
@@ -96,8 +95,8 @@
           "to_if_alone": [
             {
               "set_variable": {
-                "name": "left_command_tapped_once",
-                "value": 1
+                "name": "left_command_tapped_once_expiration",
+                "expression": "system.now.milliseconds + 300"
               }
             },
             {
@@ -106,22 +105,11 @@
                 "right_option"
               ]
             }
-          ],
-          "to_delayed_action": {
-            "to_if_invoked": [
-              {
-                "set_variable": {
-                  "name": "left_command_tapped_once",
-                  "value": 0
-                }
-              }
-            ],
-            "to_if_canceled": []
-          }
+          ]
         },
         {
           "type": "basic",
-          "description": "Left Command + Right Option -> Cmd+Delete (delete word forward)",
+          "description": "Right Option + Left Command -> Cmd+Delete (delete line)",
           "from": {
             "key_code": "left_command",
             "modifiers": {
@@ -144,7 +132,7 @@
         },
         {
           "type": "basic",
-          "description": "Left Command + Control -> Option+Delete (delete word backward)",
+          "description": "Control + Left Command -> Option+Delete (delete word)",
           "from": {
             "key_code": "left_command",
             "modifiers": {
@@ -167,7 +155,7 @@
         },
         {
           "type": "basic",
-          "description": "Left Command (double tap & hold alone) -> Repeat Backspace",
+          "description": "Left Command (double tap & hold) -> Repeat Backspace",
           "from": {
             "key_code": "left_command",
             "modifiers": {
@@ -178,9 +166,8 @@
           },
           "conditions": [
             {
-              "type": "variable_if",
-              "name": "left_command_alone_tapped_once",
-              "value": 1
+              "type": "expression_if",
+              "expression": "left_command_alone_tapped_once_expiration > system.now.milliseconds"
             }
           ],
           "to": [
@@ -202,7 +189,7 @@
           "to_after_key_up": [
             {
               "set_variable": {
-                "name": "left_command_alone_tapped_once",
+                "name": "left_command_alone_tapped_once_expiration",
                 "value": 0
               }
             }
@@ -210,7 +197,7 @@
         },
         {
           "type": "basic",
-          "description": "Left Command (first tap alone) -> Backspace, set double-tap detection",
+          "description": "Left Command -> Left Command when held and Backspace when tapped",
           "from": {
             "key_code": "left_command",
             "modifiers": {
@@ -227,25 +214,14 @@
           "to_if_alone": [
             {
               "set_variable": {
-                "name": "left_command_alone_tapped_once",
-                "value": 1
+                "name": "left_command_alone_tapped_once_expiration",
+                "expression": "system.now.milliseconds + 300"
               }
             },
             {
               "key_code": "delete_or_backspace"
             }
-          ],
-          "to_delayed_action": {
-            "to_if_invoked": [
-              {
-                "set_variable": {
-                  "name": "left_command_alone_tapped_once",
-                  "value": 0
-                }
-              }
-            ],
-            "to_if_canceled": []
-          }
+          ]
         }
       ]
     }
