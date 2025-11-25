@@ -22,12 +22,11 @@
                                         "value": 1
                                     },
                                     {
-                                        "name": "left_command_tapped_once",
-                                        "type": "variable_if",
-                                        "value": 1
+                                        "expression": "left_command_tapped_once_expiration > system.now.milliseconds",
+                                        "type": "expression_if"
                                     }
                                 ],
-                                "description": "Right Command + Left Command (double tap & hold) -> Repeat Option+Delete (delete word backward)",
+                                "description": "Right Command + Left Command (double tap & hold) -> Repeat Option+Delete",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": { "optional": ["caps_lock"] }
@@ -50,7 +49,7 @@
                                     },
                                     {
                                         "set_variable": {
-                                            "name": "left_command_tapped_once",
+                                            "name": "left_command_tapped_once_expiration",
                                             "value": 0
                                         }
                                     }
@@ -78,28 +77,17 @@
                                         "value": 1
                                     }
                                 ],
-                                "description": "Right Command + Left Command (first tap) -> Option+Delete once, set double-tap detection",
+                                "description": "Right Command + Left Command (first tap) -> Option+Delete",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": { "optional": ["caps_lock"] }
                                 },
                                 "to": [{ "key_code": "left_command" }],
-                                "to_delayed_action": {
-                                    "to_if_canceled": [],
-                                    "to_if_invoked": [
-                                        {
-                                            "set_variable": {
-                                                "name": "left_command_tapped_once",
-                                                "value": 0
-                                            }
-                                        }
-                                    ]
-                                },
                                 "to_if_alone": [
                                     {
                                         "set_variable": {
-                                            "name": "left_command_tapped_once",
-                                            "value": 1
+                                            "expression": "system.now.milliseconds + 300",
+                                            "name": "left_command_tapped_once_expiration"
                                         }
                                     },
                                     {
@@ -110,7 +98,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Left Command + Right Option -> Cmd+Delete (delete word forward)",
+                                "description": "Right Option + Left Command -> Cmd+Delete (delete line)",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": {
@@ -127,7 +115,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Left Command + Control -> Option+Delete (delete word backward)",
+                                "description": "Control + Left Command -> Option+Delete (delete word)",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": {
@@ -146,12 +134,11 @@
                             {
                                 "conditions": [
                                     {
-                                        "name": "left_command_alone_tapped_once",
-                                        "type": "variable_if",
-                                        "value": 1
+                                        "expression": "left_command_alone_tapped_once_expiration > system.now.milliseconds",
+                                        "type": "expression_if"
                                     }
                                 ],
-                                "description": "Left Command (double tap & hold alone) -> Repeat Backspace",
+                                "description": "Left Command (double tap & hold) -> Repeat Backspace",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": { "optional": ["caps_lock"] }
@@ -160,7 +147,7 @@
                                 "to_after_key_up": [
                                     {
                                         "set_variable": {
-                                            "name": "left_command_alone_tapped_once",
+                                            "name": "left_command_alone_tapped_once_expiration",
                                             "value": 0
                                         }
                                     }
@@ -175,28 +162,17 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Left Command (first tap alone) -> Backspace, set double-tap detection",
+                                "description": "Left Command -> Left Command when held and Backspace when tapped",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": { "optional": ["caps_lock"] }
                                 },
                                 "to": [{ "key_code": "left_command" }],
-                                "to_delayed_action": {
-                                    "to_if_canceled": [],
-                                    "to_if_invoked": [
-                                        {
-                                            "set_variable": {
-                                                "name": "left_command_alone_tapped_once",
-                                                "value": 0
-                                            }
-                                        }
-                                    ]
-                                },
                                 "to_if_alone": [
                                     {
                                         "set_variable": {
-                                            "name": "left_command_alone_tapped_once",
-                                            "value": 1
+                                            "expression": "system.now.milliseconds + 300",
+                                            "name": "left_command_alone_tapped_once_expiration"
                                         }
                                     },
                                     { "key_code": "delete_or_backspace" }
@@ -209,7 +185,7 @@
                         "description": "Right Command -> F18 when held and Return when tapped",
                         "manipulators": [
                             {
-                                "description": "Right Command + Shift + Control -> Return + Shift + Control",
+                                "description": "Control + Shift + Right Command -> Control + Shift + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -226,7 +202,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Shift + Option -> Return + Shift + Option",
+                                "description": "Shift + Option + Right Command -> Shift + Option + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -236,6 +212,12 @@
                                 },
                                 "to": [
                                     {
+                                        "key_code": "right_command",
+                                        "modifiers": ["left_shift", "option"]
+                                    }
+                                ],
+                                "to_if_alone": [
+                                    {
                                         "key_code": "return_or_enter",
                                         "modifiers": ["left_shift", "option"]
                                     }
@@ -243,7 +225,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Control + Option -> Return + Control + Option",
+                                "description": "Control + Option + Right Command -> Control + Option + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -260,7 +242,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Left Command + Option -> Return + Command + Option",
+                                "description": "Option + Left Command + Right Command -> Option + Command + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -277,7 +259,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Shift + Control + Option -> Return + Shift + Control + Option",
+                                "description": "Control + Shift + Option + Right Command -> Control + Shift + Option + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -294,7 +276,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Shift + Control + Left Command -> Return + Shift + Control + Command",
+                                "description": "Control + Shift + Left Command + Right Command -> Control + Shift + Command + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -311,7 +293,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Shift + Option + Left Command -> Return + Shift + Option + Command",
+                                "description": "Shift + Option + Left Command + Right Command -> Shift + Option + Command + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -328,7 +310,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Control + Option + Left Command -> Return + Control + Option + Command",
+                                "description": "Control + Option + Left Command + Right Command -> Control + Option + Command + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -345,7 +327,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Shift + Control + Option + Left Command -> Return + All Modifiers",
+                                "description": "Control + Shift + Option + Left Command + Right Command -> All Modifiers + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -362,7 +344,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Shift + Left Command -> Return + Shift + Command",
+                                "description": "Left Shift + Left Command + Right Command -> Shift + Command + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -379,7 +361,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Control + Left Command -> Return + Control + Command",
+                                "description": "Control + Left Command + Right Command -> Control + Command + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -396,7 +378,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Left Command -> Return + Command",
+                                "description": "Left Command + Right Command -> Command + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -413,7 +395,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Shift -> Return + Shift",
+                                "description": "Shift + Right Command -> Shift + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -423,6 +405,12 @@
                                 },
                                 "to": [
                                     {
+                                        "key_code": "right_command",
+                                        "modifiers": ["left_shift"]
+                                    }
+                                ],
+                                "to_if_alone": [
+                                    {
                                         "key_code": "return_or_enter",
                                         "modifiers": ["left_shift"]
                                     }
@@ -430,7 +418,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Control -> Return + Control",
+                                "description": "Control + Right Command -> Control + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -447,7 +435,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command + Option -> Right Command + Option when held, Return + Option when tapped",
+                                "description": "Option + Right Command -> Option + Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": {
@@ -472,12 +460,11 @@
                             {
                                 "conditions": [
                                     {
-                                        "name": "right_command_alone_tapped_once",
-                                        "type": "variable_if",
-                                        "value": 1
+                                        "expression": "right_command_alone_tapped_once_expiration > system.now.milliseconds",
+                                        "type": "expression_if"
                                     }
                                 ],
-                                "description": "Right Command (double tap & hold alone) -> Repeat Return",
+                                "description": "Right Command (double tap & hold) -> Repeat Return",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": { "optional": ["caps_lock"] }
@@ -500,7 +487,7 @@
                                     },
                                     {
                                         "set_variable": {
-                                            "name": "right_command_alone_tapped_once",
+                                            "name": "right_command_alone_tapped_once_expiration",
                                             "value": 0
                                         }
                                     }
@@ -515,7 +502,7 @@
                                 "type": "basic"
                             },
                             {
-                                "description": "Right Command (first tap alone) -> Return, set double-tap detection",
+                                "description": "Right Command -> F18 when held and Return when tapped",
                                 "from": {
                                     "key_code": "right_command",
                                     "modifiers": { "optional": ["caps_lock"] }
@@ -537,22 +524,11 @@
                                         }
                                     }
                                 ],
-                                "to_delayed_action": {
-                                    "to_if_canceled": [],
-                                    "to_if_invoked": [
-                                        {
-                                            "set_variable": {
-                                                "name": "right_command_alone_tapped_once",
-                                                "value": 0
-                                            }
-                                        }
-                                    ]
-                                },
                                 "to_if_alone": [
                                     {
                                         "set_variable": {
-                                            "name": "right_command_alone_tapped_once",
-                                            "value": 1
+                                            "expression": "system.now.milliseconds + 300",
+                                            "name": "right_command_alone_tapped_once_expiration"
                                         }
                                     },
                                     { "key_code": "return_or_enter" }
