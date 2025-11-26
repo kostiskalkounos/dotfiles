@@ -20,76 +20,15 @@
                                         "name": "right_command_held",
                                         "type": "variable_if",
                                         "value": 1
-                                    },
-                                    {
-                                        "expression": "left_command_tapped_once_expiration > system.now.milliseconds",
-                                        "type": "expression_if"
                                     }
                                 ],
-                                "description": "Right Command + Left Command (double tap & hold) -> Repeat Option+Delete",
-                                "from": {
-                                    "key_code": "left_command",
-                                    "modifiers": { "optional": ["caps_lock"] }
-                                },
-                                "to": [
-                                    {
-                                        "set_variable": {
-                                            "name": "repeat_delete",
-                                            "value": 1
-                                        }
-                                    },
-                                    { "key_code": "left_command" }
-                                ],
-                                "to_after_key_up": [
-                                    {
-                                        "set_variable": {
-                                            "name": "repeat_delete",
-                                            "value": 0
-                                        }
-                                    },
-                                    {
-                                        "set_variable": {
-                                            "name": "left_command_tapped_once_expiration",
-                                            "value": 0
-                                        }
-                                    }
-                                ],
-                                "to_if_alone": [
-                                    {
-                                        "key_code": "delete_or_backspace",
-                                        "modifiers": ["right_option"]
-                                    }
-                                ],
-                                "to_if_held_down": [
-                                    {
-                                        "key_code": "delete_or_backspace",
-                                        "modifiers": ["right_option"],
-                                        "repeat": true
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "name": "right_command_held",
-                                        "type": "variable_if",
-                                        "value": 1
-                                    }
-                                ],
-                                "description": "Right Command + Left Command (first tap) -> Option+Delete",
+                                "description": "Right Command (Held) + Left Command (Tap) -> Option+Delete",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": { "optional": ["caps_lock"] }
                                 },
                                 "to": [{ "key_code": "left_command" }],
                                 "to_if_alone": [
-                                    {
-                                        "set_variable": {
-                                            "expression": "system.now.milliseconds + 300",
-                                            "name": "left_command_tapped_once_expiration"
-                                        }
-                                    },
                                     {
                                         "key_code": "delete_or_backspace",
                                         "modifiers": ["right_option"]
@@ -132,51 +71,13 @@
                                 "type": "basic"
                             },
                             {
-                                "conditions": [
-                                    {
-                                        "expression": "left_command_alone_tapped_once_expiration > system.now.milliseconds",
-                                        "type": "expression_if"
-                                    }
-                                ],
-                                "description": "Left Command (double tap & hold) -> Repeat Backspace",
-                                "from": {
-                                    "key_code": "left_command",
-                                    "modifiers": { "optional": ["caps_lock"] }
-                                },
-                                "to": [{ "key_code": "left_command" }],
-                                "to_after_key_up": [
-                                    {
-                                        "set_variable": {
-                                            "name": "left_command_alone_tapped_once_expiration",
-                                            "value": 0
-                                        }
-                                    }
-                                ],
-                                "to_if_alone": [{ "key_code": "delete_or_backspace" }],
-                                "to_if_held_down": [
-                                    {
-                                        "key_code": "delete_or_backspace",
-                                        "repeat": true
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
                                 "description": "Left Command -> Left Command when held and Backspace when tapped",
                                 "from": {
                                     "key_code": "left_command",
                                     "modifiers": { "optional": ["caps_lock"] }
                                 },
                                 "to": [{ "key_code": "left_command" }],
-                                "to_if_alone": [
-                                    {
-                                        "set_variable": {
-                                            "expression": "system.now.milliseconds + 300",
-                                            "name": "left_command_alone_tapped_once_expiration"
-                                        }
-                                    },
-                                    { "key_code": "delete_or_backspace" }
-                                ],
+                                "to_if_alone": [{ "key_code": "delete_or_backspace" }],
                                 "type": "basic"
                             }
                         ]
@@ -458,50 +359,6 @@
                                 "type": "basic"
                             },
                             {
-                                "conditions": [
-                                    {
-                                        "expression": "right_command_alone_tapped_once_expiration > system.now.milliseconds",
-                                        "type": "expression_if"
-                                    }
-                                ],
-                                "description": "Right Command (double tap & hold) -> Repeat Return",
-                                "from": {
-                                    "key_code": "right_command",
-                                    "modifiers": { "optional": ["caps_lock"] }
-                                },
-                                "to": [
-                                    {
-                                        "set_variable": {
-                                            "name": "right_command_held",
-                                            "value": 1
-                                        }
-                                    },
-                                    { "key_code": "f18" }
-                                ],
-                                "to_after_key_up": [
-                                    {
-                                        "set_variable": {
-                                            "name": "right_command_held",
-                                            "value": 0
-                                        }
-                                    },
-                                    {
-                                        "set_variable": {
-                                            "name": "right_command_alone_tapped_once_expiration",
-                                            "value": 0
-                                        }
-                                    }
-                                ],
-                                "to_if_alone": [{ "key_code": "return_or_enter" }],
-                                "to_if_held_down": [
-                                    {
-                                        "key_code": "return_or_enter",
-                                        "repeat": true
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
                                 "description": "Right Command -> F18 when held and Return when tapped",
                                 "from": {
                                     "key_code": "right_command",
@@ -524,15 +381,7 @@
                                         }
                                     }
                                 ],
-                                "to_if_alone": [
-                                    {
-                                        "set_variable": {
-                                            "expression": "system.now.milliseconds + 300",
-                                            "name": "right_command_alone_tapped_once_expiration"
-                                        }
-                                    },
-                                    { "key_code": "return_or_enter" }
-                                ],
+                                "to_if_alone": [{ "key_code": "return_or_enter" }],
                                 "type": "basic"
                             }
                         ]
