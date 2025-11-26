@@ -410,60 +410,6 @@
         },
         {
           "type": "basic",
-          "description": "Right Command (double tap & hold) -> Repeat Return",
-          "from": {
-            "key_code": "right_command",
-            "modifiers": {
-              "optional": [
-                "caps_lock"
-              ]
-            }
-          },
-          "conditions": [
-            {
-              "type": "expression_if",
-              "expression": "right_command_alone_tapped_once_expiration > system.now.milliseconds"
-            }
-          ],
-          "to": [
-            {
-              "set_variable": {
-                "name": "right_command_held",
-                "value": 1
-              }
-            },
-            {
-              "key_code": "f18"
-            }
-          ],
-          "to_if_alone": [
-            {
-              "key_code": "return_or_enter"
-            }
-          ],
-          "to_if_held_down": [
-            {
-              "key_code": "return_or_enter",
-              "repeat": true
-            }
-          ],
-          "to_after_key_up": [
-            {
-              "set_variable": {
-                "name": "right_command_held",
-                "value": 0
-              }
-            },
-            {
-              "set_variable": {
-                "name": "right_command_alone_tapped_once_expiration",
-                "value": 0
-              }
-            }
-          ]
-        },
-        {
-          "type": "basic",
           "description": "Right Command -> F18 when held and Return when tapped",
           "from": {
             "key_code": "right_command",
@@ -485,12 +431,6 @@
             }
           ],
           "to_if_alone": [
-            {
-              "set_variable": {
-                "name": "right_command_alone_tapped_once_expiration",
-                "expression": "system.now.milliseconds + 300"
-              }
-            },
             {
               "key_code": "return_or_enter"
             }

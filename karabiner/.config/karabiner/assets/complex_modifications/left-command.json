@@ -6,72 +6,7 @@
       "manipulators": [
         {
           "type": "basic",
-          "description": "Right Command + Left Command (double tap & hold) -> Repeat Option+Delete",
-          "from": {
-            "key_code": "left_command",
-            "modifiers": {
-              "optional": [
-                "caps_lock"
-              ]
-            }
-          },
-          "conditions": [
-            {
-              "type": "variable_if",
-              "name": "right_command_held",
-              "value": 1
-            },
-            {
-              "type": "expression_if",
-              "expression": "left_command_tapped_once_expiration > system.now.milliseconds"
-            }
-          ],
-          "to": [
-            {
-              "set_variable": {
-                "name": "repeat_delete",
-                "value": 1
-              }
-            },
-            {
-              "key_code": "left_command"
-            }
-          ],
-          "to_if_alone": [
-            {
-              "key_code": "delete_or_backspace",
-              "modifiers": [
-                "right_option"
-              ]
-            }
-          ],
-          "to_if_held_down": [
-            {
-              "key_code": "delete_or_backspace",
-              "modifiers": [
-                "right_option"
-              ],
-              "repeat": true
-            }
-          ],
-          "to_after_key_up": [
-            {
-              "set_variable": {
-                "name": "repeat_delete",
-                "value": 0
-              }
-            },
-            {
-              "set_variable": {
-                "name": "left_command_tapped_once_expiration",
-                "value": 0
-              }
-            }
-          ]
-        },
-        {
-          "type": "basic",
-          "description": "Right Command + Left Command (first tap) -> Option+Delete",
+          "description": "Right Command (Held) + Left Command (Tap) -> Option+Delete",
           "from": {
             "key_code": "left_command",
             "modifiers": {
@@ -93,12 +28,6 @@
             }
           ],
           "to_if_alone": [
-            {
-              "set_variable": {
-                "name": "left_command_tapped_once_expiration",
-                "expression": "system.now.milliseconds + 300"
-              }
-            },
             {
               "key_code": "delete_or_backspace",
               "modifiers": [
@@ -155,48 +84,6 @@
         },
         {
           "type": "basic",
-          "description": "Left Command (double tap & hold) -> Repeat Backspace",
-          "from": {
-            "key_code": "left_command",
-            "modifiers": {
-              "optional": [
-                "caps_lock"
-              ]
-            }
-          },
-          "conditions": [
-            {
-              "type": "expression_if",
-              "expression": "left_command_alone_tapped_once_expiration > system.now.milliseconds"
-            }
-          ],
-          "to": [
-            {
-              "key_code": "left_command"
-            }
-          ],
-          "to_if_alone": [
-            {
-              "key_code": "delete_or_backspace"
-            }
-          ],
-          "to_if_held_down": [
-            {
-              "key_code": "delete_or_backspace",
-              "repeat": true
-            }
-          ],
-          "to_after_key_up": [
-            {
-              "set_variable": {
-                "name": "left_command_alone_tapped_once_expiration",
-                "value": 0
-              }
-            }
-          ]
-        },
-        {
-          "type": "basic",
           "description": "Left Command -> Left Command when held and Backspace when tapped",
           "from": {
             "key_code": "left_command",
@@ -212,12 +99,6 @@
             }
           ],
           "to_if_alone": [
-            {
-              "set_variable": {
-                "name": "left_command_alone_tapped_once_expiration",
-                "expression": "system.now.milliseconds + 300"
-              }
-            },
             {
               "key_code": "delete_or_backspace"
             }
