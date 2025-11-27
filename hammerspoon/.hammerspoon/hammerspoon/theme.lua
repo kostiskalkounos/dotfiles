@@ -4,8 +4,7 @@ local lightWallpaper = hs.fs.pathToAbsolute("~/.hammerspoon/wallpapers/forest.jp
 local scriptTemplate =
   'tell app "System Events"\n  tell appearance preferences to set dark mode to %s\n  tell every desktop to set picture to "%s"\nend tell'
 
-local cmdTemplate =
-  'pkill -%s zsh; export NVIM_THEME=%s; [ -n "$TMUX" ] && tmux source-file ~/.tmux/%s.conf >/dev/null 2>&1 &'
+local script = "~/.hammerspoon/scripts/theme.sh %s"
 
 Hyper:bind({}, "/", function()
   local success, darkMode =
@@ -15,10 +14,10 @@ Hyper:bind({}, "/", function()
   end
 
   local newMode = not darkMode
-  local theme = newMode and "Dark" or "Light"
+  local theme = newMode and "dark" or "light"
   local wallpaper = newMode and darkWallpaper or lightWallpaper
-  local signal = newMode and "USR1" or "USR2"
 
   hs.osascript._osascript(string.format(scriptTemplate, tostring(newMode), wallpaper), "AppleScript")
-  hs.execute(string.format(cmdTemplate, signal, theme, theme), true)
+
+  hs.execute(string.format(script, theme), true)
 end)

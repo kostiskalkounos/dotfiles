@@ -106,18 +106,8 @@ export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow
 DARK_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=dark --color=fg:-1,bg:-1,hl:magenta,fg+:white,bg+:#363a4f,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,gutter:"#24273A"'
 LIGHT_FZF_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=light --color=fg:-1,bg:-1,hl:magenta,fg+:black,bg+:#ccd0da,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,gutter:"#eff1f5"'
 
-BTOP_DARK_THEME="tokyo-storm"
-BTOP_LIGHT_THEME="kanagawa-lotus"
-
-BTOP_CONFIG_FILE="$HOME/.config/btop/btop.conf"
-K9S_CONFIG_FILE="$HOME/Library/Application Support/k9s/config.yaml"
-
-update_btop_theme() {
-  local theme=$1
-  sed -i '' "s/^color_theme = \".*\"/color_theme = \"$theme\"/" "$BTOP_CONFIG_FILE" 2>/dev/null
-  sed -i '' "s/^theme_background = .*/theme_background = False/" "$BTOP_CONFIG_FILE" 2>/dev/null
-  sed -i '' "s/^vim_keys = .*/vim_keys = True/" "$BTOP_CONFIG_FILE" 2>/dev/null
-}
+trap 'export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" FZF_THEME=dark KUBECOLOR_PRESET=dark NVIM_THEME=dark' USR1
+trap 'export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" FZF_THEME=light KUBECOLOR_PRESET=light NVIM_THEME=light' USR2
 
 case "$FZF_THEME" in
   dark) export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" ;;
@@ -126,26 +116,16 @@ case "$FZF_THEME" in
     if defaults read -g AppleInterfaceStyle 2>/dev/null | grep -q Dark; then
       export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"
       export FZF_THEME=dark
-      export K9S_THEME=dark
       export KUBECOLOR_PRESET=dark
       export NVIM_THEME=dark
-      update_btop_theme "$BTOP_DARK_THEME"
     else
       export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"
       export FZF_THEME=light
-      export K9S_THEME=light
       export KUBECOLOR_PRESET=light
       export NVIM_THEME=light
-      update_btop_theme "$BTOP_LIGHT_THEME"
     fi
     ;;
 esac
-
-trap 'export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS" FZF_THEME=dark KUBECOLOR_PRESET=dark NVIM_THEME=dark; \
-      yq -i ".k9s.ui.skin = \"dark\"" "$K9S_CONFIG_FILE"' USR1
-
-trap ' export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS" FZF_THEME=light KUBECOLOR_PRESET=light NVIM_THEME=light; \
-      yq -i ".k9s.ui.skin = \"light\"" "$K9S_CONFIG_FILE"' USR2
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
