@@ -1,6 +1,6 @@
 Hyper = require("hammerspoon.hyper")
 
-require("hammerspoon.keys")
+require("hammerspoon.apps")
 require("hammerspoon.spaces")
 require("hammerspoon.theme")
 require("hammerspoon.window")
