@@ -97,7 +97,7 @@ setopt PUSHD_MINUS
 setopt PUSHD_SILENT
 setopt SHARE_HISTORY
 
-export FZF_ALT_C_COMMAND="fd -t d --exclude '{.git,.npm,.cache,.venv,node_modules}' . $HOME"
+export FZF_ALT_C_COMMAND="fd -t d --hidden --follow --exclude '{.git,.npm,.cache,.venv,node_modules}' . $HOME"
 export FZF_CTRL_T_COMMAND='rg --files --hidden --follow --no-ignore -g "!{.git,.cache,.clangd,.venv,.DS_Store,node_modules}" 2> /dev/null'
 export FZF_DEFAULT_COMMAND=$FZF_CTRL_T_COMMAND
 export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
