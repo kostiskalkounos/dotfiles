@@ -62,8 +62,10 @@ autoload -U compinit && compinit -u
 autoload -U down-line-or-beginning-search && zle -N down-line-or-beginning-search
 autoload -U edit-command-line && zle -N edit-command-line
 autoload -U up-line-or-beginning-search && zle -N up-line-or-beginning-search
+autoload zmv
 zle_highlight=('paste:none')
 
+bindkey ' ' magic-space
 bindkey '^N' down-line-or-beginning-search
 bindkey '^P' up-line-or-beginning-search
 bindkey '^X^E' edit-command-line
