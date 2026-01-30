@@ -613,6 +613,19 @@
                             "to": [{ "key_code": "grave_accent_and_tilde" }]
                         }
                     ]
+                },
+                {
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "product_id": 668,
+                        "vendor_id": 1452
+                    },
+                    "simple_modifications": [
+                        {
+                            "from": { "consumer_key_code": "al_terminal_lock_or_screensaver" },
+                            "to": [{ "key_code": "delete_or_backspace" }]
+                        }
+                    ]
                 }
             ],
             "name": "Default profile",
