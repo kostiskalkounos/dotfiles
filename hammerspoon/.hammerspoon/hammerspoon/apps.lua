@@ -12,7 +12,7 @@ Hyper:bind({}, "s", function() application.launchOrFocus("Safari") end)
 Hyper:bind({}, "t", function() application.launchOrFocus("Calculator") end)
 Hyper:bind({}, "v", function() application.launchOrFocus("Brave Browser") end)
 Hyper:bind({}, "w", function() application.launchOrFocus("WhatsApp") end)
-Hyper:bind({}, "x", function() application.launchOrFocus("Launchpad") end)
+Hyper:bind({}, "x", function() application.launchOrFocus("Apps") end)
 Hyper:bind({}, "z", function() application.launchOrFocus("Activity Monitor") end)
 
 Hyper:bind({ "cmd" }, "g", function() application.launchOrFocus("App Store") end)
