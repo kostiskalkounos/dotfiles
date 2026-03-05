@@ -189,10 +189,10 @@ git_branch() {
   git branch --no-color 2>/dev/null | sed -E -n "s/^\* (.*)/%F{magenta}%f %F{green}\1%f /p"
 }
 
-line=$'\n'
+PROMPT_LN=$'\n'
 #PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f $(git_branch)%(1j.%F{yellow}* %f.)${line}%(0?;%F{magenta}➜%f;%F{red}➜%f) '
-#PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f $(git_branch)%(1j.%F{yellow}* %f.)%(0?;;%F{red}[!] %? %f)${line}'
-PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f $(git_branch)%(1j.%F{yellow}* %f.)%(0?;;%F{red} %f)${line}'
+#PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f $(git_branch)%(1j.%F{yellow}* %f.)%(0?;;%F{red}[!] %? %f)${PROMPT_LN}'
+PROMPT='%(!.%F{cyan}.%F{blue})${PWD/#$HOME/~}%f $(git_branch)%(1j.%F{yellow}* %f.)%(0?;;%F{red} %f)${PROMPT_LN}'
 
 eval "$(zoxide init zsh)"
 
