@@ -5,11 +5,10 @@ return {
     build = ":TSUpdate",
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
-      "nvim-treesitter/playground",
       { "windwp/nvim-ts-autotag", opts = {} },
     },
     config = function()
-      require("nvim-treesitter.configs").setup({
+      require("nvim-treesitter").setup({
         auto_install = false,
         autopairs = { enable = true },
         highlight = { enable = not vim.g.vscode },
