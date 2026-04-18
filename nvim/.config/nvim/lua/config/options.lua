@@ -10,6 +10,7 @@ o.cindent = true
 o.cursorline = true
 o.expandtab = true
 o.ff = "unix"
+o.fillchars = "eob: "
 o.foldlevelstart = 99
 o.foldmethod = "indent"
 o.hidden = true
