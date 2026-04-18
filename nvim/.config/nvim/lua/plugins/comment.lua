@@ -5,10 +5,7 @@ return {
     dependencies = "JoosepAlviste/nvim-ts-context-commentstring",
     config = function()
       require("ts_context_commentstring").setup({
-        enable_autocmd = true,
-        custom_commentstring = function(ctx)
-          return require("ts_context_commentstring.internal").calculate_commentstring(ctx) or vim.bo.commentstring
-        end,
+        enable_autocmd = false,
       })
       require("Comment").setup({
         padding = true,
@@ -31,7 +28,7 @@ return {
           basic = true,
           extra = true,
         },
-        pre_hook = nil,
+        pre_hook = require("ts_context_commentstring.integrations.comment_nvim").create_pre_hook(),
         post_hook = nil,
       })
     end,
