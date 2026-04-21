@@ -11,19 +11,21 @@ end
 
 local function removeSpace(sp)
   local cur_screen = screen.mainScreen()
+  if not cur_screen then return end
   local cur_screen_id = cur_screen:getUUID()
   local all_spaces = spaces.allSpaces()
-  local spaceID = all_spaces[cur_screen_id][sp]
+  local spaceID = all_spaces[cur_screen_id] and all_spaces[cur_screen_id][sp]
   if not spaceID then return end
   spaces.removeSpace(spaceID)
 end
 
 local function moveWindowToSpace(sp)
   local win = window.focusedWindow()
-  local cur_screen = screen.mainScreen()
+  if not win then return end
+  local cur_screen = win:screen()
   local cur_screen_id = cur_screen:getUUID()
   local all_spaces = spaces.allSpaces()
-  local spaceID = all_spaces[cur_screen_id][sp]
+  local spaceID = all_spaces[cur_screen_id] and all_spaces[cur_screen_id][sp]
   if not spaceID then return end
   spaces.moveWindowToSpace(win:id(), spaceID)
   spaces.gotoSpace(spaceID)
