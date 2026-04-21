@@ -12,7 +12,7 @@ o.expandtab = true
 o.ff = "unix"
 o.fillchars = "eob: "
 o.foldlevelstart = 99
-o.foldmethod = "indent"
+o.foldmethod = "manual"
 o.hidden = true
 o.ignorecase = true
 o.inccommand = "split"
@@ -65,11 +65,13 @@ opt.shortmess:append("c")
 opt.suffixes:remove(".h")
 opt.wildignore:append("*.o,*.rej,*.so,.cache/*,.clangd/*,.venv/*,node_modules/*,package-lock.json,yarn.lock")
 
-if vim.fn.filereadable("/usr/local/bin/python3") == 1 then
+if vim.uv.fs_stat("/usr/local/bin/python3") then
   g.python3_host_prog = "/usr/local/bin/python3"
 end
 
-g.skip_ts_context_commenstring_module = true
+g.skip_ts_context_commentstring_module = true
 g.undotree_HighlightChangedText = 0
+g.undotree_SetFocusWhenToggle = 1
+g.undotree_WindowLayout = 2
 g.undotree_SetFocusWhenToggle = 1
 g.undotree_WindowLayout = 2

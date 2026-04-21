@@ -40,7 +40,7 @@ return {
       end
 
       local exp = fn.expand("%")
-      if exp ~= "" and bo.buftype == "" and fn.filereadable(exp) == 0 then
+      if exp ~= "" and bo.buftype == "" and not vim.uv.fs_stat(exp) then
         parts[#parts + 1] = " [New]"
       end
       return table.concat(parts)
