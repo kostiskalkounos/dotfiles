@@ -1,28 +1,30 @@
-local fnutils = require("hs.fnutils")
 local geometry = require("hs.geometry")
 local screen = require("hs.screen")
 local window = require("hs.window")
 
 local whitelist = {
-  "Brave Browser",
-  "Safari",
-  "kitty",
+  ["Brave Browser"] = true,
+  ["Ghostty"] = true,
+  ["IntelliJ IDEA"] = true,
+  ["Safari"] = true,
+  ["kitty"] = true,
 }
 
-local function isInScreen(iScreen, win)
-  return win:screen() == iScreen
-end
-
 local function focusScreen(iScreen)
-  local windows = fnutils.filter(window.orderedWindows(), fnutils.partial(isInScreen, iScreen))
-  local windowToFocus = #windows > 0 and windows[1] or window.desktop()
-
+  local windowToFocus = window.desktop()
+  for _, win in ipairs(window.orderedWindows()) do
+    if win:screen() == iScreen then
+      windowToFocus = win
+      break
+    end
+  end
   windowToFocus:focus()
 end
 
 local function moveWindowToDisplay(d)
   local displays = screen.allScreens()
   local win = window.focusedWindow()
+  if not win or not displays[d] then return end
 
   win:moveToScreen(displays[d], false, true)
 end
@@ -97,12 +99,12 @@ local function centerWindow()
 end
 
 local function maximizeWindows(x1, y1, x2, y2)
-  local allWindows = window.allWindows()
+  local allWindows = window.visibleWindows()
 
   for _, win in ipairs(allWindows) do
     local app = win:application()
 
-    if win:isStandard() and app and fnutils.contains(whitelist, app:name()) then
+    if win:isStandard() and app and whitelist[app:name()] then
       if (x1 and y1 and x2 and y2) then
         moveWindowToFraction(x1, y1, x2, y2, win)
       else
@@ -121,10 +123,11 @@ local function focusWindowInDirection(direction)
   local candidateWindows = {}
 
   for _, w in ipairs(allWindows) do
-    local appName = w:application():name()
-
-    if fnutils.contains(whitelist, appName) and w:screen() == focusedScreen then
-      table.insert(candidateWindows, w)
+    if w:screen() == focusedScreen then
+      local app = w:application()
+      if app and whitelist[app:name()] then
+        table.insert(candidateWindows, w)
+      end
     end
   end
 
@@ -139,15 +142,27 @@ local function focusWindowInDirection(direction)
   win[method](win, candidateWindows)
 end
 
-Hyper:bind({}, "[", function() focusScreen(window.focusedWindow():screen():previous()) end)
-Hyper:bind({}, "]", function() focusScreen(window.focusedWindow():screen():next()) end)
+Hyper:bind({}, "[", function()
+  local win = window.focusedWindow()
+  if win then focusScreen(win:screen():previous()) end
+end)
+Hyper:bind({}, "]", function()
+  local win = window.focusedWindow()
+  if win then focusScreen(win:screen():next()) end
+end)
 
 Hyper:bind({ "alt" }, "1", function() moveWindowToDisplay(1) end)
 Hyper:bind({ "alt" }, "2", function() moveWindowToDisplay(2) end)
 Hyper:bind({ "alt" }, "3", function() moveWindowToDisplay(3) end)
 
-Hyper:bind({ "alt" }, "[", function() if window.focusedWindow():moveOneScreenWest() then window.focusedWindow():moveOneScreenWest() else window.focusedWindow():moveOneScreenEast() end end)
-Hyper:bind({ "alt" }, "]", function() if window.focusedWindow():moveOneScreenEast() then window.focusedWindow():moveOneScreenEast() else window.focusedWindow():moveOneScreenWest() end end)
+Hyper:bind({ "alt" }, "[", function()
+  local win = window.focusedWindow()
+  if win then if win:moveOneScreenWest() then win:moveOneScreenWest() else win:moveOneScreenEast() end end
+end)
+Hyper:bind({ "alt" }, "]", function()
+  local win = window.focusedWindow()
+  if win then if win:moveOneScreenEast() then win:moveOneScreenEast() else win:moveOneScreenWest() end end
+end)
 
 Hyper:bind({}, "h", function() focusWindowInDirection("west") end)
 Hyper:bind({}, "j", function() focusWindowInDirection("south") end)
@@ -161,7 +176,10 @@ Hyper:bind({ "alt" }, "p", function() moveWindowToFraction(0.33, 0, 0.67, 1) end
 Hyper:bind({ "ctrl" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) end)
 Hyper:bind({ "shift" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) end)
 
-Hyper:bind({}, "'", function() window.focusedWindow():moveToUnit("[100,0,0,100]") end)
+Hyper:bind({}, "'", function()
+  local win = window.focusedWindow()
+  if win then win:moveToUnit("[100,0,0,100]") end
+end)
 Hyper:bind({}, ";", function() moveWindowToFraction(0, 0, 1, 1) end)
 
 Hyper:bind({ "cmd" }, "'", function() maximizeWindows() end)
