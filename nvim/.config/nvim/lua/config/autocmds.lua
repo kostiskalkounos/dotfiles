@@ -9,24 +9,15 @@ local api_nvim_create_user_command = api.nvim_create_user_command
 api_nvim_create_autocmd("TextYankPost", {
   group = api_nvim_create_augroup("highlight_yank", { clear = true }),
   callback = function()
-    vim.highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = true })
+    vim.highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = false })
   end,
 })
 
-api_nvim_create_autocmd({ "BufEnter", "BufFilePost" }, {
-  group = api_nvim_create_augroup("Jenkinsfile", { clear = true }),
-  pattern = "Jenkinsfile*",
-  callback = function()
-    vim.bo.filetype = "groovy"
-  end,
-})
-
-api_nvim_create_autocmd({ "BufEnter", "BufFilePost" }, {
-  group = api_nvim_create_augroup("Dockerfile", { clear = true }),
-  pattern = "Dockerfile*",
-  callback = function()
-    vim.bo.filetype = "dockerfile"
-  end,
+vim.filetype.add({
+  pattern = {
+    ["Jenkinsfile.*"] = "groovy",
+    ["Dockerfile.*"] = "dockerfile",
+  },
 })
 
 local g = api_nvim_create_augroup("CursorLineControl", { clear = true })
