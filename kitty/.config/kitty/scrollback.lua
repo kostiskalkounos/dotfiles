@@ -10,6 +10,7 @@ local o = vim.o
 
 o.background = "dark"
 o.cursorline = false
+o.fillchars = "eob: "
 o.ignorecase = true
 o.laststatus = 0
 o.number = false
