@@ -40,17 +40,4 @@ return {
       integrations = { diffview = true },
     },
   },
-  {
-    "nvim-orgmode/orgmode",
-    event = "VeryLazy",
-    config = function()
-      require("orgmode").setup({
-        org_agenda_files = "~/Documents/Orgfiles/**/*",
-        org_default_notes_file = "~/Documents/Orgfiles/refile.org",
-        mappings = {
-          disable_all = true,
-        },
-      })
-    end,
-  },
 }
