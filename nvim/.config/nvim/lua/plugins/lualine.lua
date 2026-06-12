@@ -46,36 +46,47 @@ return {
       return table.concat(parts)
     end
 
-    local is_light = vim.o.background == "light"
-    local colors = lualine_colors[is_light and "light" or "dark"]
+    local function reload_lualine()
+      local is_light = vim.o.background == "light"
+      local colors = lualine_colors[is_light and "light" or "dark"]
 
-    require("lualine").setup({
-      options = {
-        icons_enabled = true,
-        theme = create_lualine_theme(colors),
-        component_separators = "",
-        section_separators = "",
-        always_divide_middle = true,
-      },
-      sections = {
-        lualine_a = { get_filename_display },
-        lualine_b = { "diff" },
-        lualine_c = {},
-        lualine_x = {
-          { "diagnostics", update_in_insert = false },
-          { "branch", icon = "", padding = { left = 2 } },
+      require("lualine").setup({
+        options = {
+          icons_enabled = true,
+          theme = create_lualine_theme(colors),
+          component_separators = "",
+          section_separators = "",
+          always_divide_middle = true,
         },
-        lualine_y = { "location" },
-        lualine_z = { "progress" },
-      },
-      inactive_sections = {
-        lualine_a = { get_filename_display },
-        lualine_b = {},
-        lualine_c = {},
-        lualine_x = { { "branch", padding = { left = 2 } } },
-        lualine_y = { "location" },
-        lualine_z = { "progress" },
-      },
+        sections = {
+          lualine_a = { get_filename_display },
+          lualine_b = { "diff" },
+          lualine_c = {},
+          lualine_x = {
+            { "diagnostics", update_in_insert = false },
+            { "branch", icon = "", padding = { left = 2 } },
+          },
+          lualine_y = { "location" },
+          lualine_z = { "progress" },
+        },
+        inactive_sections = {
+          lualine_a = { get_filename_display },
+          lualine_b = {},
+          lualine_c = {},
+          lualine_x = { { "branch", padding = { left = 2 } } },
+          lualine_y = { "location" },
+          lualine_z = { "progress" },
+        },
+      })
+    end
+
+    reload_lualine()
+
+    local lualine_group = vim.api.nvim_create_augroup("LualineThemeReload", { clear = true })
+    vim.api.nvim_create_autocmd("OptionSet", {
+      group = lualine_group,
+      pattern = "background",
+      callback = reload_lualine,
     })
   end,
 }

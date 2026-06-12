@@ -1,6 +1,20 @@
 #!/bin/bash
-if [[ "$(defaults read -g AppleInterfaceStyle 2>/dev/null)" == "Dark" ]]; then
-    delta --syntax-theme "Catppuccin Macchiato" "$@"
+theme="${FZF_THEME}"
+if [[ -z "$theme" && -f "$HOME/.cache/theme" ]]; then
+    read -r theme < "$HOME/.cache/theme"
+fi
+if [[ -z "$theme" ]]; then
+    if defaults read -g AppleInterfaceStyle &>/dev/null; then
+        theme="dark"
+    else
+        theme="light"
+    fi
+    mkdir -p "$HOME/.cache"
+    echo "$theme" > "$HOME/.cache/theme"
+fi
+
+if [[ "$theme" == "light" ]]; then
+    exec delta --features "catppuccin-latte" "$@"
 else
-    delta --syntax-theme "Catppuccin Latte" "$@"
+    exec delta --features "catppuccin-macchiato" "$@"
 fi
