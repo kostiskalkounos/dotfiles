@@ -1,4 +1,4 @@
-hs.console.darkMode(true)
+hs.console.darkMode(hs.settings.get("AppleInterfaceStyle") == "Dark")
 hs.window.animationDuration = 0
 
 require("hammerspoon")
