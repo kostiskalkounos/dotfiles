@@ -6,29 +6,36 @@
   tap (multi
     (layer-switch nomods)
     (on-idle-fakekey to-base tap 20)
-)
+  )
 
-  meh (tap-hold $tap-time $hold-time spc lsft)
+  meh (multi f18)
+  tmeh (tap-hold $tap-time $hold-time spc @meh)
+  lay (layer-toggle arrows)
   fn (tap-hold $tap-time $hold-time fn (layer-toggle fn))
   mc C-up ;; Mission Control
   sls M-spc ;; Spotlight Search
   dtn S-C-A-M-f5 ;; Dictation
   dnd S-C-A-M-f6 ;; Do Not Disturb
 
-  lmet (tap-hold $tap-time $hold-time (fork bspc del (lsft rsft)) lmet)
+  lmet (tap-hold $tap-time $hold-time (fork bspc del (lsft rsft)) @lay)
   rmet (tap-hold $tap-time $hold-time ret f18)
-
-  lay (layer-toggle arrows)
-  lalt (tap-hold $tap-time $hold-time lalt @lay)
-
   lsft (fork lsft caps (rsft))
   rsft (fork rsft caps (lsft))
 
   grv (fork lsft caps (rsft))
+  slsh (tap-hold-release-keys $tap-time $hold-time (multi / @tap) rsft $right-hand-keys)
   ibs grv
 
-  ;; / (tap-hold-release-keys $tap-time $hold-time (multi / @tap) rsft $right-hand-keys)
-  ;; z (tap-hold-release-keys $tap-time $hold-time (multi z @tap) rsft $left-hand-keys)
+  a (tap-hold-release-keys $tap-time $hold-time (multi a @tap) lctl $left-hand-keys)
+  s (tap-hold-release-keys $tap-time $hold-time (multi s @tap) lalt $left-hand-keys)
+  d (tap-hold-release-keys $tap-time $hold-time (multi d @tap) lmet $left-hand-keys)
+  f (tap-hold-release-keys $tap-time $hold-time (multi f @tap) lsft $left-hand-keys)
+  j (tap-hold-release-keys $tap-time $hold-time (multi j @tap) rsft $right-hand-keys)
+  k (tap-hold-release-keys $tap-time $hold-time (multi k @tap) rmet $right-hand-keys)
+  l (tap-hold-release-keys $tap-time $hold-time (multi l @tap) ralt $right-hand-keys)
+  ; (tap-hold-release-keys $tap-time $hold-time (multi ; @tap) lctl $left-hand-keys)
+
+  / (tap-hold-release-keys $tap-time $hold-time (multi / @tap) rsft $left-hand-keys)
 
   caps (tap-hold-release-keys $tap-time $hold-time (multi esc @tap) rctl $right-hand-keys)
 )
@@ -47,6 +54,9 @@
 )
 
 (defvar
+  ;; Note: consider using different time values for your different fingers.
+  ;; For example, your pinkies might be slower to release keys and index
+  ;; fingers faster.
   tap-time 200
   hold-time 150
 
@@ -55,7 +65,6 @@
     a s d f g
     z x c v b
   )
-
   right-hand-keys (
     y u i o p
     h j k l ;
@@ -65,11 +74,11 @@
 
 (deflayer base
   esc   f1    f2    f3    f4    f5    f6    f7    f8    f9    f10   f11   f12
-  @ibs  1    2    3    4    5       6    7    8    9    0       -    =    bspc
-  tab   q    w    e    r    t       y    u    i    o    p       [    ]    ret
-  @caps a    s    d    f    g       h    j    k    l    ;       '    \
-  @lsft   @grv   z    x    c    v    b       n    m    ,    .    /   @rsft
-  @fn   lctl          @lalt @lmet          @meh            @rmet ralt
+  @ibs           1    2    3    4    5       6    7    8    9    0       -    =    bspc
+  tab            q    w    e    r    t       y    u    i    o    p       [    ]    ret
+  @caps          @a   @s   @d   @f   g       h    @j   @k   @l   @;      '    \
+  @lsft   @grv   z    x    c    v    b       n    m    ,    .    @slsh   @rsft
+  @fn   lctl           lalt @lmet          @tmeh            @rmet ralt
 )
 
 (deflayer nomods
@@ -77,7 +86,7 @@
   @ibs  1    2    3    4    5       6    7    8    9    0       -    =    bspc
   tab   q    w    e    r    t       y    u    i    o    p       [    ]    ret
   @caps a    s    d    f    g       h    j    k    l    ;       '    \
-  lsft   @grv       z    x    c    v    b       n    m    ,    .    /       rsft
+  lsft   @grv       z    x    c    v    b       n    m    ,    .    @/       rsft
   @fn    lctl           lalt lmet          spc            rmet ralt
 )
 
@@ -85,16 +94,16 @@
   esc     f1    f2    f3    f4    f5    f6    f7    f8    f9    f10   f11   f12
   @ibs    1     2     3     4     5    6      7     8     9     0     -     =    bspc
   tab     q     w     e     r     t    y      u     i     o     p     [     ]    ret
-  @caps   a     s     d     f     g    left   down  up    right ;     '     \
-  @lsft   @grv        z     x     c    v      b     n     m     ,     .     /   @rsft
-  @fn     lctl           @lalt @lmet          @meh            rmet ralt
+  @caps   @a    @s    @d    @f    g    left   down  up    right ;     '     \
+  @lsft   @grv        z     x     c    v      b     n     m     ,     .     @/   @rsft
+  @fn     lctl           lalt lmet          @tmeh            rmet ralt
 )
 
 (deflayer fn
   esc     🔅    🔆    @mc   @sls  @dtn  @dnd  ◀◀    ▶⏸    ▶▶    🔇    🔉    🔊
   @ibs    1     2     3     4     5    6      7     8     9     0     -     =    bspc
   tab     q     w     e     r     t    y      u     i     o     p     [     ]    ret
-  @caps a    s    d    f    g       h    j    k    l    ;       '    \
-  @lsft   @grv        z     x     c    v      b     n     m     ,     .     /   @rsft
-  @fn    lctl           @lalt @lmet          @meh            rmet ralt
+  @caps   @a    @s    @d    @f    g    left   down  up    right ;     '     \
+  @lsft   @grv        z     x     c    v      b     n     m     ,     .     @/   @rsft
+  @fn    lctl           lalt lmet          @tmeh            rmet ralt
 )

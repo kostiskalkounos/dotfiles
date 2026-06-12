@@ -1,11 +1,3 @@
 .DS_Store
-.netrwhist
-autoload/
-build
-node_modules
-package-lock.json
-packer_compiled.lua
-plugged/
-undodir/
-vendor
-yarn.lock
+k9s/.config/k9s/skins/current.yaml
+kitty/.config/kitty/current-theme.conf

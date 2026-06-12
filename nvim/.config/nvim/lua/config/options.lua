@@ -73,5 +73,3 @@ g.skip_ts_context_commentstring_module = true
 g.undotree_HighlightChangedText = 0
 g.undotree_SetFocusWhenToggle = 1
 g.undotree_WindowLayout = 2
-g.undotree_SetFocusWhenToggle = 1
-g.undotree_WindowLayout = 2

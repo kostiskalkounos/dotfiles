@@ -5,7 +5,15 @@ return {
   priority = 1000,
   config = function()
     local theme = os.getenv("NVIM_THEME")
-    if theme then
+    if not theme then
+      local cache_file = vim.fn.expand("~/.cache/theme")
+      local f = io.open(cache_file, "r")
+      if f then
+        theme = vim.trim(f:read("*l") or "")
+        f:close()
+      end
+    end
+    if theme == "dark" or theme == "light" then
       vim.o.background = theme
     end
 
@@ -18,8 +26,7 @@ return {
         macchiato = { blue = "#89b4fa", lavender = "#b4befe", sapphire = "#74c7ec" },
       },
       custom_highlights = function(colors)
-        local flavor = catppuccin.flavour
-        local is_light = flavor == "latte"
+        local is_light = vim.o.background == "light"
         return {
           ["@attribute"] = { fg = colors.sapphire },
           ["@constant"] = { fg = colors.teal },
