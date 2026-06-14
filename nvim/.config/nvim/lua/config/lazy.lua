@@ -19,6 +19,7 @@ local options = {
   debug = false,
   defaults = { lazy = true },
   performance = {
+    cache = { enabled = true },
     rtp = {
       disabled_plugins = {
         "2html_plugin",

@@ -18,7 +18,6 @@ o.ignorecase = true
 o.inccommand = "split"
 o.joinspaces = false
 o.laststatus = 2
-o.lazyredraw = true
 o.linebreak = true
 o.list = true
 o.makeprg = "make -j4 -w"
@@ -65,9 +64,11 @@ opt.shortmess:append("c")
 opt.suffixes:remove(".h")
 opt.wildignore:append("*.o,*.rej,*.so,.cache/*,.clangd/*,.venv/*,node_modules/*,package-lock.json,yarn.lock")
 
-if vim.uv.fs_stat("/usr/local/bin/python3") then
-  g.python3_host_prog = "/usr/local/bin/python3"
-end
+g.loaded_node_provider = 0
+g.loaded_perl_provider = 0
+g.loaded_python3_provider = 0
+g.loaded_python_provider = 0
+g.loaded_ruby_provider = 0
 
 g.skip_ts_context_commentstring_module = true
 g.undotree_HighlightChangedText = 0

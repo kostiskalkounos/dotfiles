@@ -63,9 +63,13 @@ local config = {
         updateBuildConfiguration = "interactive",
         -- runtimes = {
         --   {
-        --     name = "JavaSE-25",
+        --     name = "JavaSE-26",
         --     path = "/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home",
         --     default = true,
+        --   },
+        --   {
+        --     name = "JavaSE-26",
+        --     path = "/Library/Java/JavaVirtualMachines/temurin-26.jdk/Contents/Home",
         --   },
         -- },
       },

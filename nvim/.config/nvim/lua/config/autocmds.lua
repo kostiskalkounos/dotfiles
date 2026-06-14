@@ -55,28 +55,34 @@ end, { nargs = "*", complete = "file" })
 local rpc_socket_path = nil
 
 local function setup_rpc_socket()
-  local pid = vim.fn.getpid()
-  local socket_dir = vim.fn.expand("~/.cache/nvim/sockets")
+  local uv = vim.uv or vim.loop
+  local pid = uv.os_getpid()
+  local socket_dir = (os.getenv("HOME") or "") .. "/.cache/nvim/sockets"
   vim.fn.mkdir(socket_dir, "p")
 
-  local uv = vim.uv or vim.loop
-  local files = vim.fn.glob(socket_dir .. "/nvim-*.sock", true, true)
-  for _, file in ipairs(files) do
-    local socket_pid = file:match("nvim%-(%d+)%.sock$")
-    if socket_pid then
-      socket_pid = tonumber(socket_pid)
+  local req = uv.fs_scandir(socket_dir)
+  if req then
+    while true do
+      local name, _ = uv.fs_scandir_next(req)
+      if not name then
+        break
+      end
+      local socket_pid = name:match("nvim%-(%d+)%.sock$")
       if socket_pid then
-        local success, _, err_name = uv.kill(socket_pid, 0)
-        local is_running = (success == 0 or err_name == "EPERM")
-        if not is_running then
-          pcall(os.remove, file)
+        socket_pid = tonumber(socket_pid)
+        if socket_pid then
+          local success, _, err_name = uv.kill(socket_pid, 0)
+          local is_running = (success == 0 or err_name == "EPERM")
+          if not is_running then
+            pcall(os.remove, socket_dir .. "/" .. name)
+          end
         end
       end
     end
   end
 
   rpc_socket_path = socket_dir .. "/nvim-" .. pid .. ".sock"
-  if vim.fn.getftype(rpc_socket_path) ~= "" then
+  if uv.fs_stat(rpc_socket_path) then
     pcall(os.remove, rpc_socket_path)
   end
   pcall(vim.fn.serverstart, rpc_socket_path)
@@ -94,7 +100,7 @@ api_nvim_create_autocmd("VimLeave", {
   group = rpc_group,
   desc = "Stop RPC server and clean up socket on exit",
   callback = function()
-    if rpc_socket_path and vim.fn.getftype(rpc_socket_path) ~= "" then
+    if rpc_socket_path and (vim.uv or vim.loop).fs_stat(rpc_socket_path) then
       pcall(vim.fn.serverstop, rpc_socket_path)
       pcall(os.remove, rpc_socket_path)
     end
@@ -108,8 +114,9 @@ local function load_vars_from_zsh()
     return cached_vars
   end
 
-  local zshrc_path = vim.fn.expand("~/.zshrc")
-  local cache_dir = vim.fn.expand("~/.cache/nvim")
+  local home = os.getenv("HOME") or ""
+  local zshrc_path = home .. "/.zshrc"
+  local cache_dir = home .. "/.cache/nvim"
   local cache_path = cache_dir .. "/fzf_bat_themes.json"
 
   local uv = vim.uv or vim.loop
@@ -229,4 +236,27 @@ api_nvim_create_autocmd("OptionSet", {
   callback = update_fzf_opts,
 })
 
-update_fzf_opts()
+vim.schedule(update_fzf_opts)
+
+local get_option = vim.filetype.get_option
+---@diagnostic disable-next-line: duplicate-set-field
+vim.filetype.get_option = function(filetype, option)
+  if option == "commentstring" then
+    local ok, ts_cs = pcall(require, "ts_context_commentstring")
+    if not ok then
+      pcall(require("lazy").load, { plugins = { "nvim-ts-context-commentstring" } })
+      ok, ts_cs = pcall(require, "ts_context_commentstring")
+    end
+    if ok and ts_cs and ts_cs.calculate_commentstring then
+      return ts_cs.calculate_commentstring() or get_option(filetype, option)
+    end
+  end
+  return get_option(filetype, option)
+end
+
+api_nvim_create_autocmd("BufWritePost", {
+  group = api_nvim_create_augroup("LualineNewFileReset", { clear = true }),
+  callback = function(args)
+    vim.b[args.buf].lualine_is_new_file = false
+  end,
+})

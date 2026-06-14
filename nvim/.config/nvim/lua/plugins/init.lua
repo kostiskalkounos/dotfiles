@@ -1,11 +1,25 @@
 return {
-  { "almo7aya/openingh.nvim", event = "VeryLazy" },
-  { "mbbill/undotree", event = "VeryLazy" },
-  { "stevearc/oil.nvim", event = "VeryLazy", opts = {} },
-  { "MagicDuck/grug-far.nvim", event = { "VeryLazy" } },
+  { "almo7aya/openingh.nvim", cmd = { "OpenInGHFileLines", "OpenInGHFile", "OpenInGHRepo" } },
+  { "mbbill/undotree", cmd = "UndotreeToggle" },
+  {
+    "stevearc/oil.nvim",
+    cmd = "Oil",
+    init = function()
+      if vim.fn.argc() == 1 then
+        local arg = vim.fn.argv(0)
+        local stat = vim.uv.fs_stat(arg)
+        if stat and stat.type == "directory" then
+          require("lazy").load({ plugins = { "oil.nvim" } })
+        end
+      end
+    end,
+    opts = {},
+  },
+  { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
+  { "MagicDuck/grug-far.nvim", cmd = { "GrugFar", "GrugFarWithin" } },
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    event = "VeryLazy",
+    ft = "markdown",
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
     config = function()
       require("render-markdown").setup({
@@ -25,7 +39,7 @@ return {
   },
   {
     "NeogitOrg/neogit",
-    event = "VeryLazy",
+    cmd = { "Neogit", "DiffviewOpen" },
     dependencies = {
       "nvim-lua/plenary.nvim",
       "sindrets/diffview.nvim",
