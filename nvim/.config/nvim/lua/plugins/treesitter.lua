@@ -1,7 +1,7 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    event = "VeryLazy",
+    event = { "BufReadPost", "BufNewFile" },
     build = ":TSUpdate",
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
@@ -10,7 +10,6 @@ return {
     config = function()
       require("nvim-treesitter").setup({
         auto_install = false,
-        autopairs = { enable = true },
         highlight = { enable = not vim.g.vscode },
         ignore_install = {},
         indent = { enable = true },

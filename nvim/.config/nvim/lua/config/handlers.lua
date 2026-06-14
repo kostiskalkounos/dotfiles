@@ -36,26 +36,29 @@ function M.setup()
     update_in_insert = false,
     virtual_text = false,
   })
-end
 
-local hover = buf.hover
----@diagnostic disable-next-line: duplicate-set-field
-buf.hover = function()
-  return hover({
-    border = "rounded",
-    max_width = math.floor(vim.o.columns * 0.7),
-    max_height = math.floor(vim.o.lines * 0.7),
-  })
-end
+  if not M._setup_done then
+    local hover = vim.lsp.buf.hover
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.lsp.buf.hover = function()
+      return hover({
+        border = "rounded",
+        max_width = math.floor(vim.o.columns * 0.7),
+        max_height = math.floor(vim.o.lines * 0.7),
+      })
+    end
 
-local signature = buf.signature_help
----@diagnostic disable-next-line: duplicate-set-field
-buf.signature_help = function()
-  return signature({
-    border = "rounded",
-    max_width = math.floor(vim.o.columns * 0.4),
-    max_height = math.floor(vim.o.lines * 0.5),
-  })
+    local signature = vim.lsp.buf.signature_help
+    ---@diagnostic disable-next-line: duplicate-set-field
+    vim.lsp.buf.signature_help = function()
+      return signature({
+        border = "rounded",
+        max_width = math.floor(vim.o.columns * 0.4),
+        max_height = math.floor(vim.o.lines * 0.5),
+      })
+    end
+    M._setup_done = true
+  end
 end
 
 function M.on_attach()

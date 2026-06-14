@@ -1,6 +1,6 @@
 return {
   "nvim-tree/nvim-tree.lua",
-  event = "VeryLazy",
+  cmd = { "NvimTreeToggle", "NvimTreeRefresh", "NvimTreeOpen" },
   dependencies = "nvim-tree/nvim-web-devicons",
   opts = {
     actions = { open_file = { resize_window = false } },

@@ -1,9 +1,10 @@
 return {
-  { "mfussenegger/nvim-jdtls", event = "VeryLazy" },
-  { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = {} },
+  { "mfussenegger/nvim-jdtls", ft = "java" },
+  { "lewis6991/gitsigns.nvim", event = { "BufReadPost", "BufNewFile" }, opts = {} },
   {
     "stevearc/conform.nvim",
-    event = "VeryLazy",
+    cmd = { "ConformInfo" },
+    event = "BufWritePre",
     config = function()
       local prettier = { "prettier", "prettierd", stop_after_first = true }
       require("conform").setup({
@@ -33,11 +34,11 @@ return {
       end, {})
     end,
   },
-  { "towolf/vim-helm", event = "VeryLazy" },
-  { "j-hui/fidget.nvim", event = "VeryLazy", opts = {} },
+  { "towolf/vim-helm", ft = "helm" },
+  { "j-hui/fidget.nvim", event = "LspAttach", opts = {} },
   {
     "folke/lazydev.nvim",
-    event = "VeryLazy",
+    ft = "lua",
     opts = {
       library = {
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },
@@ -46,11 +47,11 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
-    event = "VeryLazy",
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "mason-org/mason.nvim",
       "mason-org/mason-lspconfig.nvim",
-      "jay-babu/mason-nvim-dap.nvim",
+      "saghen/blink.cmp",
     },
     config = function()
       local handlers = require("config.handlers")
@@ -96,16 +97,11 @@ return {
         automatic_enable = false,
         ensure_installed = servers,
       })
-      require("mason-nvim-dap").setup({
-        automatic_installation = true,
-        ensure_installed = { "delve", "javadbg", "javatest" },
-      })
 
       local lsp = vim.lsp
       for _, server_name in ipairs(servers) do
         if server_name ~= "jdtls" then
           local config = {
-            capabilities = handlers.capabilities,
             on_attach = handlers.on_attach,
           }
           if servers_settings[server_name] then

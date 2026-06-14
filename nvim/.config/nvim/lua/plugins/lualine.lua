@@ -1,6 +1,6 @@
 return {
   "nvim-lualine/lualine.nvim",
-  lazy = false,
+  event = "UIEnter",
   priority = 999,
   config = function()
     local lualine_colors = {
@@ -23,15 +23,25 @@ return {
     end
 
     local bo = vim.bo
-    local fn = vim.fn
 
     local function get_filename_display()
       local parts = {}
-      local ex = fn.expand("%:~:.")
-      if vim.startswith(ex, "jdt://") then
-        ex = ex:match("(.-)%?")
+      local bufname = vim.api.nvim_buf_get_name(0)
+      local ex = bufname
+
+      if ex == "" then
+        parts[1] = "[No Name]"
+      else
+        local cwd = vim.uv.cwd() or ""
+        if vim.startswith(ex, cwd) then
+          ex = ex:sub(#cwd + 2)
+        end
+        if vim.startswith(ex, "jdt://") then
+          ex = ex:match("(.-)%?") or ex
+        end
+        parts[1] = ex
       end
-      parts[1] = ex ~= "" and ex or "[No Name]"
+
       if bo.modified then
         parts[#parts + 1] = " [+]"
       end
@@ -39,9 +49,13 @@ return {
         parts[#parts + 1] = " [-]"
       end
 
-      local exp = fn.expand("%")
-      if exp ~= "" and bo.buftype == "" and not vim.uv.fs_stat(exp) then
-        parts[#parts + 1] = " [New]"
+      if bufname ~= "" and bo.buftype == "" then
+        if vim.b.lualine_is_new_file == nil then
+          vim.b.lualine_is_new_file = not vim.uv.fs_stat(bufname)
+        end
+        if vim.b.lualine_is_new_file then
+          parts[#parts + 1] = " [New]"
+        end
       end
       return table.concat(parts)
     end
