@@ -1,5 +1,4 @@
 local api = vim.api
-local opt_local = vim.opt_local
 
 local api_nvim_command = api.nvim_command
 local api_nvim_create_augroup = api.nvim_create_augroup
@@ -24,20 +23,14 @@ local g = api_nvim_create_augroup("CursorLineControl", { clear = true })
 api_nvim_create_autocmd("WinLeave", {
   group = g,
   callback = function()
-    opt_local.cursorline = false
+    vim.wo[0].cursorline = false
   end,
 })
+
 api_nvim_create_autocmd("WinEnter", {
   group = g,
   callback = function()
-    opt_local.cursorline = true
-  end,
-})
-api_nvim_create_autocmd("FileType", {
-  group = g,
-  pattern = "TelescopePrompt",
-  callback = function()
-    opt_local.cursorline = false
+    vim.wo[0].cursorline = true
   end,
 })
 
@@ -60,32 +53,34 @@ local function setup_rpc_socket()
   local socket_dir = (os.getenv("HOME") or "") .. "/.cache/nvim/sockets"
   vim.fn.mkdir(socket_dir, "p")
 
-  local req = uv.fs_scandir(socket_dir)
-  if req then
-    while true do
-      local name, _ = uv.fs_scandir_next(req)
-      if not name then
-        break
-      end
-      local socket_pid = name:match("nvim%-(%d+)%.sock$")
-      if socket_pid then
-        socket_pid = tonumber(socket_pid)
-        if socket_pid then
-          local success, _, err_name = uv.kill(socket_pid, 0)
-          local is_running = (success == 0 or err_name == "EPERM")
-          if not is_running then
-            pcall(os.remove, socket_dir .. "/" .. name)
-          end
-        end
-      end
-    end
-  end
-
   rpc_socket_path = socket_dir .. "/nvim-" .. pid .. ".sock"
   if uv.fs_stat(rpc_socket_path) then
     pcall(os.remove, rpc_socket_path)
   end
   pcall(vim.fn.serverstart, rpc_socket_path)
+
+  vim.schedule(function()
+    local req = uv.fs_scandir(socket_dir)
+    if req then
+      while true do
+        local name, _ = uv.fs_scandir_next(req)
+        if not name then
+          break
+        end
+        local socket_pid = name:match("nvim%-(%d+)%.sock$")
+        if socket_pid then
+          socket_pid = tonumber(socket_pid)
+          if socket_pid then
+            local success, _, err_name = uv.kill(socket_pid, 0)
+            local is_running = (success == 0 or err_name == "EPERM")
+            if not is_running then
+              pcall(os.remove, socket_dir .. "/" .. name)
+            end
+          end
+        end
+      end
+    end
+  end)
 end
 
 local rpc_group = api_nvim_create_augroup("PredictableRpcSocket", { clear = true })
@@ -236,27 +231,37 @@ api_nvim_create_autocmd("OptionSet", {
   callback = update_fzf_opts,
 })
 
-vim.schedule(update_fzf_opts)
+_G.update_fzf_opts = update_fzf_opts
 
 local get_option = vim.filetype.get_option
+local has_ts_cs, ts_cs
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.filetype.get_option = function(filetype, option)
   if option == "commentstring" then
-    local ok, ts_cs = pcall(require, "ts_context_commentstring")
-    if not ok then
-      pcall(require("lazy").load, { plugins = { "nvim-ts-context-commentstring" } })
-      ok, ts_cs = pcall(require, "ts_context_commentstring")
+    if has_ts_cs == nil then
+      has_ts_cs, ts_cs = pcall(require, "ts_context_commentstring")
+      if not has_ts_cs then
+        pcall(require("lazy").load, { plugins = { "nvim-ts-context-commentstring" } })
+        has_ts_cs, ts_cs = pcall(require, "ts_context_commentstring")
+      end
     end
-    if ok and ts_cs and ts_cs.calculate_commentstring then
+    if has_ts_cs and ts_cs and ts_cs.calculate_commentstring then
       return ts_cs.calculate_commentstring() or get_option(filetype, option)
     end
   end
   return get_option(filetype, option)
 end
 
-api_nvim_create_autocmd("BufWritePost", {
-  group = api_nvim_create_augroup("LualineNewFileReset", { clear = true }),
+local lualine_new_file_group = api_nvim_create_augroup("LualineNewFileCheck", { clear = true })
+api_nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+  group = lualine_new_file_group,
   callback = function(args)
     vim.b[args.buf].lualine_is_new_file = false
+  end,
+})
+api_nvim_create_autocmd("BufNewFile", {
+  group = lualine_new_file_group,
+  callback = function(args)
+    vim.b[args.buf].lualine_is_new_file = true
   end,
 })

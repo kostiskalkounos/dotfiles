@@ -46,11 +46,42 @@ return {
     },
   },
   {
+    "mason-org/mason.nvim",
+    cmd = { "Mason", "MasonInstall", "MasonUpdate", "MasonUninstall", "MasonLog" },
+    opts = {},
+  },
+  {
+    "mason-org/mason-lspconfig.nvim",
+    cmd = { "LspInstall", "LspUninstall" },
+    opts = {
+      automatic_enable = false,
+      ensure_installed = {
+        "bashls",
+        "clangd",
+        "cssls",
+        "dockerls",
+        "eslint",
+        "gopls",
+        "helm_ls",
+        "html",
+        "jdtls",
+        "jsonls",
+        "lemminx",
+        "lua_ls",
+        "pyright",
+        "rust_analyzer",
+        "taplo",
+        "terraformls",
+        "ts_ls",
+        "vimls",
+        "yamlls",
+      },
+    },
+  },
+  {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      "mason-org/mason.nvim",
-      "mason-org/mason-lspconfig.nvim",
       "saghen/blink.cmp",
     },
     config = function()
@@ -92,22 +123,16 @@ return {
         },
       }
 
-      require("mason").setup()
-      require("mason-lspconfig").setup({
-        automatic_enable = false,
-        ensure_installed = servers,
+      local lsp = vim.lsp
+      lsp.config("*", {
+        on_attach = handlers.on_attach,
       })
 
-      local lsp = vim.lsp
       for _, server_name in ipairs(servers) do
         if server_name ~= "jdtls" then
-          local config = {
-            on_attach = handlers.on_attach,
-          }
           if servers_settings[server_name] then
-            config = vim.tbl_deep_extend("force", config, servers_settings[server_name])
+            lsp.config[server_name] = servers_settings[server_name]
           end
-          lsp.config[server_name] = config
           lsp.enable(server_name)
         end
       end

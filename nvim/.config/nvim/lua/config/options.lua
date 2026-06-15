@@ -2,6 +2,8 @@ local g = vim.g
 local o = vim.o
 local opt = vim.opt
 
+vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
+
 o.autoindent = true
 o.backup = false
 o.belloff = "all"
@@ -59,7 +61,6 @@ opt.diffopt:append("foldcolumn:0")
 opt.directory:append(".")
 opt.isfname:append("@-@")
 opt.listchars:append("tab:  ,extends:>,precedes:<,trail:·,nbsp:⎵")
-opt.path:append("**")
 opt.shortmess:append("c")
 opt.suffixes:remove(".h")
 opt.wildignore:append("*.o,*.rej,*.so,.cache/*,.clangd/*,.venv/*,node_modules/*,package-lock.json,yarn.lock")

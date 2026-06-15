@@ -1,6 +1,6 @@
 return {
   "catgoose/nvim-colorizer.lua",
-  event = { "BufReadPost", "BufNewFile" },
+  ft = { "css", "html", "javascript", "typescript", "lua", "yaml", "json" },
   config = function()
     require("colorizer").setup({
       options = {
