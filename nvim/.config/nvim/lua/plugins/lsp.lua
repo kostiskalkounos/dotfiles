@@ -1,10 +1,9 @@
 return {
   { "mfussenegger/nvim-jdtls", ft = "java" },
-  { "lewis6991/gitsigns.nvim", event = { "BufReadPost", "BufNewFile" }, opts = {} },
+  { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = {} },
   {
     "stevearc/conform.nvim",
-    cmd = { "ConformInfo" },
-    event = "BufWritePre",
+    event = "VeryLazy",
     config = function()
       local prettier = { "prettier", "prettierd", stop_after_first = true }
       require("conform").setup({
@@ -34,8 +33,8 @@ return {
       end, {})
     end,
   },
-  { "towolf/vim-helm", ft = "helm" },
-  { "j-hui/fidget.nvim", event = "LspAttach", opts = {} },
+  { "towolf/vim-helm",   ft = "helm" },
+  { "j-hui/fidget.nvim", event = "VeryLazy", opts = {} },
   {
     "folke/lazydev.nvim",
     ft = "lua",
@@ -46,43 +45,12 @@ return {
     },
   },
   {
-    "mason-org/mason.nvim",
-    cmd = { "Mason", "MasonInstall", "MasonUpdate", "MasonUninstall", "MasonLog" },
-    opts = {},
-  },
-  {
-    "mason-org/mason-lspconfig.nvim",
-    cmd = { "LspInstall", "LspUninstall" },
-    opts = {
-      automatic_enable = false,
-      ensure_installed = {
-        "bashls",
-        "clangd",
-        "cssls",
-        "dockerls",
-        "eslint",
-        "gopls",
-        "helm_ls",
-        "html",
-        "jdtls",
-        "jsonls",
-        "lemminx",
-        "lua_ls",
-        "pyright",
-        "rust_analyzer",
-        "taplo",
-        "terraformls",
-        "ts_ls",
-        "vimls",
-        "yamlls",
-      },
-    },
-  },
-  {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
+    event = "VeryLazy",
     dependencies = {
-      "saghen/blink.cmp",
+      "mason-org/mason.nvim",
+      "mason-org/mason-lspconfig.nvim",
+      "jay-babu/mason-nvim-dap.nvim",
     },
     config = function()
       local handlers = require("config.handlers")
@@ -122,6 +90,17 @@ return {
           },
         },
       }
+
+      require("mason").setup()
+      require("mason-lspconfig").setup({
+        automatic_enable = false,
+        ensure_installed = servers,
+      })
+
+      require("mason-nvim-dap").setup({
+        automatic_installation = true,
+        ensure_installed = { "delve", "javadbg", "javatest" },
+      })
 
       local lsp = vim.lsp
       lsp.config("*", {

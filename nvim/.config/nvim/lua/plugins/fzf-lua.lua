@@ -1,6 +1,6 @@
 return {
   "ibhagwan/fzf-lua",
-  cmd = "FzfLua",
+  event = "VeryLazy",
   init = function()
     vim.ui.select = function(...)
       require("lazy").load({ plugins = { "fzf-lua" } })
