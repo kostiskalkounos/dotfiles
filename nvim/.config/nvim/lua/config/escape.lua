@@ -6,10 +6,6 @@ local set = vim.keymap.set
 local replaceTermcodes = api.nvim_replace_termcodes
 local defaultEscapeSequence = replaceTermcodes("<C-\\><C-n>", true, true, true)
 
-local function transformKeySequence(sequence)
-  return replaceTermcodes(sequence, true, true, true)
-end
-
 local function hasExcludedProcess(processId, excludedProcesses)
   local processInfo = api.nvim_get_proc(processId)
   if processInfo then
@@ -27,8 +23,13 @@ local function hasExcludedProcess(processId, excludedProcesses)
 end
 
 function M.smartEscape(processId)
-  return hasExcludedProcess(processId, M.excludedProcesses) and transformKeySequence(M.escapeKey)
-    or defaultEscapeSequence
+  local now = vim.uv.now()
+  local last_checked = vim.b.terminal_exclusion_last_checked or 0
+  if vim.b.terminal_has_exclusion == nil or (now - last_checked) > 500 then
+    vim.b.terminal_has_exclusion = hasExcludedProcess(processId, M.excludedProcesses)
+    vim.b.terminal_exclusion_last_checked = now
+  end
+  return vim.b.terminal_has_exclusion and M.transformedEscapeKey or defaultEscapeSequence
 end
 
 local function createExclusionSet(processNames)
@@ -41,6 +42,7 @@ end
 
 function M.setup(config)
   M.escapeKey = config and config.key or "<Esc>"
+  M.transformedEscapeKey = replaceTermcodes(M.escapeKey, true, true, true)
   M.excludedProcesses = config and config.except and createExclusionSet(config.except) or { nvim = true }
   _G.termesc = M
   set("t", M.escapeKey, "v:lua.termesc.smartEscape(b:terminal_job_pid)", { noremap = true, expr = true })

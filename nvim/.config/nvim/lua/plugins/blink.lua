@@ -32,21 +32,32 @@ return {
     },
     cmdline = { enabled = false },
     sources = {
-      default = function()
-        local sources = { "lsp", "buffer" }
-        local ok, node = pcall(vim.treesitter.get_node)
+      default = (function()
+        local comment_nodes = { comment = true, line_comment = true, block_comment = true }
+        return function()
+          local sources = { "lsp", "buffer" }
+          local buf = vim.api.nvim_get_current_buf()
+          local has_parser = vim.treesitter.highlighter.active[buf] ~= nil
 
-        if ok and node then
-          if not vim.tbl_contains({ "comment", "line_comment", "block_comment" }, node:type()) then
+          if has_parser then
+            local ok, node = pcall(vim.treesitter.get_node)
+            if ok and node then
+              local node_type = node:type()
+              if not comment_nodes[node_type] then
+                table.insert(sources, "path")
+              end
+              if node_type ~= "string" then
+                table.insert(sources, "snippets")
+              end
+            end
+          else
             table.insert(sources, "path")
-          end
-          if node:type() ~= "string" then
             table.insert(sources, "snippets")
           end
-        end
 
-        return sources
-      end,
+          return sources
+        end
+      end)(),
     },
     appearance = {
       kind_icons = {

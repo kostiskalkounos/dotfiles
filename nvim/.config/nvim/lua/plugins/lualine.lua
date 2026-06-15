@@ -22,42 +22,36 @@ return {
       }
     end
 
-    local bo = vim.bo
+    local nvim_buf_get_name = vim.api.nvim_buf_get_name
+    local startswith = vim.startswith
+    local v_b = vim.b
+    local cached_cwd = vim.uv.cwd() or ""
+
+    vim.api.nvim_create_autocmd("DirChanged", {
+      callback = function()
+        cached_cwd = vim.uv.cwd() or ""
+      end,
+    })
 
     local function get_filename_display()
-      local parts = {}
-      local bufname = vim.api.nvim_buf_get_name(0)
-      local ex = bufname
-
-      if ex == "" then
-        parts[1] = "[No Name]"
+      local name = nvim_buf_get_name(0)
+      if name == "" then
+        name = "[No Name]"
       else
-        local cwd = vim.uv.cwd() or ""
-        if vim.startswith(ex, cwd) then
-          ex = ex:sub(#cwd + 2)
+        if startswith(name, cached_cwd) then
+          name = name:sub(#cached_cwd + 2)
         end
-        if vim.startswith(ex, "jdt://") then
-          ex = ex:match("(.-)%?") or ex
+        if startswith(name, "jdt://") then
+          name = name:match("(.-)%?") or name
         end
-        parts[1] = ex
       end
 
-      if bo.modified then
-        parts[#parts + 1] = " [+]"
-      end
-      if not bo.modifiable or bo.readonly then
-        parts[#parts + 1] = " [-]"
-      end
+      local bo = vim.bo
+      local modified = bo.modified and " [+]" or ""
+      local readonly = (not bo.modifiable or bo.readonly) and " [-]" or ""
+      local is_new = (name ~= "" and bo.buftype == "" and v_b.lualine_is_new_file) and " [New]" or ""
 
-      if bufname ~= "" and bo.buftype == "" then
-        if vim.b.lualine_is_new_file == nil then
-          vim.b.lualine_is_new_file = not vim.uv.fs_stat(bufname)
-        end
-        if vim.b.lualine_is_new_file then
-          parts[#parts + 1] = " [New]"
-        end
-      end
-      return table.concat(parts)
+      return name .. modified .. readonly .. is_new
     end
 
     local function reload_lualine()
