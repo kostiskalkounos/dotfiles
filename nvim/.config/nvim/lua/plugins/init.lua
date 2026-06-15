@@ -1,9 +1,9 @@
 return {
-  { "almo7aya/openingh.nvim", cmd = { "OpenInGHFileLines", "OpenInGHFile", "OpenInGHRepo" } },
-  { "mbbill/undotree", cmd = "UndotreeToggle" },
+  { "almo7aya/openingh.nvim", event = "VeryLazy" },
+  { "mbbill/undotree",        event = "VeryLazy" },
   {
     "stevearc/oil.nvim",
-    cmd = "Oil",
+    event = "VeryLazy",
     init = function()
       if vim.fn.argc() == 1 then
         local arg = vim.fn.argv(0)
@@ -15,8 +15,8 @@ return {
     end,
     opts = {},
   },
-  { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true, opts = { enable_autocmd = false } },
-  { "MagicDuck/grug-far.nvim", cmd = { "GrugFar", "GrugFarWithin" } },
+  { "JoosepAlviste/nvim-ts-context-commentstring", event = "VeryLazy", opts = { enable_autocmd = false } },
+  { "MagicDuck/grug-far.nvim",                     event = "VeryLazy" },
   {
     "MeanderingProgrammer/render-markdown.nvim",
     ft = "markdown",
@@ -39,7 +39,7 @@ return {
   },
   {
     "NeogitOrg/neogit",
-    cmd = { "Neogit", "DiffviewOpen" },
+    event = "VeryLazy",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "sindrets/diffview.nvim",

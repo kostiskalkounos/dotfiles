@@ -1,10 +1,9 @@
 return {
   { "mfussenegger/nvim-jdtls", ft = "java" },
-  { "lewis6991/gitsigns.nvim", event = { "BufReadPost", "BufNewFile" }, opts = {} },
+  { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = {} },
   {
     "stevearc/conform.nvim",
-    cmd = { "ConformInfo" },
-    event = "BufWritePre",
+    event = "VeryLazy",
     config = function()
       local prettier = { "prettier", "prettierd", stop_after_first = true }
       require("conform").setup({
@@ -34,8 +33,8 @@ return {
       end, {})
     end,
   },
-  { "towolf/vim-helm", ft = "helm" },
-  { "j-hui/fidget.nvim", event = "LspAttach", opts = {} },
+  { "towolf/vim-helm",   ft = "helm" },
+  { "j-hui/fidget.nvim", event = "VeryLazy", opts = {} },
   {
     "folke/lazydev.nvim",
     ft = "lua",
@@ -47,11 +46,11 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
+    event = "VeryLazy",
     dependencies = {
       "mason-org/mason.nvim",
       "mason-org/mason-lspconfig.nvim",
-      "saghen/blink.cmp",
+      "jay-babu/mason-nvim-dap.nvim",
     },
     config = function()
       local handlers = require("config.handlers")
@@ -93,21 +92,27 @@ return {
       }
 
       require("mason").setup()
+
       require("mason-lspconfig").setup({
         automatic_enable = false,
         ensure_installed = servers,
       })
 
+      require("mason-nvim-dap").setup({
+        automatic_installation = true,
+        ensure_installed = { "delve", "javadbg", "javatest" },
+      })
+
       local lsp = vim.lsp
+      lsp.config("*", {
+        on_attach = handlers.on_attach,
+      })
+
       for _, server_name in ipairs(servers) do
         if server_name ~= "jdtls" then
-          local config = {
-            on_attach = handlers.on_attach,
-          }
           if servers_settings[server_name] then
-            config = vim.tbl_deep_extend("force", config, servers_settings[server_name])
+            lsp.config[server_name] = servers_settings[server_name]
           end
-          lsp.config[server_name] = config
           lsp.enable(server_name)
         end
       end

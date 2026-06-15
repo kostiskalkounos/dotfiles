@@ -3,16 +3,12 @@ local M = {}
 local buf = vim.lsp.buf
 local diagnostic = vim.diagnostic
 local float = { float = true }
-local opts = { noremap = true, silent = true }
 local set = vim.keymap.set
 
 local keymap = vim.keymap
-keymap.del("n", "gra")
-keymap.del("n", "gri")
-keymap.del("n", "grn")
-keymap.del("n", "grr")
-keymap.del("n", "grt")
-keymap.del("n", "grx")
+for _, map in ipairs({ "gra", "gri", "grn", "grr", "grt", "grx" }) do
+  pcall(keymap.del, "n", map)
+end
 
 function M.setup()
   diagnostic.config({
@@ -40,28 +36,29 @@ function M.setup()
   if not M._setup_done then
     local hover = vim.lsp.buf.hover
     ---@diagnostic disable-next-line: duplicate-set-field
-    vim.lsp.buf.hover = function()
-      return hover({
-        border = "rounded",
-        max_width = math.floor(vim.o.columns * 0.7),
-        max_height = math.floor(vim.o.lines * 0.7),
-      })
+    vim.lsp.buf.hover = function(opts)
+      opts = opts or {}
+      opts.border = opts.border or "rounded"
+      opts.max_width = opts.max_width or math.floor(vim.o.columns * 0.7)
+      opts.max_height = opts.max_height or math.floor(vim.o.lines * 0.7)
+      return hover(opts)
     end
 
     local signature = vim.lsp.buf.signature_help
     ---@diagnostic disable-next-line: duplicate-set-field
-    vim.lsp.buf.signature_help = function()
-      return signature({
-        border = "rounded",
-        max_width = math.floor(vim.o.columns * 0.4),
-        max_height = math.floor(vim.o.lines * 0.5),
-      })
+    vim.lsp.buf.signature_help = function(opts)
+      opts = opts or {}
+      opts.border = opts.border or "rounded"
+      opts.max_width = opts.max_width or math.floor(vim.o.columns * 0.4)
+      opts.max_height = opts.max_height or math.floor(vim.o.lines * 0.5)
+      return signature(opts)
     end
     M._setup_done = true
   end
 end
 
-function M.on_attach()
+function M.on_attach(_, bufnr)
+  local opts = { noremap = true, silent = true, buffer = bufnr }
   set("n", "<leader>Y", diagnostic.setqflist, opts)
   set("n", "<leader>o", diagnostic.open_float, opts)
   set("n", "<leader>r", buf.rename, opts)
