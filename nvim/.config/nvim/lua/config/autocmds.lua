@@ -267,11 +267,13 @@ api_nvim_create_autocmd("BufNewFile", {
   end,
 })
 
+local termesc_setup = false
 api_nvim_create_autocmd("TermOpen", {
   group = api_nvim_create_augroup("SmartEscapeSetup", { clear = true }),
   callback = function()
-    if not _G.termesc then
+    if not termesc_setup then
       require("config.escape").setup({ key = "<Esc>", except = { "nvim", "fzf" } })
+      termesc_setup = true
     end
   end,
 })
