@@ -1,4 +1,4 @@
-stow_dirs = $(wildcard */)
+stow_dirs = $(filter-out scripts/, $(wildcard */))
 .PHONY : stow
 stow :
 	stow --target $(HOME) --verbose $(stow_dirs)

@@ -8,6 +8,7 @@
 [core]
   excludesfile = ~/.gitignore
   pager = ~/Dotfiles/git/git-delta
+  untrackedCache = true
 
 [color]
   ui = auto
@@ -27,6 +28,7 @@
 
 [fetch]
   prune = true
+  writeCommitGraph = true
 
 [branch]
   autosetupmerge = true
@@ -41,7 +43,13 @@
   diffFilter = delta --color-only
 
 [merge]
-  conflictstyle = diff3
+  conflictstyle = zdiff3
+
+[diff]
+  algorithm = histogram
+
+[commit]
+  verbose = true
 
 [advice]
   skippedCherryPicks = false
