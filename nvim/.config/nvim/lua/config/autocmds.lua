@@ -144,42 +144,56 @@ local function load_vars_from_zsh()
   if f then
     local in_dark_func = false
     local in_light_func = false
+    local found_common = false
+    local found_dark_opts = false
+    local found_light_opts = false
+    local found_dark_bat = false
+    local found_light_bat = false
 
     for line in f:lines() do
-      local common = line:match('^FZF_COMMON_OPTS=[\x27"](.*)[\x27"]')
-      if common then
-        fzf_common = common
-      end
-
-      local dark = line:match('^DARK_FZF_OPTS=[\x27"](.*)[\x27"]')
-      if dark then
-        dark_opts = dark
-      end
-
-      local light = line:match('^LIGHT_FZF_OPTS=[\x27"](.*)[\x27"]')
-      if light then
-        light_opts = light
-      end
-
-      if line:match("^_set_dark_theme%s*%(%s*%)") then
-        in_dark_func = true
-      elseif line:match("^_set_light_theme%s*%(%s*%)") then
-        in_light_func = true
-      elseif line:match("^}") then
+      local b1 = line:byte(1)
+      if b1 == 70 then
+        local common = line:match('^FZF_COMMON_OPTS=[\x27"](.*)[\x27"]')
+        if common then
+          fzf_common = common
+          found_common = true
+        end
+      elseif b1 == 68 then
+        local dark = line:match('^DARK_FZF_OPTS=[\x27"](.*)[\x27"]')
+        if dark then
+          dark_opts = dark
+          found_dark_opts = true
+        end
+      elseif b1 == 76 then
+        local light = line:match('^LIGHT_FZF_OPTS=[\x27"](.*)[\x27"]')
+        if light then
+          light_opts = light
+          found_light_opts = true
+        end
+      elseif b1 == 95 then
+        if line:match("^_set_dark_theme%s*%(%s*%)") then
+          in_dark_func = true
+        elseif line:match("^_set_light_theme%s*%(%s*%)") then
+          in_light_func = true
+        end
+      elseif b1 == 125 then
         in_dark_func = false
         in_light_func = false
+      elseif in_dark_func or in_light_func then
+        local bat = line:match('BAT_THEME=[\x27"](.*)[\x27"]')
+        if bat then
+          if in_dark_func then
+            dark_bat = bat
+            found_dark_bat = true
+          else
+            light_bat = bat
+            found_light_bat = true
+          end
+        end
       end
 
-      if in_dark_func then
-        local bat = line:match('BAT_THEME=[\x27"](.*)[\x27"]')
-        if bat then
-          dark_bat = bat
-        end
-      elseif in_light_func then
-        local bat = line:match('BAT_THEME=[\x27"](.*)[\x27"]')
-        if bat then
-          light_bat = bat
-        end
+      if found_common and found_dark_opts and found_light_opts and found_dark_bat and found_light_bat then
+        break
       end
     end
     f:close()
@@ -212,16 +226,21 @@ local function update_fzf_opts()
     return
   end
 
-  local vars = load_vars_from_zsh()
-  if vim.o.background == "dark" then
-    vim.env.FZF_DEFAULT_OPTS = vars.dark.fzf ~= "" and vars.dark.fzf or nil
-    vim.env.FZF_THEME = "dark"
-    vim.env.BAT_THEME = vars.dark.bat
-  else
-    vim.env.FZF_DEFAULT_OPTS = vars.light.fzf ~= "" and vars.light.fzf or nil
-    vim.env.FZF_THEME = "light"
-    vim.env.BAT_THEME = vars.light.bat
-  end
+  vim.schedule(function()
+    if vim.o.background == vim.env.FZF_THEME then
+      return
+    end
+    local vars = load_vars_from_zsh()
+    if vim.o.background == "dark" then
+      vim.env.FZF_DEFAULT_OPTS = vars.dark.fzf ~= "" and vars.dark.fzf or nil
+      vim.env.FZF_THEME = "dark"
+      vim.env.BAT_THEME = vars.dark.bat
+    else
+      vim.env.FZF_DEFAULT_OPTS = vars.light.fzf ~= "" and vars.light.fzf or nil
+      vim.env.FZF_THEME = "light"
+      vim.env.BAT_THEME = vars.light.bat
+    end
+  end)
 end
 
 local fzf_theme_group = api_nvim_create_augroup("FzfThemeUpdate", { clear = true })
@@ -264,14 +283,5 @@ api_nvim_create_autocmd("BufNewFile", {
   group = lualine_new_file_group,
   callback = function(args)
     vim.b[args.buf].lualine_is_new_file = true
-  end,
-})
-
-api_nvim_create_autocmd("TermOpen", {
-  group = api_nvim_create_augroup("SmartEscapeSetup", { clear = true }),
-  callback = function()
-    if not _G.termesc then
-      require("config.escape").setup({ key = "<Esc>", except = { "nvim", "fzf" } })
-    end
   end,
 })

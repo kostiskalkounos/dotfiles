@@ -1,13 +1,58 @@
 bindkey -e
 
-export HOMEBREW_NO_ANALYTICS=1
-export MANPAGER='nvim +Man!'
+FZF_COMMON_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=fg:-1,bg:-1,hl:magenta,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
+DARK_FZF_OPTS="--color=dark ${FZF_COMMON_OPTS} --color=fg+:white,bg+:#363a4f,gutter:#24273A"
+LIGHT_FZF_OPTS="--color=light ${FZF_COMMON_OPTS} --color=fg+:black,bg+:#ccd0da,gutter:#eff1f5"
+
+_set_dark_theme() {
+  export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"
+  export FZF_THEME=dark
+  export KUBECOLOR_PRESET=dark
+  export NVIM_THEME=dark
+  export BAT_THEME="Catppuccin Macchiato"
+}
+
+_set_light_theme() {
+  export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"
+  export FZF_THEME=light
+  export KUBECOLOR_PRESET=light
+  export NVIM_THEME=light
+  export BAT_THEME="Catppuccin Latte"
+}
+
+if [[ -n "$FZF_THEME" ]]; then
+  _theme="$FZF_THEME"
+elif [[ -f $HOME/.cache/theme ]]; then
+  _theme=$(<$HOME/.cache/theme)
+else
+  if defaults read -g AppleInterfaceStyle &>/dev/null; then
+    _theme="dark"
+  else
+    _theme="light"
+  fi
+  mkdir -p "$HOME/.cache"
+  echo "$_theme" > "$HOME/.cache/theme"
+fi
+
+if [[ "$_theme" == "dark" ]]; then
+  _set_dark_theme
+else
+  _set_light_theme
+fi
+unset _theme
+
+[[ -f ~/.artifactory ]] && source ~/.artifactory
+
 export PATH="$PATH:$HOME/go/bin"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
+export MANPAGER='nvim +Man!'
 
 export XDG_CONFIG_HOME="$HOME/.config"
 export ZSH_CACHE_DIR="$HOME/.cache/zsh"
 [[ -d "$ZSH_CACHE_DIR" ]] || mkdir -p "$ZSH_CACHE_DIR"
+
+export HOMEBREW_NO_ANALYTICS=1
+export GOOGLE_CLOUD_PROJECT="sym-code-assist"
 
 export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow=33:st=34"
@@ -187,47 +232,6 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' use-cache yes
 zstyle ':completion:*:complete:(cd|pushd):*' tag-order 'local-directories named-directories'
 zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)'
-
-FZF_COMMON_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=fg:-1,bg:-1,hl:magenta,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
-DARK_FZF_OPTS="--color=dark ${FZF_COMMON_OPTS} --color=fg+:white,bg+:#363a4f,gutter:#24273A"
-LIGHT_FZF_OPTS="--color=light ${FZF_COMMON_OPTS} --color=fg+:black,bg+:#ccd0da,gutter:#eff1f5"
-
-if [[ -n "$FZF_THEME" ]]; then
-  _theme="$FZF_THEME"
-elif [[ -f $HOME/.cache/theme ]]; then
-  _theme=$(<$HOME/.cache/theme)
-else
-  if defaults read -g AppleInterfaceStyle &>/dev/null; then
-    _theme="dark"
-  else
-    _theme="light"
-  fi
-  mkdir -p "$HOME/.cache"
-  echo "$_theme" > "$HOME/.cache/theme"
-fi
-
-_set_dark_theme() {
-  export FZF_DEFAULT_OPTS="$DARK_FZF_OPTS"
-  export FZF_THEME=dark
-  export KUBECOLOR_PRESET=dark
-  export NVIM_THEME=dark
-  export BAT_THEME="Catppuccin Macchiato"
-}
-
-_set_light_theme() {
-  export FZF_DEFAULT_OPTS="$LIGHT_FZF_OPTS"
-  export FZF_THEME=light
-  export KUBECOLOR_PRESET=light
-  export NVIM_THEME=light
-  export BAT_THEME="Catppuccin Latte"
-}
-
-if [[ "$_theme" == "dark" ]]; then
-  _set_dark_theme
-else
-  _set_light_theme
-fi
-unset _theme
 
 TRAPUSR1() {
   _set_dark_theme

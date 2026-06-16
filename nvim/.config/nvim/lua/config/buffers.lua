@@ -48,9 +48,9 @@ M.quit_all = function()
   local bo = vim.bo
   for _, buf_id in ipairs(api.nvim_list_bufs()) do
     if
-      is_loaded(buf_id)
-      and bo[buf_id].modified
-      and bo[buf_id].buftype == ""
+        is_loaded(buf_id)
+        and bo[buf_id].modified
+        and bo[buf_id].buftype == ""
     then
       local current_buf = api.nvim_get_current_buf()
       if current_buf ~= buf_id then
