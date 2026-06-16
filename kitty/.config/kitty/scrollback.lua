@@ -7,22 +7,6 @@ vim.g.maplocalleader = " "
 local set = vim.keymap.set
 local o = vim.o
 
-if vim.fn.has("mac") == 1 or vim.fn.has("macunix") == 1 then
-  vim.g.clipboard = {
-    name = "pbcopy",
-    copy = {
-      ["+"] = "pbcopy",
-      ["*"] = "pbcopy",
-    },
-    paste = {
-      ["+"] = "pbpaste",
-      ["*"] = "pbpaste",
-    },
-    cache_enabled = 0,
-  }
-end
-vim.opt.clipboard = "unnamedplus"
-
 o.background = "dark"
 o.cursorline = false
 o.fillchars = "eob: "
