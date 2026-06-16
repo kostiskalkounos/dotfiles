@@ -259,9 +259,19 @@ api_nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
     vim.b[args.buf].lualine_is_new_file = false
   end,
 })
+
 api_nvim_create_autocmd("BufNewFile", {
   group = lualine_new_file_group,
   callback = function(args)
     vim.b[args.buf].lualine_is_new_file = true
+  end,
+})
+
+api_nvim_create_autocmd("TermOpen", {
+  group = api_nvim_create_augroup("SmartEscapeSetup", { clear = true }),
+  callback = function()
+    if not _G.termesc then
+      require("config.escape").setup({ key = "<Esc>", except = { "nvim", "fzf" } })
+    end
   end,
 })

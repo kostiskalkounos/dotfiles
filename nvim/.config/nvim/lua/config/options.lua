@@ -2,8 +2,6 @@ local g = vim.g
 local o = vim.o
 local opt = vim.opt
 
-vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
-
 o.autoindent = true
 o.backup = false
 o.belloff = "all"

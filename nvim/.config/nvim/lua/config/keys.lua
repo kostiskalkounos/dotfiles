@@ -19,60 +19,73 @@ set("c", "Q", "q", unique)
 set("i", "<space>", "<space><c-g>u", default)
 set("i", "<M-bs>", "<C-W>", default)
 
-set("t", "<M-r>", [['<C-\><C-N>"'.nr2char(getchar()).'pi']], default)
+set("t", "<M-r>", function()
+  local char = vim.fn.getchar()
+  local register = type(char) == "number" and vim.fn.nr2char(char) or char
+  local valid_regs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"*+_-/:.%#="
+  if type(register) == "string" and #register == 1 and string.find(valid_regs, register, 1, true) then
+    local content = vim.fn.getreg(register)
+    if content and content ~= "" then
+      vim.api.nvim_paste(content, false, -1)
+    end
+  end
+end, default)
 
-set("n", "-", "<CMD>Oil<cr>", unique)
+set("n", "-", "<cmd>Oil<cr>", unique)
 
 set("n", "<M-h>", "<cmd>vertical resize -2<cr>", unique)
 set("n", "<M-j>", "<cmd>resize -2<cr>", unique)
 set("n", "<M-k>", "<cmd>resize +2<cr>", unique)
 set("n", "<M-l>", "<cmd>vertical resize +2<cr>", unique)
 
-set("i", "<M-j>", "<Esc><cmd>m .+1<cr>==gi", unique)
-set("i", "<M-k>", "<Esc><cmd>m .-2<cr>==gi", unique)
+set("i", "<M-j>", "<esc><cmd>m .+1<cr>==gi", unique)
+set("i", "<M-k>", "<esc><cmd>m .-2<cr>==gi", unique)
 set("v", "<M-j>", ":m '>+1<cr>gv=gv", default)
 set("v", "<M-k>", ":m '<-2<cr>gv=gv", default)
 
-set("n", "<C-j>", "<cmd>cnext<cr>", unique)
-set("n", "<C-k>", "<cmd>cprev<cr>", unique)
-set("n", "<C-h>", "<cmd>lprev<cr>", unique)
-set("n", "<C-l>", "<cmd>lnext<cr>", special)
+set({ "n", "v" }, "<C-j>", "<cmd>cnext<cr>", unique)
+set({ "n", "v" }, "<C-k>", "<cmd>cprev<cr>", unique)
+set({ "n", "v" }, "<C-h>", "<cmd>lprev<cr>", unique)
+set({ "n", "v" }, "<C-l>", "<cmd>lnext<cr>", special)
 
-set("v", "<C-j>", "<cmd>cnext<cr>", unique)
-set("v", "<C-k>", "<cmd>cprev<cr>", unique)
-set("v", "<C-h>", "<cmd>lprev<cr>", unique)
-set("v", "<C-l>", "<cmd>lnext<cr>", special)
+set("n", "<esc>", "<cmd>nohlsearch<cr>", unique)
 
-set("n", "<Esc>", "<cmd>nohlsearch<cr>", unique)
-set("n", "j", [[v:count == 0 ? "gj" : "j"]], expr)
-set("n", "k", [[v:count == 0 ? "gk" : "k"]], expr)
+local move_j = function()
+  if vim.fn.mode() == "\22" then
+    return "j"
+  end
+  return vim.v.count == 0 and "gj" or "j"
+end
+
+local move_k = function()
+  if vim.fn.mode() == "\22" then
+    return "k"
+  end
+  return vim.v.count == 0 and "gk" or "k"
+end
+
+set({ "n", "v" }, "j", move_j, expr)
+set({ "n", "v" }, "k", move_k, expr)
+
 set("v", "<", "<gv", default)
 set("v", "<S-Tab>", "<gv", special)
 set("v", "<Tab>", ">gv", special)
 set("v", ">", ">gv", default)
-set("v", "j", "gj", default)
-set("v", "k", "gk", default)
 set("v", "p", [["_dP]], default)
 
 set("n", "<leader>0", "<cmd>tabl<cr>", unique)
-set("n", "<leader>1", "1gt", default)
-set("n", "<leader>2", "2gt", default)
-set("n", "<leader>3", "3gt", default)
-set("n", "<leader>4", "4gt", default)
-set("n", "<leader>5", "5gt", default)
-set("n", "<leader>6", "6gt", default)
-set("n", "<leader>7", "7gt", default)
-set("n", "<leader>8", "8gt", default)
-set("n", "<leader>9", "9gt", default)
+for i = 1, 9 do
+  set("n", "<leader>" .. i, "<cmd>tabnext " .. i .. "<cr>", default)
+end
 
-set("n", "<leader>H", "<C-w>H", default)
-set("n", "<leader>J", "<C-w>J", default)
-set("n", "<leader>K", "<C-w>K", default)
-set("n", "<leader>L", "<C-w>L", default)
-set("n", "<leader>h", "<C-w>h", default)
-set("n", "<leader>j", "<C-w>j", default)
-set("n", "<leader>k", "<C-w>k", default)
-set("n", "<leader>l", "<C-w>l", default)
+set("n", "<leader>H", "<cmd>wincmd H<cr>", default)
+set("n", "<leader>J", "<cmd>wincmd J<cr>", default)
+set("n", "<leader>K", "<cmd>wincmd K<cr>", default)
+set("n", "<leader>L", "<cmd>wincmd L<cr>", default)
+set("n", "<leader>h", "<cmd>wincmd h<cr>", default)
+set("n", "<leader>j", "<cmd>wincmd j<cr>", default)
+set("n", "<leader>k", "<cmd>wincmd k<cr>", default)
+set("n", "<leader>l", "<cmd>wincmd l<cr>", default)
 
 set("", "<leader>X", "<cmd>!open %<cr><cr>", unique)
 set("n", "<Leader>n", "<cmd>bn<cr>", unique)
@@ -89,7 +102,7 @@ set("n", "<leader>I", "<cmd>FzfLua lsp_finder<cr>", unique)
 set("n", "<leader>O", "<cmd>OpenInGHFileLines<cr>", unique)
 set("n", "<leader>S", "<cmd>Neogit<cr>", unique)
 set("n", "<leader>T", "<cmd>Vterm<cr>", unique)
-set("n", "<leader>U", ":bufdo set nu! rnu!<cr>", unique)
+set("n", "<leader>U", "<cmd>bufdo set nu! rnu!<cr>", unique)
 set("n", "<leader>V", "<cmd>set paste!<cr>", unique)
 set("n", "<leader>W", "<cmd>FormatToggle<cr>", unique)
 set("n", "<leader>a", "<cmd>FzfLua live_grep<cr>", unique)
@@ -117,7 +130,11 @@ set("n", "<leader>-", "<cmd>sp<cr>", unique)
 set("n", "<leader>=", "<cmd>sp<cr>", unique)
 set("n", "<leader>\\", "<cmd>vsp<cr>", unique)
 
-set("n", "<leader>C", [[gg"+yG]], default)
+set("n", "<leader>C", function()
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  vim.fn.setreg("+", lines, "l")
+  vim.notify("Copied entire buffer to clipboard!", vim.log.levels.INFO)
+end, default)
 set("n", "<leader>v", [["+p]], default)
 set("v", "<leader>c", [["+y]], default)
 set("v", "<leader>p", "p", default)
