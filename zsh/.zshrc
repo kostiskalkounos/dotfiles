@@ -41,8 +41,6 @@ else
 fi
 unset _theme
 
-[[ -f ~/.artifactory ]] && source ~/.artifactory
-
 export PATH="$PATH:$HOME/go/bin"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
 export MANPAGER='nvim +Man!'
@@ -51,8 +49,8 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export ZSH_CACHE_DIR="$HOME/.cache/zsh"
 [[ -d "$ZSH_CACHE_DIR" ]] || mkdir -p "$ZSH_CACHE_DIR"
 
+export HOMEBREW_BUNDLE_NO_DESCRIBE=1
 export HOMEBREW_NO_ANALYTICS=1
-export GOOGLE_CLOUD_PROJECT="sym-code-assist"
 
 export LSCOLORS=exfxfxfxcxgxgxbxbxdxdx
 export LS_COLORS="di=34:ln=35:so=35:pi=35:ex=32:bd=36:cd=36:su=31:sg=31:tw=33:ow=33:st=34"
