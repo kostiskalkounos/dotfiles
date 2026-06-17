@@ -1,14 +1,28 @@
 local env = vim.env
-local fn = vim.fn
 local fs = vim.fs
 local keymap = vim.keymap
+
+local bit = require("bit")
+local bxor, lshift, tohex = bit.bxor, bit.lshift, bit.tohex
+local byte = string.byte
 
 local handlers = require("config.handlers")
 local jdtls = require("jdtls")
 
 local mason = env.HOME .. "/.local/share/nvim/mason"
-local project_name = fn.fnamemodify(fn.getcwd(), ":p:h:t")
-local workspace_dir = env.HOME .. "/.local/share/eclipse/" .. project_name
+local root_dir = fs.root(0, { ".git", "mvnw", "gradlew" }) or vim.uv.cwd()
+local project_name = fs.basename(root_dir)
+
+local function djb2(str)
+  local hash = 5381
+  for i = 1, #str do
+    hash = bxor(lshift(hash, 5) + hash, byte(str, i))
+  end
+  return tohex(hash)
+end
+
+local workspace_hash = djb2(root_dir)
+local workspace_dir = env.HOME .. "/.local/share/nvim/jdtls-workspace/" .. project_name .. "-" .. workspace_hash
 
 if not _G._jdtls_bundles then
   local bundles = {}
@@ -22,11 +36,15 @@ if not _G._jdtls_bundles then
     ["jacocoagent.jar"] = true,
   }
 
-  for _, jar in ipairs(fn.glob(mason .. "/share/java-test/*.jar", true, true)) do
-    if not exclude[fs.basename(jar)] then
-      table.insert(bundles, jar)
+  local test_dir = mason .. "/share/java-test"
+  if vim.uv.fs_stat(test_dir) then
+    for name, type in fs.dir(test_dir) do
+      if (type == "file" or type == "link") and name:sub(-4) == ".jar" and not exclude[name] then
+        table.insert(bundles, test_dir .. "/" .. name)
+      end
     end
   end
+  table.sort(bundles)
   _G._jdtls_bundles = bundles
 end
 
@@ -57,7 +75,7 @@ local config = {
     "-data",
     workspace_dir,
   },
-  root_dir = fs.root(0, { ".git", "mvnw", "gradlew" }),
+  root_dir = root_dir,
   settings = {
     java = {
       autobuild = { enabled = false },

@@ -18,7 +18,6 @@ return {
       "nvim-neotest/nvim-nio",
       "rcarriga/nvim-dap-ui",
       "mason-org/mason.nvim",
-      "jay-babu/mason-nvim-dap.nvim",
       {
         "leoluz/nvim-dap-go",
         config = function()
@@ -31,11 +30,6 @@ return {
       },
     },
     config = function()
-      require("mason-nvim-dap").setup({
-        automatic_installation = true,
-        ensure_installed = { "delve", "javadbg", "javatest" },
-      })
-
       local dap = require("dap")
       local dapui = require("dapui")
       local default = { noremap = true, unique = true, silent = true }
@@ -264,5 +258,17 @@ return {
         },
       }
     end,
+  },
+  {
+    "jay-babu/mason-nvim-dap.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "mason-org/mason.nvim",
+      "mfussenegger/nvim-dap",
+    },
+    opts = {
+      automatic_installation = true,
+      ensure_installed = { "delve", "javadbg", "javatest" },
+    },
   },
 }

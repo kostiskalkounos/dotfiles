@@ -69,7 +69,6 @@ g.loaded_python3_provider = 0
 g.loaded_python_provider = 0
 g.loaded_ruby_provider = 0
 
-g.skip_ts_context_commentstring_module = true
 g.undotree_HighlightChangedText = 0
 g.undotree_SetFocusWhenToggle = 1
 g.undotree_WindowLayout = 2

@@ -15,11 +15,10 @@ return {
     end,
     opts = {},
   },
-  { "JoosepAlviste/nvim-ts-context-commentstring", event = "VeryLazy", opts = { enable_autocmd = false } },
-  { "MagicDuck/grug-far.nvim",                     event = "VeryLazy" },
+  { "MagicDuck/grug-far.nvim", event = "VeryLazy" },
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    ft = "markdown",
+    event = "VeryLazy",
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
     config = function()
       require("render-markdown").setup({
