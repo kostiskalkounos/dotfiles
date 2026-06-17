@@ -22,18 +22,6 @@ set("c", "Q", "q", unique)
 set("i", "<space>", "<space><c-g>u", default)
 set("i", "<M-bs>", "<C-W>", default)
 
-set("t", "<M-r>", function()
-  local char = vimfn.getchar()
-  local register = type(char) == "number" and vimfn.nr2char(char) or char
-  local valid_regs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"*+_-/:.%#="
-  if type(register) == "string" and #register == 1 and string.find(valid_regs, register, 1, true) then
-    local content = vimfn.getreg(register)
-    if content and content ~= "" then
-      vimapi.nvim_paste(content, false, -1)
-    end
-  end
-end, default)
-
 set("n", "-", "<cmd>Oil<cr>", unique)
 set("n", "<esc>", "<cmd>nohlsearch<cr>", unique)
 
@@ -90,12 +78,12 @@ set("n", "<leader>T", "<cmd>Vterm<cr>", unique)
 set("n", "<leader>U", "<cmd>bufdo set nu! rnu!<cr>", unique)
 set("n", "<leader>V", "<cmd>set paste!<cr>", unique)
 set("n", "<leader>W", "<cmd>FormatToggle<cr>", unique)
+set("n", "<leader>Z", "<cmd>setlocal spell! spelllang=en_us<cr>", unique)
 set("n", "<leader>a", "<cmd>FzfLua live_grep<cr>", unique)
 set("n", "<leader>b", "<cmd>GrugFar<cr>", unique)
 set("n", "<leader>d", "<cmd>FzfLua resume<cr>", unique)
 set("n", "<leader>f", "<cmd>NvimTreeOpen<cr>", unique)
 set("n", "<leader>i", "<cmd>FzfLua buffers<cr>", unique)
-set("n", "<leader>m", "<cmd>setlocal spell! spelllang=en_us<cr>", unique)
 set("n", "<leader>s", "<cmd>FzfLua files<cr>", unique)
 set("n", "<leader>t", "<cmd>Term<cr>", unique)
 set("n", "<leader>u", "<cmd>UndotreeToggle<cr>", unique)

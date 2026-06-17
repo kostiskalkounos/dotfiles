@@ -3,87 +3,86 @@ return {
     "nvim-treesitter/nvim-treesitter",
     event = "VeryLazy",
     build = ":TSUpdate",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter-textobjects",
-      { "windwp/nvim-ts-autotag", opts = {} },
-    },
+    dependencies = { "windwp/nvim-ts-autotag", opts = {} },
     config = function()
-      require("nvim-treesitter").setup({
-        auto_install = false,
-        highlight = {
-          enable = not vim.g.vscode,
-          disable = function(buf)
-            if vim.api.nvim_buf_line_count(buf) > 5000 then
-              return true
-            end
-            local name = vim.api.nvim_buf_get_name(buf)
-            if name ~= "" then
-              local max_filesize = 100 * 1024 -- 100 KB
-              local ok, stats = pcall(vim.uv.fs_stat, name)
-              if ok and stats and stats.size > max_filesize then
-                return true
-              end
-            end
-          end,
-        },
-        ignore_install = {},
-        indent = { enable = true },
-        modules = {},
-        sync_install = false,
-        ensure_installed = {
-          "bash",
-          "c",
-          "cpp",
-          "css",
-          "dockerfile",
-          "git_config",
-          "git_rebase",
-          "gitcommit",
-          "go",
-          "groovy",
-          "html",
-          "java",
-          "javascript",
-          "json",
-          "lua",
-          "nix",
-          "python",
-          "rust",
-          "terraform",
-          "toml",
-          "tsx",
-          "typescript",
-          "vim",
-          "xml",
-          "yaml",
-        },
-        textobjects = {
-          select = {
-            enable = true,
-            lookahead = true,
-            keymaps = {
-              ["aa"] = "@parameter.outer",
-              ["ia"] = "@parameter.inner",
-              ["af"] = "@function.outer",
-              ["if"] = "@function.inner",
-              ["ac"] = "@class.outer",
-              ["ic"] = "@class.inner",
-            },
-          },
-          move = {
-            enable = true,
-            set_jumps = true,
-            goto_next_start = { ["]f"] = "@function.outer", ["]]"] = "@class.outer" },
-            goto_next_end = { ["]F"] = "@function.outer", ["]["] = "@class.outer" },
-            goto_previous_start = { ["[f"] = "@function.outer", ["[["] = "@class.outer" },
-            goto_previous_end = { ["[F"] = "@function.outer", ["[]"] = "@class.outer" },
-          },
-          swap = {
-            enable = true,
-            swap_next = { ["[p"] = "@parameter.inner" },
-            swap_previous = { ["]p"] = "@parameter.inner" },
-          },
-        },
+      local ts = require("nvim-treesitter")
+      ts.setup()
+      local parsers = {
+        "bash",
+        "c",
+        "cpp",
+        "css",
+        "dockerfile",
+        "git_config",
+        "git_rebase",
+        "gitcommit",
+        "go",
+        "groovy",
+        "html",
+        "java",
+        "javascript",
+        "json",
+        "lua",
+        "nix",
+        "python",
+        "rust",
+        "terraform",
+        "toml",
+        "tsx",
+        "typescript",
+        "vim",
+        "xml",
+        "yaml",
+      }
+
+      vim.schedule(function()
+        local installed = ts.get_installed()
+        local missing = {}
+        for _, p in ipairs(parsers) do
+          if not vim.list_contains(installed, p) then
+            table.insert(missing, p)
+          end
+        end
+
+        if #missing > 0 then
+          ts.install(missing)
+        end
+      end)
+
+      local function should_disable(buf)
+        local line_count = vim.api.nvim_buf_line_count(buf)
+        return line_count > 5000 or vim.api.nvim_buf_get_offset(buf, line_count) > 102400
+      end
+
+      local parser_cache = {}
+      local function has_parser(lang)
+        if parser_cache[lang] ~= nil then
+          return parser_cache[lang]
+        end
+        local ok = vim.treesitter.language.add(lang)
+        parser_cache[lang] = not not ok
+        return parser_cache[lang]
+      end
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "*",
+        callback = function(args)
+          local buf = args.buf
+          if should_disable(buf) then
+            return
+          end
+
+          local ft = args.match
+          if not ft or ft == "" then
+            return
+          end
+
+          local lang = vim.treesitter.language.get_lang(ft) or ft
+          if lang and has_parser(lang) then
+            vim.treesitter.start(buf, lang)
+            vim.api.nvim_set_option_value("indentexpr", "v:lua.require'nvim-treesitter'.indentexpr()", { buf = buf })
+          end
+        end,
       })
     end,
   },
