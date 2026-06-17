@@ -14,8 +14,11 @@ return {
           css = prettier,
           html = prettier,
           yaml = prettier,
+          json = prettier,
           jsonc = prettier,
           javascript = prettier,
+          typescript = prettier,
+          typescriptreact = prettier,
         },
         format_on_save = function()
           if vim.g.disable_autoformat then
@@ -50,7 +53,6 @@ return {
     dependencies = {
       "mason-org/mason.nvim",
       "mason-org/mason-lspconfig.nvim",
-      "jay-babu/mason-nvim-dap.nvim",
     },
     config = function()
       local handlers = require("config.handlers")
@@ -92,15 +94,9 @@ return {
       }
 
       require("mason").setup()
-
       require("mason-lspconfig").setup({
         automatic_enable = false,
         ensure_installed = servers,
-      })
-
-      require("mason-nvim-dap").setup({
-        automatic_installation = true,
-        ensure_installed = { "delve", "javadbg", "javatest" },
       })
 
       local lsp = vim.lsp
