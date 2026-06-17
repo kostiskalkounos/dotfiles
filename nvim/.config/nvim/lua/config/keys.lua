@@ -1,4 +1,7 @@
 local set = vim.keymap.set
+local vimapi = vim.api
+local vimfn = vim.fn
+local vimv = vim.v
 
 local default = { noremap = true, unique = true, silent = true }
 local expr = { noremap = true, unique = true, expr = true, silent = true }
@@ -20,18 +23,19 @@ set("i", "<space>", "<space><c-g>u", default)
 set("i", "<M-bs>", "<C-W>", default)
 
 set("t", "<M-r>", function()
-  local char = vim.fn.getchar()
-  local register = type(char) == "number" and vim.fn.nr2char(char) or char
+  local char = vimfn.getchar()
+  local register = type(char) == "number" and vimfn.nr2char(char) or char
   local valid_regs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"*+_-/:.%#="
   if type(register) == "string" and #register == 1 and string.find(valid_regs, register, 1, true) then
-    local content = vim.fn.getreg(register)
+    local content = vimfn.getreg(register)
     if content and content ~= "" then
-      vim.api.nvim_paste(content, false, -1)
+      vimapi.nvim_paste(content, false, -1)
     end
   end
 end, default)
 
 set("n", "-", "<cmd>Oil<cr>", unique)
+set("n", "<esc>", "<cmd>nohlsearch<cr>", unique)
 
 set("n", "<M-h>", "<cmd>vertical resize -2<cr>", unique)
 set("n", "<M-j>", "<cmd>resize -2<cr>", unique)
@@ -47,25 +51,6 @@ set({ "n", "v" }, "<C-j>", "<cmd>cnext<cr>", unique)
 set({ "n", "v" }, "<C-k>", "<cmd>cprev<cr>", unique)
 set({ "n", "v" }, "<C-h>", "<cmd>lprev<cr>", unique)
 set({ "n", "v" }, "<C-l>", "<cmd>lnext<cr>", special)
-
-set("n", "<esc>", "<cmd>nohlsearch<cr>", unique)
-
-local move_j = function()
-  if vim.fn.mode() == "\22" then
-    return "j"
-  end
-  return vim.v.count == 0 and "gj" or "j"
-end
-
-local move_k = function()
-  if vim.fn.mode() == "\22" then
-    return "k"
-  end
-  return vim.v.count == 0 and "gk" or "k"
-end
-
-set({ "n", "v" }, "j", move_j, expr)
-set({ "n", "v" }, "k", move_k, expr)
 
 set("v", "<", "<gv", default)
 set("v", "<S-Tab>", "<gv", special)
@@ -130,15 +115,18 @@ set("n", "<leader>-", "<cmd>sp<cr>", unique)
 set("n", "<leader>=", "<cmd>sp<cr>", unique)
 set("n", "<leader>\\", "<cmd>vsp<cr>", unique)
 
-set("n", "<leader>C", function()
-  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-  vim.fn.setreg("+", lines, "l")
-  vim.notify("Copied entire buffer to clipboard", vim.log.levels.WARN)
-end, default)
 set("n", "<leader>v", [["+p]], default)
 set("v", "<leader>c", [["+y]], default)
 set("v", "<leader>p", "p", default)
 set("v", "<leader>v", [["+p]], default)
 
+set("n", "j", function() return vimv.count == 0 and "gj" or "j" end, expr)
+set("n", "k", function() return vimv.count == 0 and "gk" or "k" end, expr)
+
 set("n", "<leader>Q", function() require("config.buffers").quit_all() end, unique)
 set("n", "<leader>q", function() require("config.buffers").close_buffer() end, unique)
+
+set("n", "<leader>C", function()
+  local lines = vimapi.nvim_buf_get_lines(0, 0, -1, false)
+  vimfn.setreg("+", lines, "l")
+end, default)
