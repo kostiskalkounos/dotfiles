@@ -1,11 +1,11 @@
 return {
-  { "mfussenegger/nvim-jdtls", ft = "java" },
+  { "mfussenegger/nvim-jdtls", event = "VeryLazy" },
   { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = {} },
   {
     "stevearc/conform.nvim",
     event = "VeryLazy",
     config = function()
-      local prettier = { "prettier", stop_after_first = true }
+      local prettier = { "prettier" }
       require("conform").setup({
         formatters_by_ft = {
           go = { "goimports", "gofmt" },
@@ -36,11 +36,11 @@ return {
       end, {})
     end,
   },
-  { "towolf/vim-helm",   ft = "helm" },
+  { "towolf/vim-helm", event = "VeryLazy" },
   { "j-hui/fidget.nvim", event = "VeryLazy", opts = {} },
   {
     "folke/lazydev.nvim",
-    ft = "lua",
+    event = "VeryLazy",
     opts = {
       library = {
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },

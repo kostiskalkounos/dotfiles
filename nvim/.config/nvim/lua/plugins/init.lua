@@ -1,6 +1,5 @@
 return {
-  { "almo7aya/openingh.nvim", event = "VeryLazy" },
-  { "mbbill/undotree",        event = "VeryLazy" },
+  { "mbbill/undotree", event = "VeryLazy" },
   {
     "stevearc/oil.nvim",
     event = "VeryLazy",
@@ -15,11 +14,10 @@ return {
     end,
     opts = {},
   },
-  { "JoosepAlviste/nvim-ts-context-commentstring", event = "VeryLazy", opts = { enable_autocmd = false } },
-  { "MagicDuck/grug-far.nvim",                     event = "VeryLazy" },
+  { "MagicDuck/grug-far.nvim", event = "VeryLazy" },
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    ft = "markdown",
+    event = "VeryLazy",
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
     config = function()
       require("render-markdown").setup({
@@ -36,22 +34,5 @@ return {
         },
       })
     end,
-  },
-  {
-    "NeogitOrg/neogit",
-    event = "VeryLazy",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "sindrets/diffview.nvim",
-    },
-    opts = {
-      kind = "split",
-      signs = {
-        section = { "", "" },
-        item = { "", "" },
-        hunk = { "", "" },
-      },
-      integrations = { diffview = true },
-    },
   },
 }

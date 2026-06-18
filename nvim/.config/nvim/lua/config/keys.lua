@@ -22,18 +22,6 @@ set("c", "Q", "q", unique)
 set("i", "<space>", "<space><c-g>u", default)
 set("i", "<M-bs>", "<C-W>", default)
 
-set("t", "<M-r>", function()
-  local char = vimfn.getchar()
-  local register = type(char) == "number" and vimfn.nr2char(char) or char
-  local valid_regs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"*+_-/:.%#="
-  if type(register) == "string" and #register == 1 and string.find(valid_regs, register, 1, true) then
-    local content = vimfn.getreg(register)
-    if content and content ~= "" then
-      vimapi.nvim_paste(content, false, -1)
-    end
-  end
-end, default)
-
 set("n", "-", "<cmd>Oil<cr>", unique)
 set("n", "<esc>", "<cmd>nohlsearch<cr>", unique)
 
@@ -76,15 +64,14 @@ set("", "<leader>X", "<cmd>!open %<cr><cr>", unique)
 set("n", "<Leader>n", "<cmd>bn<cr>", unique)
 set("n", "<Leader>p", "<cmd>bp<cr>", unique)
 set("n", "<leader>/", "<cmd>FzfLua lgrep_curbuf<cr>", unique)
-set("n", "<leader>;", "<cmd>NvimTreeToggle<cr>", unique)
 set("n", "<leader><leader>", "<C-^>", default)
 set("n", "<leader>?", "<cmd>FzfLua oldfiles<cr>", unique)
 set("n", "<leader>A", "<cmd>FzfLua lines<cr>", unique)
 set("n", "<leader>D", "<cmd>DiffviewOpen<cr>", unique)
-set("n", "<leader>F", "<cmd>NvimTreeRefresh<cr>", unique)
 set("n", "<leader>G", "<cmd>Gitsigns blame<cr>", unique)
 set("n", "<leader>I", "<cmd>FzfLua lsp_finder<cr>", unique)
-set("n", "<leader>O", "<cmd>OpenInGHFileLines<cr>", unique)
+
+set("n", "<leader>;", "<cmd>lua MiniFiles.open()<cr>", unique)
 set("n", "<leader>S", "<cmd>Neogit<cr>", unique)
 set("n", "<leader>T", "<cmd>Vterm<cr>", unique)
 set("n", "<leader>U", "<cmd>bufdo set nu! rnu!<cr>", unique)
@@ -94,7 +81,6 @@ set("n", "<leader>Z", "<cmd>setlocal spell! spelllang=en_us<cr>", unique)
 set("n", "<leader>a", "<cmd>FzfLua live_grep<cr>", unique)
 set("n", "<leader>b", "<cmd>GrugFar<cr>", unique)
 set("n", "<leader>d", "<cmd>FzfLua resume<cr>", unique)
-set("n", "<leader>f", "<cmd>NvimTreeOpen<cr>", unique)
 set("n", "<leader>i", "<cmd>FzfLua buffers<cr>", unique)
 set("n", "<leader>s", "<cmd>FzfLua files<cr>", unique)
 set("n", "<leader>t", "<cmd>Term<cr>", unique)
@@ -120,13 +106,59 @@ set("v", "<leader>c", [["+y]], default)
 set("v", "<leader>p", "p", default)
 set("v", "<leader>v", [["+p]], default)
 
-set("n", "j", function() return vimv.count == 0 and "gj" or "j" end, expr)
-set("n", "k", function() return vimv.count == 0 and "gk" or "k" end, expr)
+set("n", "j", function()
+  return vimv.count == 0 and "gj" or "j"
+end, expr)
 
-set("n", "<leader>Q", function() require("config.buffers").quit_all() end, unique)
-set("n", "<leader>q", function() require("config.buffers").close_buffer() end, unique)
+set("n", "k", function()
+  return vimv.count == 0 and "gk" or "k"
+end, expr)
+
+set("n", "<leader>Q", function()
+  require("config.buffers").quit_all()
+end, unique)
+
+set("n", "<leader>q", function()
+  require("config.buffers").close_buffer()
+end, unique)
 
 set("n", "<leader>C", function()
   local lines = vimapi.nvim_buf_get_lines(0, 0, -1, false)
   vimfn.setreg("+", lines, "l")
 end, default)
+
+local function open_in_github()
+  local file_path = vimapi.nvim_buf_get_name(0)
+  if file_path == "" then
+    vim.notify("No file open", vim.log.levels.WARN)
+    return
+  end
+
+  local lines =
+    vimfn.systemlist("git rev-parse --show-toplevel --abbrev-ref HEAD HEAD && git config --get remote.origin.url")
+  if vimv.shell_error ~= 0 or #lines < 4 then
+    vim.notify("Not in a git repository or no remote origin", vim.log.levels.WARN)
+    return
+  end
+
+  local git_root = lines[1]
+  local branch = lines[2]
+  local commit = lines[3]
+  local remote_url = lines[4]
+
+  local gh_url = remote_url
+    :gsub("^git@github%.com:", "https://github.com/")
+    :gsub("^https://github%.com/", "https://github.com/")
+    :gsub("%.git$", "")
+  local ref = branch == "HEAD" and commit or branch
+  local relative_path = file_path:sub(#git_root + 2)
+  local line = vimapi.nvim_win_get_cursor(0)[1]
+  local final_url = string.format("%s/blob/%s/%s#L%d", gh_url, ref, relative_path, line)
+
+  local ok, _ = pcall(vim.ui.open, final_url)
+  if not ok then
+    vimfn.system({ "open", final_url })
+  end
+end
+
+set("n", "<leader>O", open_in_github, unique)

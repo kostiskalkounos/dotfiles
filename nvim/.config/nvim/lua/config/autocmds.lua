@@ -252,25 +252,6 @@ api_nvim_create_autocmd("OptionSet", {
 
 _G.update_fzf_opts = update_fzf_opts
 
-local get_option = vim.filetype.get_option
-local has_ts_cs, ts_cs
----@diagnostic disable-next-line: duplicate-set-field
-vim.filetype.get_option = function(filetype, option)
-  if option == "commentstring" then
-    if has_ts_cs == nil then
-      has_ts_cs, ts_cs = pcall(require, "ts_context_commentstring")
-      if not has_ts_cs then
-        pcall(require("lazy").load, { plugins = { "nvim-ts-context-commentstring" } })
-        has_ts_cs, ts_cs = pcall(require, "ts_context_commentstring")
-      end
-    end
-    if has_ts_cs and ts_cs and ts_cs.calculate_commentstring then
-      return ts_cs.calculate_commentstring() or get_option(filetype, option)
-    end
-  end
-  return get_option(filetype, option)
-end
-
 local lualine_new_file_group = api_nvim_create_augroup("LualineNewFileCheck", { clear = true })
 api_nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
   group = lualine_new_file_group,

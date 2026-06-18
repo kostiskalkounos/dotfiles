@@ -1,6 +1,6 @@
 return {
   "catgoose/nvim-colorizer.lua",
-  ft = { "css", "html", "javascript", "typescript", "lua", "yaml", "json" },
+  event = "VeryLazy",
   config = function()
     require("colorizer").setup({
       options = {
