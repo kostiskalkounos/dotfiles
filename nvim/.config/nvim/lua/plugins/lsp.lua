@@ -36,7 +36,7 @@ return {
       end, {})
     end,
   },
-  { "towolf/vim-helm", event = "VeryLazy" },
+  { "towolf/vim-helm",   event = "VeryLazy" },
   { "j-hui/fidget.nvim", event = "VeryLazy", opts = {} },
   {
     "folke/lazydev.nvim",
