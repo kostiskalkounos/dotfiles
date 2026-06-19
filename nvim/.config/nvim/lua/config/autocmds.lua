@@ -251,18 +251,3 @@ api_nvim_create_autocmd("OptionSet", {
 })
 
 _G.update_fzf_opts = update_fzf_opts
-
-local lualine_new_file_group = api_nvim_create_augroup("LualineNewFileCheck", { clear = true })
-api_nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
-  group = lualine_new_file_group,
-  callback = function(args)
-    vim.b[args.buf].lualine_is_new_file = false
-  end,
-})
-
-api_nvim_create_autocmd("BufNewFile", {
-  group = lualine_new_file_group,
-  callback = function(args)
-    vim.b[args.buf].lualine_is_new_file = true
-  end,
-})

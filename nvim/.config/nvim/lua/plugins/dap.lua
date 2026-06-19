@@ -1,19 +1,7 @@
 return {
   {
     "mfussenegger/nvim-dap",
-    keys = {
-      "<F1>",
-      "<F2>",
-      "<F3>",
-      "<F4>",
-      "<F5>",
-      "<F6>",
-      "<F7>",
-      "<F8>",
-      "<F12>",
-      { "<leader>:", mode = { "n", "v" } },
-      { '<leader>"', mode = { "n", "v" } },
-    },
+    event = "VeryLazy",
     dependencies = {
       "nvim-neotest/nvim-nio",
       "rcarriga/nvim-dap-ui",
@@ -69,9 +57,9 @@ return {
             position = "left",
             size = 0.30,
             elements = {
-              { id = "scopes",      size = 0.38 },
-              { id = "watches",     size = 0.16 },
-              { id = "stacks",      size = 0.28 },
+              { id = "scopes", size = 0.38 },
+              { id = "watches", size = 0.16 },
+              { id = "stacks", size = 0.28 },
               { id = "breakpoints", size = 0.18 },
             },
           },
@@ -79,7 +67,7 @@ return {
             position = "bottom",
             size = 0.30,
             elements = {
-              { id = "repl",    size = 0.50 },
+              { id = "repl", size = 0.50 },
               { id = "console", size = 0.50 },
             },
           },

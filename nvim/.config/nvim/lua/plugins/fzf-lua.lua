@@ -7,7 +7,7 @@ return {
       return vim.ui.select(...)
     end
   end,
-  dependencies = "nvim-tree/nvim-web-devicons",
+  dependencies = "nvim-mini/mini.icons",
   config = function()
     local f = require("fzf-lua")
     if _G.update_fzf_opts then

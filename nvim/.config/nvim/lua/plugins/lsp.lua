@@ -1,6 +1,8 @@
 return {
-  { "mfussenegger/nvim-jdtls", event = "VeryLazy" },
+  { "j-hui/fidget.nvim", event = "VeryLazy", opts = {} },
   { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = {} },
+  { "mfussenegger/nvim-jdtls", event = "VeryLazy" },
+  { "towolf/vim-helm", event = "VeryLazy" },
   {
     "stevearc/conform.nvim",
     event = "VeryLazy",
@@ -36,8 +38,6 @@ return {
       end, {})
     end,
   },
-  { "towolf/vim-helm",   event = "VeryLazy" },
-  { "j-hui/fidget.nvim", event = "VeryLazy", opts = {} },
   {
     "folke/lazydev.nvim",
     event = "VeryLazy",
