@@ -1,25 +1,11 @@
 return {
   { "almo7aya/openingh.nvim", event = "VeryLazy" },
-  { "mbbill/undotree",        event = "VeryLazy" },
-  {
-    "stevearc/oil.nvim",
-    event = "VeryLazy",
-    init = function()
-      if vim.fn.argc() == 1 then
-        local arg = vim.fn.argv(0)
-        local stat = vim.uv.fs_stat(arg)
-        if stat and stat.type == "directory" then
-          require("lazy").load({ plugins = { "oil.nvim" } })
-        end
-      end
-    end,
-    opts = {},
-  },
   { "MagicDuck/grug-far.nvim", event = "VeryLazy" },
+  { "mbbill/undotree", event = "VeryLazy" },
   {
     "MeanderingProgrammer/render-markdown.nvim",
     event = "VeryLazy",
-    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.icons" },
     config = function()
       require("render-markdown").setup({
         file_types = { "markdown" },
@@ -51,5 +37,19 @@ return {
       },
       integrations = { diffview = true },
     },
+  },
+  {
+    "stevearc/oil.nvim",
+    event = "VeryLazy",
+    init = function()
+      if vim.fn.argc() == 1 then
+        local arg = vim.fn.argv(0)
+        local stat = vim.uv.fs_stat(arg)
+        if stat and stat.type == "directory" then
+          require("lazy").load({ plugins = { "oil.nvim" } })
+        end
+      end
+    end,
+    opts = {},
   },
 }

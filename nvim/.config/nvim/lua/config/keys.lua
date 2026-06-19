@@ -108,11 +108,21 @@ set("v", "<leader>c", [["+y]], default)
 set("v", "<leader>p", "p", default)
 set("v", "<leader>v", [["+p]], default)
 
-set("n", "j", function() return vimv.count == 0 and "gj" or "j" end, expr)
-set("n", "k", function() return vimv.count == 0 and "gk" or "k" end, expr)
+set("n", "j", function()
+  return vimv.count == 0 and "gj" or "j"
+end, expr)
 
-set("n", "<leader>Q", function() require("config.buffers").quit_all() end, unique)
-set("n", "<leader>q", function() require("config.buffers").close_buffer() end, unique)
+set("n", "k", function()
+  return vimv.count == 0 and "gk" or "k"
+end, expr)
+
+set("n", "<leader>Q", function()
+  require("config.buffers").quit_all()
+end, unique)
+
+set("n", "<leader>q", function()
+  require("config.buffers").close_buffer()
+end, unique)
 
 set("n", "<leader>C", function()
   local lines = vimapi.nvim_buf_get_lines(0, 0, -1, false)

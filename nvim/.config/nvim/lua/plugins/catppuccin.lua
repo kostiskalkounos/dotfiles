@@ -30,6 +30,9 @@ return {
         latte = { pink = "#d154a5" },
         macchiato = { blue = "#89b4fa", lavender = "#b4befe", sapphire = "#74c7ec" },
       },
+      integrations = {
+        mini = true,
+      },
       custom_highlights = function(colors)
         local is_light = vim.o.background == "light"
         return {
@@ -54,9 +57,18 @@ return {
           ["Operator"] = { fg = colors.mauve },
           ["PreProc"] = { fg = colors.sapphire },
           ["javaTypedef"] = { fg = colors.mauve },
+
+          MiniStatusline = { fg = colors.text, bg = colors.base },
+          MiniStatuslineDiagnosticError = { fg = colors.red, bg = colors.base },
+          MiniStatuslineDiagnosticHint = { fg = colors.teal, bg = colors.base },
+          MiniStatuslineDiagnosticInfo = { fg = colors.blue, bg = colors.base },
+          MiniStatuslineDiagnosticWarn = { fg = colors.yellow, bg = colors.base },
+          MiniStatuslineInactive = { fg = colors.overlay0, bg = colors.base },
+
+          StatusLine = { fg = colors.text, bg = colors.base },
+          StatusLineNC = { fg = colors.surface1, bg = colors.base },
         }
       end,
-      integrations = { lualine = true },
     })
 
     vim.api.nvim_command("colorscheme catppuccin-nvim")

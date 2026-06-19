@@ -1,7 +1,7 @@
 return {
   "nvim-tree/nvim-tree.lua",
   event = "VeryLazy",
-  dependencies = "nvim-tree/nvim-web-devicons",
+  dependencies = "nvim-mini/mini.icons",
   opts = {
     actions = { open_file = { resize_window = false } },
     update_focused_file = { enable = true, update_cwd = false },
