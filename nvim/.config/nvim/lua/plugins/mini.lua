@@ -36,11 +36,12 @@ return {
       local BRANCH_ICON = "  "
 
       local HL_ACTIVE = "%#MiniStatusline#"
-      local HL_INACTIVE = "%#MiniStatuslineInactive#"
+      local HL_ADD = "%#MiniStatuslineAdd#"
       local HL_ERROR = "%#MiniStatuslineDiagnosticError#"
-      local HL_WARN = "%#MiniStatuslineDiagnosticWarn#"
-      local HL_INFO = "%#MiniStatuslineDiagnosticInfo#"
       local HL_HINT = "%#MiniStatuslineDiagnosticHint#"
+      local HL_INACTIVE = "%#MiniStatuslineInactive#"
+      local HL_INFO = "%#MiniStatuslineDiagnosticInfo#"
+      local HL_WARN = "%#MiniStatuslineDiagnosticWarn#"
 
       local signs = {
         ERROR = HL_ERROR .. "  " .. HL_ACTIVE,
@@ -55,20 +56,33 @@ return {
       local opts_diag = { icon = EMPTY, signs = signs }
       local section_diagnostics = mini_statusline.section_diagnostics
 
-      local PLUS_REPL = HL_HINT:gsub("%%", "%%%%") .. "%1" .. HL_ACTIVE:gsub("%%", "%%%%")
-      local TILDE_REPL = HL_WARN:gsub("%%", "%%%%") .. "%1" .. HL_ACTIVE:gsub("%%", "%%%%")
-      local MINUS_REPL = HL_ERROR:gsub("%%", "%%%%") .. "%1" .. HL_ACTIVE:gsub("%%", "%%%%")
-
+      local b = vim.b
       local parts = {}
 
       local function build_statusline()
-        local b = vim.b[0]
         parts[1] = ACTIVE_PREFIX
 
-        local status = b.gitsigns_status
-        parts[2] = (status and status ~= EMPTY)
-            and (SPACE .. status:gsub("%+%d+", PLUS_REPL):gsub("~%d+", TILDE_REPL):gsub("%-%d+", MINUS_REPL))
-          or EMPTY
+        local git_dict = b.gitsigns_status_dict
+        if git_dict then
+          local git_parts = {}
+          if git_dict.added and git_dict.added > 0 then
+            git_parts[#git_parts + 1] = HL_ADD .. "+" .. git_dict.added .. HL_ACTIVE
+          end
+          if git_dict.changed and git_dict.changed > 0 then
+            git_parts[#git_parts + 1] = HL_WARN .. "~" .. git_dict.changed .. HL_ACTIVE
+          end
+          if git_dict.removed and git_dict.removed > 0 then
+            git_parts[#git_parts + 1] = HL_ERROR .. "-" .. git_dict.removed .. HL_ACTIVE
+          end
+
+          if #git_parts > 0 then
+            parts[2] = SPACE .. table.concat(git_parts, SPACE)
+          else
+            parts[2] = EMPTY
+          end
+        else
+          parts[2] = EMPTY
+        end
 
         parts[3] = SEPARATOR
         parts[4] = section_diagnostics(opts_diag)

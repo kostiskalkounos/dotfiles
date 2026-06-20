@@ -46,6 +46,8 @@ return {
           ["@lsp.type.annotationMember"] = { fg = colors.flamingo },
           ["@lsp.type.interface"] = { fg = colors.sapphire },
           ["@lsp.type.parameter"] = { fg = colors.text },
+          ["@lsp.type.property"] = { fg = is_light and colors.pink or colors.lavender },
+          ["@lsp.typemod.property.static"] = { fg = colors.teal },
           ["@module"] = { fg = colors.sapphire },
           ["@property"] = { fg = is_light and colors.pink or colors.lavender },
           ["@variable.builtin"] = { fg = colors.mauve },
@@ -59,12 +61,15 @@ return {
           ["javaTypedef"] = { fg = colors.mauve },
 
           MiniStatusline = { fg = colors.text, bg = colors.base },
+          MiniStatuslineAdd = { fg = colors.green, bg = colors.base },
           MiniStatuslineDiagnosticError = { fg = colors.red, bg = colors.base },
           MiniStatuslineDiagnosticHint = { fg = colors.teal, bg = colors.base },
           MiniStatuslineDiagnosticInfo = { fg = colors.blue, bg = colors.base },
           MiniStatuslineDiagnosticWarn = { fg = colors.yellow, bg = colors.base },
           MiniStatuslineInactive = { fg = colors.overlay0, bg = colors.base },
 
+          NvimTreeStatusLine = { fg = colors.text, bg = colors.base },
+          NvimTreeStatusLineNC = { fg = colors.surface1, bg = colors.base },
           StatusLine = { fg = colors.text, bg = colors.base },
           StatusLineNC = { fg = colors.surface1, bg = colors.base },
         }

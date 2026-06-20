@@ -131,9 +131,6 @@ return {
           lsp.enable(server_name)
         end
       end
-
-      vim.api.nvim_set_hl(0, "@lsp.type.property", { link = "@variable.member", default = true })
-      vim.api.nvim_set_hl(0, "@lsp.typemod.property.static", { link = "@constant", default = true })
     end,
   },
 }

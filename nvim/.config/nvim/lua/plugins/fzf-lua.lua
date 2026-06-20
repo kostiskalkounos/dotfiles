@@ -4,10 +4,11 @@ return {
   dependencies = "nvim-mini/mini.icons",
   config = function()
     local f = require("fzf-lua")
+    local cache = vim.fn.stdpath("cache")
+
     if _G.update_fzf_opts then
       _G.update_fzf_opts()
     end
-    vim.api.nvim_command("FzfLua register_ui_select")
 
     f.setup({
       fzf_opts = {
@@ -22,12 +23,12 @@ return {
       },
       files = {
         fzf_opts = {
-          ["--history"] = "/tmp/fzf-lua-files-history",
+          ["--history"] = cache .. "/fzf-files-history",
         },
       },
       grep = {
         fzf_opts = {
-          ["--history"] = "/tmp/fzf-lua-grep-history",
+          ["--history"] = cache .. "/fzf-grep-history",
         },
       },
       keymap = {
@@ -56,5 +57,7 @@ return {
         },
       },
     })
+
+    f.register_ui_select()
   end,
 }

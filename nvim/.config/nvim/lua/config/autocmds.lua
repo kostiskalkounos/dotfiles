@@ -84,14 +84,13 @@ local function setup_rpc_socket()
 end
 
 local rpc_group = api_nvim_create_augroup("PredictableRpcSocket", { clear = true })
-
 api_nvim_create_autocmd("VimEnter", {
   group = rpc_group,
   desc = "Start RPC server on predictable socket for theme hot-reloads",
   callback = setup_rpc_socket,
 })
 
-api_nvim_create_autocmd("VimLeave", {
+api_nvim_create_autocmd("VimLeavePre", {
   group = rpc_group,
   desc = "Stop RPC server and clean up socket on exit",
   callback = function()

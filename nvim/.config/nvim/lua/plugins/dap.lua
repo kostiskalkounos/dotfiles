@@ -32,7 +32,9 @@ return {
       fn.sign_define("DapBreakpointRejected", { text = "", texthl = "DiagnosticError", linehl = "", numhl = "" })
       fn.sign_define("DapLogPoint", { text = "󰁕 ", texthl = "DiagnosticInfo", linehl = "", numhl = "" })
 
+      local dap_group = api.nvim_create_augroup("DapReplAutocomplete", { clear = true })
       api.nvim_create_autocmd("FileType", {
+        group = dap_group,
         pattern = "dap-repl",
         callback = function()
           require("dap.ext.autocompl").attach()
