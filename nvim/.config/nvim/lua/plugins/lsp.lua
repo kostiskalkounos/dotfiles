@@ -10,7 +10,7 @@ return {
       local prettier = { "prettier" }
       require("conform").setup({
         formatters_by_ft = {
-          go = { "goimports", "gofmt" },
+          go = { "goimports", "gofumpt" },
           lua = { "stylua" },
           python = { "black" },
           css = prettier,
@@ -99,6 +99,24 @@ return {
         automatic_enable = false,
         ensure_installed = servers,
       })
+      local mason_registry = require("mason-registry")
+      local tools = {
+        "black",
+        "gofumpt",
+        "goimports",
+        "isort",
+        "prettier",
+        "stylua",
+      }
+
+      mason_registry.refresh(function()
+        for _, tool in ipairs(tools) do
+          local pkg = mason_registry.get_package(tool)
+          if not pkg:is_installed() then
+            pkg:install()
+          end
+        end
+      end)
 
       local lsp = vim.lsp
       lsp.config("*", {
