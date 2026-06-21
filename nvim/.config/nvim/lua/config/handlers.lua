@@ -1,108 +1,105 @@
 local M = {}
 
-local buf = vim.lsp.buf
-local diagnostic = vim.diagnostic
-local float = { float = true }
-local set = vim.keymap.set
+local api = vim.api
+local diag = vim.diagnostic
+local floor = math.floor
+local o = vim.o
 
-local keymap = vim.keymap
-for _, map in ipairs({ "gra", "gri", "grn", "grr", "grt", "grx" }) do
-  pcall(keymap.del, "n", map)
+local diag_cfg = {
+  float = { focusable = true, style = "minimal", border = "rounded", source = true },
+  signs = {
+    text = {
+      [diag.severity.ERROR] = "",
+      [diag.severity.WARN] = "",
+      [diag.severity.INFO] = "",
+      [diag.severity.HINT] = "󰌶",
+    },
+  },
+  severity_sort = true,
+  underline = true,
+  update_in_insert = false,
+  virtual_text = false,
+}
+
+local function get_dims(width_ratio, height_ratio)
+  return {
+    border = "rounded",
+    max_width = floor(o.columns * width_ratio),
+    max_height = floor(o.lines * height_ratio),
+  }
+end
+
+local function hover()
+  vim.lsp.buf.hover(get_dims(0.7, 0.7))
+end
+
+local function signature_help()
+  vim.lsp.buf.signature_help(get_dims(0.4, 0.5))
+end
+
+local SEV_ERR = diag.severity.ERROR
+local SEV_WARN = diag.severity.WARN
+
+local function on_lsp_attach(ev)
+  local buf = ev.buf
+  local opt = { buffer = buf, silent = true }
+  local set = vim.keymap.set
+
+  set("n", "K", hover, opt)
+  set("n", "gH", signature_help, opt)
+  set("n", "<leader>r", vim.lsp.buf.rename, opt)
+
+  set("n", "[d", function()
+    diag.jump({ count = -1, float = true })
+  end, opt)
+
+  set("n", "]d", function()
+    diag.jump({ count = 1, float = true })
+  end, opt)
+
+  set("n", "[e", function()
+    diag.jump({ count = -1, severity = SEV_ERR, float = true })
+  end, opt)
+
+  set("n", "]e", function()
+    diag.jump({ count = 1, severity = SEV_ERR, float = true })
+  end, opt)
+
+  set("n", "[w", function()
+    diag.jump({ count = -1, severity = SEV_WARN, float = true })
+  end, opt)
+
+  set("n", "]w", function()
+    diag.jump({ count = 1, severity = SEV_WARN, float = true })
+  end, opt)
+
+  set("n", "<leader>Y", diag.setqflist, opt)
+  set("n", "<leader>y", diag.setloclist, opt)
+  set("n", "<leader>o", diag.open_float, opt)
+
+  set("n", "gd", "<cmd>FzfLua lsp_definitions<cr>", opt)
+  set("n", "gh", "<cmd>FzfLua lsp_typedefs<cr>", opt)
+  set("n", "gi", "<cmd>FzfLua lsp_implementations<cr>", opt)
+  set("n", "gr", "<cmd>FzfLua lsp_references<cr>", opt)
+  set("n", "gs", "<cmd>FzfLua lsp_document_symbols<cr>", opt)
+  set("n", "<M-cr>", "<cmd>FzfLua lsp_code_actions<cr>", opt)
+  set("n", "<leader>g", "<cmd>FzfLua lsp_code_actions<cr>", opt)
+  set("n", "<leader>M", "<cmd>FzfLua diagnostics_workspace<cr>", opt)
+  set("n", "<leader>m", "<cmd>FzfLua diagnostics_document<cr>", opt)
 end
 
 function M.setup()
-  diagnostic.config({
-    float = {
-      focusable = true,
-      style = "minimal",
-      border = "rounded",
-      source = true,
-    },
-    signs = {
-      active = true,
-      text = {
-        [diagnostic.severity.ERROR] = "",
-        [diagnostic.severity.WARN] = "",
-        [diagnostic.severity.HINT] = "󰌶",
-        [diagnostic.severity.INFO] = "",
-      },
-    },
-    severity_sort = true,
-    underline = true,
-    update_in_insert = false,
-    virtual_text = false,
-  })
-
-  if not M._setup_done then
-    local hover = vim.lsp.buf.hover
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.lsp.buf.hover = function(opts)
-      opts = opts or {}
-      opts.border = opts.border or "rounded"
-      opts.max_width = opts.max_width or math.floor(vim.o.columns * 0.7)
-      opts.max_height = opts.max_height or math.floor(vim.o.lines * 0.7)
-      return hover(opts)
-    end
-
-    local signature = vim.lsp.buf.signature_help
-    ---@diagnostic disable-next-line: duplicate-set-field
-    vim.lsp.buf.signature_help = function(opts)
-      opts = opts or {}
-      opts.border = opts.border or "rounded"
-      opts.max_width = opts.max_width or math.floor(vim.o.columns * 0.4)
-      opts.max_height = opts.max_height or math.floor(vim.o.lines * 0.5)
-      return signature(opts)
-    end
-    M._setup_done = true
+  diag.config(diag_cfg)
+  local default_maps = { "gra", "gri", "grn", "grr", "grt", "grx" }
+  local del = vim.keymap.del
+  for _, map_str in ipairs(default_maps) do
+    pcall(del, { "n", "x" }, map_str)
   end
-end
 
-function M.on_attach(_, bufnr)
-  local opts = { noremap = true, silent = true, buffer = bufnr }
-  set("n", "<leader>Y", diagnostic.setqflist, opts)
-  set("n", "<leader>o", diagnostic.open_float, opts)
-  set("n", "<leader>r", buf.rename, opts)
-  set("n", "<leader>y", diagnostic.setloclist, opts)
-
-  set("n", "<M-cr>", "<cmd>FzfLua lsp_code_actions<cr>", opts)
-  set("n", "<leader>M", "<cmd>FzfLua diagnostics_workspace<cr>", opts)
-  set("n", "<leader>g", "<cmd>FzfLua lsp_code_actions<cr>", opts)
-  set("n", "<leader>m", "<cmd>FzfLua diagnostics_document<cr>", opts)
-
-  set("n", "K", buf.hover, opts)
-
-  set("n", "[d", function()
-    diagnostic.jump({ count = -1, float })
-  end, opts)
-  set("n", "]d", function()
-    diagnostic.jump({ count = 1, float })
-  end, opts)
-
-  set("n", "[e", function()
-    diagnostic.jump({ count = -1, severity = diagnostic.severity.ERROR, float })
-  end, opts)
-  set("n", "]e", function()
-    diagnostic.jump({ count = 1, severity = diagnostic.severity.ERROR, float })
-  end, opts)
-
-  set("n", "[w", function()
-    diagnostic.jump({ count = -1, severity = diagnostic.severity.WARN, float })
-  end, opts)
-  set("n", "]w", function()
-    diagnostic.jump({ count = 1, severity = diagnostic.severity.WARN, float })
-  end, opts)
-
-  set("n", "gD", buf.definition, opts)
-  set("n", "gH", buf.signature_help, opts)
-  set("n", "gI", buf.implementation, opts)
-  set("n", "gR", buf.references, opts)
-  set("n", "gS", buf.document_symbol, opts)
-
-  set("n", "gd", "<cmd>FzfLua lsp_definitions<cr>", opts)
-  set("n", "gh", "<cmd>FzfLua lsp_typedefs<cr>", opts)
-  set("n", "gi", "<cmd>FzfLua lsp_implementations<cr>", opts)
-  set("n", "gr", "<cmd>FzfLua lsp_references<cr>", opts)
-  set("n", "gs", "<cmd>FzfLua lsp_document_symbols<cr>", opts)
+  api.nvim_create_autocmd("LspAttach", {
+    group = api.nvim_create_augroup("FastLspAttach", { clear = true }),
+    callback = on_lsp_attach,
+  })
 end
 
 return M

@@ -1,6 +1,4 @@
 local set = vim.keymap.set
-local vimapi = vim.api
-local vimfn = vim.fn
 local vimv = vim.v
 
 local default = { noremap = true, unique = true, silent = true }
@@ -68,11 +66,13 @@ set("n", "<leader>;", "<cmd>NvimTreeToggle<cr>", unique)
 set("n", "<leader><leader>", "<C-^>", default)
 set("n", "<leader>?", "<cmd>FzfLua oldfiles<cr>", unique)
 set("n", "<leader>A", "<cmd>FzfLua lines<cr>", unique)
+set("n", "<leader>C", "<cmd>%y+<cr>", default)
 set("n", "<leader>D", "<cmd>DiffviewOpen<cr>", unique)
 set("n", "<leader>F", "<cmd>NvimTreeRefresh<cr>", unique)
 set("n", "<leader>G", "<cmd>Gitsigns blame<cr>", unique)
 set("n", "<leader>I", "<cmd>FzfLua lsp_finder<cr>", unique)
 set("n", "<leader>O", "<cmd>OpenInGHFileLines<cr>", unique)
+set("n", "<leader>Q", "<cmd>lua require('config.buffers').quit_all()<cr>", unique)
 set("n", "<leader>S", "<cmd>Neogit<cr>", unique)
 set("n", "<leader>T", "<cmd>Vterm<cr>", unique)
 set("n", "<leader>U", "<cmd>bufdo set nu! rnu!<cr>", unique)
@@ -84,6 +84,7 @@ set("n", "<leader>b", "<cmd>GrugFar<cr>", unique)
 set("n", "<leader>d", "<cmd>FzfLua resume<cr>", unique)
 set("n", "<leader>f", "<cmd>NvimTreeOpen<cr>", unique)
 set("n", "<leader>i", "<cmd>FzfLua buffers<cr>", unique)
+set("n", "<leader>q", "<cmd>lua require('config.buffers').close_buffer()<cr>", unique)
 set("n", "<leader>s", "<cmd>FzfLua files<cr>", unique)
 set("n", "<leader>t", "<cmd>Term<cr>", unique)
 set("n", "<leader>u", "<cmd>UndotreeToggle<cr>", unique)
@@ -115,16 +116,3 @@ end, expr)
 set("n", "k", function()
   return vimv.count == 0 and "gk" or "k"
 end, expr)
-
-set("n", "<leader>Q", function()
-  require("config.buffers").quit_all()
-end, unique)
-
-set("n", "<leader>q", function()
-  require("config.buffers").close_buffer()
-end, unique)
-
-set("n", "<leader>C", function()
-  local lines = vimapi.nvim_buf_get_lines(0, 0, -1, false)
-  vimfn.setreg("+", lines, "l")
-end, default)

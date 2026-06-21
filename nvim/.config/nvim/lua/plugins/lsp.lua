@@ -55,8 +55,7 @@ return {
       "mason-org/mason-lspconfig.nvim",
     },
     config = function()
-      local handlers = require("config.handlers")
-      handlers.setup()
+      require("config.handlers").setup()
 
       local servers = {
         "bashls",
@@ -99,6 +98,7 @@ return {
         automatic_enable = false,
         ensure_installed = servers,
       })
+
       local mason_registry = require("mason-registry")
       local tools = {
         "black",
@@ -119,9 +119,6 @@ return {
       end)
 
       local lsp = vim.lsp
-      lsp.config("*", {
-        on_attach = handlers.on_attach,
-      })
 
       for _, server_name in ipairs(servers) do
         if server_name ~= "jdtls" then

@@ -1,12 +1,10 @@
 local env = vim.env
 local fs = vim.fs
-local keymap = vim.keymap
 
 local bit = require("bit")
 local bxor, lshift, tohex = bit.bxor, bit.lshift, bit.tohex
 local byte = string.byte
 
-local handlers = require("config.handlers")
 local jdtls = require("jdtls")
 
 local mason = env.HOME .. "/.local/share/nvim/mason"
@@ -134,8 +132,6 @@ local config = {
 }
 
 config.on_attach = function(_, bufnr)
-  handlers.on_attach(nil, bufnr)
-
   jdtls.setup_dap({
     hotcodereplace = "auto",
     config_overrides = {},
@@ -143,15 +139,13 @@ config.on_attach = function(_, bufnr)
 
   require("jdtls.dap").setup_dap_main_class_configs()
 
+  local set = vim.keymap.set
   local opts = { noremap = true, silent = true, buffer = bufnr }
-  keymap.set("n", "<F9>", jdtls.test_class, opts)
-  keymap.set("n", "<F10>", jdtls.test_nearest_method, opts)
-  keymap.set("n", "<leader><Tab>", function()
-    require("jdtls.tests").goto_subjects()
-  end, opts)
-  keymap.set("n", "<leader><S-Tab>", function()
-    require("jdtls.tests").generate()
-  end, opts)
+
+  set("n", "<F9>", jdtls.test_class, opts)
+  set("n", "<F10>", jdtls.test_nearest_method, opts)
+  set("n", "<leader><Tab>", "<cmd>lua require('jdtls.tests').goto_subjects()<cr>", opts)
+  set("n", "<leader><S-Tab>", "<cmd>lua require('jdtls.tests').generate()<cr>", opts)
 end
 
 jdtls.start_or_attach(config)
