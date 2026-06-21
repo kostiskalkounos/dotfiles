@@ -4,6 +4,15 @@ return {
   { "mfussenegger/nvim-jdtls", event = "VeryLazy" },
   { "towolf/vim-helm", event = "VeryLazy" },
   {
+    "folke/lazydev.nvim",
+    event = "VeryLazy",
+    opts = {
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  },
+  {
     "stevearc/conform.nvim",
     event = "VeryLazy",
     config = function()
@@ -37,15 +46,6 @@ return {
         vim.notify("Autoformatting: " .. tostring(not g.disable_autoformat))
       end, {})
     end,
-  },
-  {
-    "folke/lazydev.nvim",
-    event = "VeryLazy",
-    opts = {
-      library = {
-        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-      },
-    },
   },
   {
     "neovim/nvim-lspconfig",

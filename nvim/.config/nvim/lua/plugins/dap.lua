@@ -16,6 +16,13 @@ return {
         "theHamsta/nvim-dap-virtual-text",
         opts = { virt_text_pos = "eol" },
       },
+      {
+        "jay-babu/mason-nvim-dap.nvim",
+        opts = {
+          automatic_installation = true,
+          ensure_installed = { "delve", "javadbg", "javatest" },
+        },
+      },
     },
     config = function()
       local dap = require("dap")
@@ -74,7 +81,6 @@ return {
             },
           },
         },
-
         floating = {
           max_height = nil,
           max_width = nil,
@@ -130,6 +136,7 @@ return {
         E = "editor",
       }
 
+      local element_keys = vim.tbl_keys(element_map)
       local keymaps_active = false
       local keymap_opts = { silent = true }
 
@@ -146,7 +153,7 @@ return {
 
       local function cleanup_keymaps()
         if keymaps_active then
-          for key in pairs(element_map) do
+          for _, key in ipairs(element_keys) do
             pcall(vim.keymap.del, "n", key)
           end
           keymaps_active = false
@@ -182,9 +189,9 @@ return {
 
       set({ "n", "v" }, "<leader>:", function()
         dapui.eval(nil, { enter = true })
-        vim.defer_fn(function()
+        vim.schedule(function()
           api.nvim_feedkeys(api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
-        end, 50)
+        end)
       end, default)
 
       set({ "n", "v" }, '<leader>"', function()
@@ -236,7 +243,7 @@ return {
           program = "${file}",
         },
         {
-          name = "Custom Java Runnner",
+          name = "Custom Java Runner",
           type = "java",
           request = "launch",
           classPaths = {},
@@ -248,17 +255,5 @@ return {
         },
       }
     end,
-  },
-  {
-    "jay-babu/mason-nvim-dap.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "mason-org/mason.nvim",
-      "mfussenegger/nvim-dap",
-    },
-    opts = {
-      automatic_installation = true,
-      ensure_installed = { "delve", "javadbg", "javatest" },
-    },
   },
 }
