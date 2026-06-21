@@ -1,27 +1,22 @@
 return {
   {
     "nvim-mini/mini.icons",
-    version = "*",
     event = "VeryLazy",
     opts = {},
     init = function()
       package.preload["nvim-web-devicons"] = function()
-        require("lazy").load({ plugins = { "mini.icons" } })
-        local mini_icons = require("mini.icons")
-        mini_icons.mock_nvim_web_devicons()
+        require("mini.icons").mock_nvim_web_devicons()
         return package.loaded["nvim-web-devicons"]
       end
     end,
   },
   {
     "nvim-mini/mini.pairs",
-    version = "*",
     event = "VeryLazy",
     opts = {},
   },
   {
     "nvim-mini/mini.statusline",
-    version = "*",
     event = "UIEnter",
     priority = 999,
     config = function()
