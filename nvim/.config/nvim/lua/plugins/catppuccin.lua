@@ -60,18 +60,12 @@ return {
           ["PreProc"] = { fg = colors.sapphire },
           ["javaTypedef"] = { fg = colors.mauve },
 
-          MiniStatusline = { fg = colors.text, bg = colors.base },
-          MiniStatuslineAdd = { fg = colors.green, bg = colors.base },
-          MiniStatuslineDiagnosticError = { fg = colors.red, bg = colors.base },
-          MiniStatuslineDiagnosticHint = { fg = colors.teal, bg = colors.base },
-          MiniStatuslineDiagnosticInfo = { fg = colors.blue, bg = colors.base },
-          MiniStatuslineDiagnosticWarn = { fg = colors.yellow, bg = colors.base },
-          MiniStatuslineInactive = { fg = colors.overlay0, bg = colors.base },
-
           NvimTreeStatusLine = { fg = colors.text, bg = colors.base },
           NvimTreeStatusLineNC = { fg = colors.surface1, bg = colors.base },
           StatusLine = { fg = colors.text, bg = colors.base },
           StatusLineNC = { fg = colors.surface1, bg = colors.base },
+
+          StlBranchIcon = { fg = colors.mauve, bg = colors.base },
         }
       end,
     })
