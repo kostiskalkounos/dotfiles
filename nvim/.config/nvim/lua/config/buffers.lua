@@ -8,6 +8,12 @@ M.close_buffer = function()
   local buf = api.nvim_get_current_buf()
   local bo = vim.bo
 
+  local wins = vim.fn.win_findbuf(buf)
+  if #wins > 1 then
+    api.nvim_win_close(0, false)
+    return
+  end
+
   if bo[buf].modified then
     local name = api.nvim_buf_get_name(buf)
     if name ~= "" then
