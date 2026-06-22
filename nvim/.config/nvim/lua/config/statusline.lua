@@ -16,16 +16,18 @@ local nvim_win_get_buf = api.nvim_win_get_buf
 
 local EMPTY = ""
 local SPACE = " "
-local FILE_NAME = "      %f%<"
-local FILE_FLAGS = "%( %m%r%)"
+local TAB = "          "
 local SEPARATOR = "%="
-local LOCATION = "   %5l:%-4c "
+
+local FILENAME = "%f%<"
+local FLAGS = "%( %m%r%)"
+local LOCATION = "%10l:%-9c"
 local PROGRESS = "%3p%% "
 
 local HL_ACTIVE = "%#StatusLine#"
 local HL_INACTIVE = "%#StatusLineNC#"
 local HL_BRANCH = "%#StlBranchIcon#"
-local BRANCH_ICON = "   " .. HL_BRANCH .. " " .. HL_ACTIVE
+local BRANCH_ICON = TAB .. HL_BRANCH .. " " .. HL_ACTIVE
 
 local HL_ADD = "%#GitSignsAdd#"
 local HL_ERROR = "%#DiagnosticError#"
@@ -48,18 +50,11 @@ local function rebuild_format_strings(c)
     return
   end
 
-  c.active = HL_ACTIVE
-    .. c.git
-    .. SEPARATOR
-    .. FILE_NAME
-    .. c.icon_active
-    .. FILE_FLAGS
-    .. SEPARATOR
-    .. c.diag
-    .. c.branch
-    .. LOCATION
-    .. PROGRESS
-  c.inactive = HL_INACTIVE .. SEPARATOR .. FILE_NAME .. c.icon_inactive .. FILE_FLAGS .. SEPARATOR
+  local left = "%-35(" .. c.git .. TAB .. c.diag .. "%)"
+  local right = "%35(" .. c.branch .. LOCATION .. PROGRESS .. "%)"
+
+  c.active = HL_ACTIVE .. left .. SEPARATOR .. FILENAME .. c.icon_active .. FLAGS .. SEPARATOR .. right
+  c.inactive = HL_INACTIVE .. SEPARATOR .. FILENAME .. c.icon_inactive .. FLAGS .. SEPARATOR
 end
 
 local function create_empty_cache()
@@ -172,7 +167,7 @@ local function update_diag_cache(bufnr)
   end
 
   local c = ensure_cache(bufnr)
-  c.diag = s ~= EMPTY and s:sub(1, -2) or EMPTY -- :sub trims the trailing space
+  c.diag = s ~= EMPTY and s:sub(1, -2) or EMPTY
   rebuild_format_strings(c)
 end
 
@@ -221,7 +216,7 @@ local function update_buftype_cache(bufnr)
   if bt == "terminal" or bt == "nofile" or bt == "prompt" then
     c.is_special = true
     local ft = get_option_value("filetype", { buf = bufnr })
-    c.special_string = HL_INACTIVE .. " " .. (ft ~= EMPTY and ft or bt) .. SEPARATOR
+    c.special_string = HL_INACTIVE .. SPACE .. (ft ~= EMPTY and ft or bt) .. SEPARATOR
   else
     c.is_special = false
   end
