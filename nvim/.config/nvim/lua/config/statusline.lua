@@ -22,7 +22,7 @@ local SEPARATOR = "%="
 local FILENAME = "%f%<"
 local FLAGS = "%( %m%r%)"
 local LOCATION = "%10l:%-9c"
-local PROGRESS = "%3p%% "
+local PROGRESS = "%3p%%"
 
 local HL_ACTIVE = "%#StatusLine#"
 local HL_INACTIVE = "%#StatusLineNC#"
@@ -45,16 +45,27 @@ local SEV_WARN = 2
 local SEV_INFO = 3
 local SEV_HINT = 4
 
-local function rebuild_format_strings(c)
+local ACTIVE_FIFRST = HL_ACTIVE .. SPACE .. FILENAME
+local ACTIVE_SECOND = SPACE .. FLAGS .. SPACE
+local ACTIVE_THIRD = LOCATION .. PROGRESS .. SPACE
+
+local INACTIVE_FIRST = HL_INACTIVE .. SPACE .. FILENAME
+local INACTIVE_SECOND = SPACE .. FLAGS
+
+local function rebuild_active_string(c)
   if c.is_special then
     return
   end
 
-  local left = "%-35(" .. c.git .. TAB .. c.diag .. "%)"
-  local right = "%35(" .. c.branch .. LOCATION .. PROGRESS .. "%)"
+  c.active = ACTIVE_FIFRST .. c.icon_active .. ACTIVE_SECOND .. c.git .. SEPARATOR .. c.diag .. c.branch .. ACTIVE_THIRD
+end
 
-  c.active = HL_ACTIVE .. left .. SEPARATOR .. FILENAME .. c.icon_active .. FLAGS .. SEPARATOR .. right
-  c.inactive = HL_INACTIVE .. SEPARATOR .. FILENAME .. c.icon_inactive .. FLAGS .. SEPARATOR
+local function rebuild_inactive_string(c)
+  if c.is_special then
+    return
+  end
+
+  c.inactive = INACTIVE_FIRST .. c.icon_inactive .. INACTIVE_SECOND
 end
 
 local function create_empty_cache()
@@ -69,7 +80,9 @@ local function create_empty_cache()
     active = EMPTY,
     inactive = EMPTY,
   }
-  rebuild_format_strings(c)
+
+  rebuild_active_string(c)
+  rebuild_inactive_string(c)
   return c
 end
 
@@ -110,7 +123,8 @@ local function update_icon_cache(bufnr)
     mini_icons_module = package.loaded["mini.icons"]
     if not mini_icons_module then
       c.icon_active, c.icon_inactive = EMPTY, EMPTY
-      rebuild_format_strings(c)
+      rebuild_active_string(c)
+      rebuild_inactive_string(c)
       return
     end
   end
@@ -126,7 +140,7 @@ local function update_icon_cache(bufnr)
     if not generated_icon_hls[hl_group] then
       local icon_colors = api.nvim_get_hl(0, { name = hl_group, link = false })
       api.nvim_set_hl(0, active_hl_name, { fg = icon_colors.fg, bg = bg_active_cache })
-      api.nvim_set_hl(0, inactive_hl_name, { fg = icon_colors.fg, bg = bg_inactive_cache })
+      api.nvim_set_hl(0, inactive_hl_name, { fg = icon_colors.bg, bg = bg_inactive_cache })
       generated_icon_hls[hl_group] = true
     end
 
@@ -135,7 +149,8 @@ local function update_icon_cache(bufnr)
   else
     c.icon_active, c.icon_inactive = EMPTY, EMPTY
   end
-  rebuild_format_strings(c)
+  rebuild_active_string(c)
+  rebuild_inactive_string(c)
 end
 
 local function update_diag_cache(bufnr)
@@ -168,7 +183,7 @@ local function update_diag_cache(bufnr)
 
   local c = ensure_cache(bufnr)
   c.diag = s ~= EMPTY and s:sub(1, -2) or EMPTY
-  rebuild_format_strings(c)
+  rebuild_active_string(c)
 end
 
 local function update_git_cache(bufnr)
@@ -203,7 +218,7 @@ local function update_git_cache(bufnr)
   local c = ensure_cache(bufnr)
   c.git = s ~= EMPTY and (SPACE .. s:sub(1, -2)) or EMPTY
   c.branch = (head and head ~= EMPTY) and (BRANCH_ICON .. head) or EMPTY
-  rebuild_format_strings(c)
+  rebuild_active_string(c)
 end
 
 local function update_buftype_cache(bufnr)
@@ -216,11 +231,15 @@ local function update_buftype_cache(bufnr)
   if bt == "terminal" or bt == "nofile" or bt == "prompt" then
     c.is_special = true
     local ft = get_option_value("filetype", { buf = bufnr })
-    c.special_string = HL_INACTIVE .. SPACE .. (ft ~= EMPTY and ft or bt) .. SEPARATOR
+    local name = ft ~= EMPTY and ft or bt
+
+    c.active = HL_ACTIVE .. SPACE .. name .. SEPARATOR
+    c.inactive = HL_INACTIVE .. SPACE .. name .. SEPARATOR
   else
     c.is_special = false
+    rebuild_active_string(c)
+    rebuild_inactive_string(c)
   end
-  rebuild_format_strings(c)
 end
 
 local augroup = api.nvim_create_augroup("NativeStatuslineOptimized", { clear = true })
@@ -308,9 +327,6 @@ _G.OptimizedStatusline = function()
   local winid = g.statusline_winid
   local c = cache[win_to_buf[winid] or nvim_win_get_buf(winid)] or EMPTY_CACHE
 
-  if c.is_special then
-    return c.special_string
-  end
   if winid == current_win_cache then
     return c.active
   end

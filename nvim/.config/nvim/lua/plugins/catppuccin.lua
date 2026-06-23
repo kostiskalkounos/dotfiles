@@ -64,6 +64,8 @@ return {
           NvimTreeStatusLineNC = { fg = colors.surface1, bg = colors.base },
           StatusLine = { fg = colors.text, bg = colors.base },
           StatusLineNC = { fg = colors.surface1, bg = colors.base },
+          StatusLineTerm = { fg = colors.text, bg = colors.base },
+          StatusLineTermNC = { fg = colors.surface1, bg = colors.base },
 
           StlBranchIcon = { fg = colors.mauve, bg = colors.base },
         }
