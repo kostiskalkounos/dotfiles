@@ -45,7 +45,7 @@ local SEV_WARN = 2
 local SEV_INFO = 3
 local SEV_HINT = 4
 
-local ACTIVE_FIFRST = HL_ACTIVE .. SPACE .. FILENAME
+local ACTIVE_FIRST = HL_ACTIVE .. SPACE .. FILENAME
 local ACTIVE_SECOND = SPACE .. FLAGS .. SPACE
 local ACTIVE_THIRD = LOCATION .. PROGRESS .. SPACE
 
@@ -56,15 +56,13 @@ local function rebuild_active_string(c)
   if c.is_special then
     return
   end
-
-  c.active = ACTIVE_FIFRST .. c.icon_active .. ACTIVE_SECOND .. c.git .. SEPARATOR .. c.diag .. c.branch .. ACTIVE_THIRD
+  c.active = ACTIVE_FIRST .. c.icon_active .. ACTIVE_SECOND .. c.git .. SEPARATOR .. c.diag .. c.branch .. ACTIVE_THIRD
 end
 
 local function rebuild_inactive_string(c)
   if c.is_special then
     return
   end
-
   c.inactive = INACTIVE_FIRST .. c.icon_inactive .. INACTIVE_SECOND
 end
 
@@ -80,21 +78,18 @@ local function create_empty_cache()
     active = EMPTY,
     inactive = EMPTY,
   }
-
   rebuild_active_string(c)
   rebuild_inactive_string(c)
   return c
 end
 
 local EMPTY_CACHE = create_empty_cache()
-local cache = {}
-local win_to_buf = {}
+local current_win_cache = nvim_get_current_win()
 
+local cache = {}
 local bg_active_cache = nil
-local bg_inactive_cache = nil
 local generated_icon_hls = {}
 local mini_icons_module = nil
-local current_win_cache = nvim_get_current_win()
 
 local function ensure_cache(bufnr)
   local c = cache[bufnr]
@@ -107,96 +102,108 @@ end
 
 local function refresh_hl_cache()
   local sl = api.nvim_get_hl(0, { name = "StatusLine", link = false })
-  local slnc = api.nvim_get_hl(0, { name = "StatusLineNC", link = false })
   bg_active_cache = sl.bg
-  bg_inactive_cache = slnc.bg
   generated_icon_hls = {}
 end
 
-local function update_icon_cache(bufnr)
+local function update_icon_cache(bufnr, c, defer_rebuild)
   if not nvim_buf_is_valid(bufnr) then
     return
   end
-  local c = ensure_cache(bufnr)
+  c = c or ensure_cache(bufnr)
+  if c.is_special then
+    return
+  end
 
   if not mini_icons_module then
     mini_icons_module = package.loaded["mini.icons"]
     if not mini_icons_module then
       c.icon_active, c.icon_inactive = EMPTY, EMPTY
-      rebuild_active_string(c)
-      rebuild_inactive_string(c)
+      if not defer_rebuild then
+        rebuild_active_string(c)
+        rebuild_inactive_string(c)
+      end
       return
     end
   end
 
   local bufname = nvim_buf_get_name(bufnr)
-  local filename = bufname:match("[^/\\]+$") or bufname
-  local icon, hl_group = mini_icons_module.get("file", filename)
+  if c.bufname == bufname then
+    return
+  end
+  c.bufname = bufname
+
+  local icon, hl_group = mini_icons_module.get("file", bufname)
 
   if icon and hl_group then
     local active_hl_name = "StlIconActive_" .. hl_group
-    local inactive_hl_name = "StlIconInactive_" .. hl_group
 
     if not generated_icon_hls[hl_group] then
       local icon_colors = api.nvim_get_hl(0, { name = hl_group, link = false })
       api.nvim_set_hl(0, active_hl_name, { fg = icon_colors.fg, bg = bg_active_cache })
-      api.nvim_set_hl(0, inactive_hl_name, { fg = icon_colors.bg, bg = bg_inactive_cache })
       generated_icon_hls[hl_group] = true
     end
 
     c.icon_active = SPACE .. "%#" .. active_hl_name .. "#" .. icon .. HL_ACTIVE
-    c.icon_inactive = SPACE .. "%#" .. inactive_hl_name .. "#" .. icon .. HL_INACTIVE
+    c.icon_inactive = SPACE .. icon
   else
     c.icon_active, c.icon_inactive = EMPTY, EMPTY
   end
-  rebuild_active_string(c)
-  rebuild_inactive_string(c)
+  if not defer_rebuild then
+    rebuild_active_string(c)
+    rebuild_inactive_string(c)
+  end
 end
 
-local function update_diag_cache(bufnr)
+local function update_diag_cache(bufnr, c, defer_rebuild)
   if not nvim_buf_is_valid(bufnr) then
     return
   end
+  c = c or ensure_cache(bufnr)
+  if c.is_special then
+    return
+  end
+
   local counts = count_diag(bufnr)
-  if not counts then
-    return
-  end
-
-  local err = counts[SEV_ERROR] or 0
-  local warn = counts[SEV_WARN] or 0
-  local info = counts[SEV_INFO] or 0
-  local hint = counts[SEV_HINT] or 0
-
   local s = EMPTY
-  if err > 0 then
-    s = s .. SIGN_ERROR .. err .. SPACE
-  end
-  if warn > 0 then
-    s = s .. SIGN_WARN .. warn .. SPACE
-  end
-  if info > 0 then
-    s = s .. SIGN_INFO .. info .. SPACE
-  end
-  if hint > 0 then
-    s = s .. SIGN_HINT .. hint .. SPACE
+  if counts then
+    local err = counts[SEV_ERROR] or 0
+    local warn = counts[SEV_WARN] or 0
+    local info = counts[SEV_INFO] or 0
+    local hint = counts[SEV_HINT] or 0
+
+    if err > 0 then
+      s = s .. SIGN_ERROR .. err .. SPACE
+    end
+    if warn > 0 then
+      s = s .. SIGN_WARN .. warn .. SPACE
+    end
+    if info > 0 then
+      s = s .. SIGN_INFO .. info .. SPACE
+    end
+    if hint > 0 then
+      s = s .. SIGN_HINT .. hint .. SPACE
+    end
   end
 
-  local c = ensure_cache(bufnr)
   c.diag = s ~= EMPTY and s:sub(1, -2) or EMPTY
-  rebuild_active_string(c)
+  if not defer_rebuild then
+    rebuild_active_string(c)
+  end
 end
 
-local function update_git_cache(bufnr)
+local function update_git_cache(bufnr, c, defer_rebuild)
   if not nvim_buf_is_valid(bufnr) then
+    return
+  end
+  c = c or ensure_cache(bufnr)
+  if c.is_special then
     return
   end
 
   local buf_vars = b[bufnr]
-  if not buf_vars then
-    return
-  end
-  local dict = buf_vars.gitsigns_status_dict
-  local head = buf_vars.gitsigns_head
+  local dict = buf_vars and buf_vars.gitsigns_status_dict
+  local head = buf_vars and buf_vars.gitsigns_head
 
   local s = EMPTY
   if dict and type(dict) == "table" then
@@ -215,17 +222,18 @@ local function update_git_cache(bufnr)
     end
   end
 
-  local c = ensure_cache(bufnr)
   c.git = s ~= EMPTY and (SPACE .. s:sub(1, -2)) or EMPTY
   c.branch = (head and head ~= EMPTY) and (BRANCH_ICON .. head) or EMPTY
-  rebuild_active_string(c)
+  if not defer_rebuild then
+    rebuild_active_string(c)
+  end
 end
 
-local function update_buftype_cache(bufnr)
+local function update_buftype_cache(bufnr, c, defer_rebuild)
   if not nvim_buf_is_valid(bufnr) then
     return
   end
-  local c = ensure_cache(bufnr)
+  c = c or ensure_cache(bufnr)
   local bt = get_option_value("buftype", { buf = bufnr })
 
   if bt == "terminal" or bt == "nofile" or bt == "prompt" then
@@ -237,18 +245,21 @@ local function update_buftype_cache(bufnr)
     c.inactive = HL_INACTIVE .. SPACE .. name .. SEPARATOR
   else
     c.is_special = false
-    rebuild_active_string(c)
-    rebuild_inactive_string(c)
+    if not defer_rebuild then
+      rebuild_active_string(c)
+      rebuild_inactive_string(c)
+    end
   end
 end
 
 local augroup = api.nvim_create_augroup("NativeStatuslineOptimized", { clear = true })
 
-api.nvim_create_autocmd({ "BufWinEnter", "WinEnter", "WinNew" }, {
+local win_to_buf = {}
+
+api.nvim_create_autocmd("BufWinEnter", {
   group = augroup,
   callback = function(args)
-    current_win_cache = nvim_get_current_win()
-    win_to_buf[current_win_cache] = args.buf
+    win_to_buf[nvim_get_current_win()] = args.buf
   end,
 })
 
@@ -259,14 +270,27 @@ api.nvim_create_autocmd("WinClosed", {
   end,
 })
 
+api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "FocusGained", "TabEnter" }, {
+  group = augroup,
+  callback = function()
+    current_win_cache = nvim_get_current_win()
+    redrawstatus()
+  end,
+})
+
 api.nvim_create_autocmd({ "BufEnter", "BufFilePost", "FileType" }, {
   group = augroup,
   callback = function(args)
     local buf = args.buf
-    update_buftype_cache(buf)
-    update_icon_cache(buf)
-    update_git_cache(buf)
-    update_diag_cache(buf)
+    local c = ensure_cache(buf)
+    update_buftype_cache(buf, c, true)
+    if not c.is_special then
+      update_icon_cache(buf, c, true)
+      update_git_cache(buf, c, true)
+      update_diag_cache(buf, c, true)
+      rebuild_active_string(c)
+      rebuild_inactive_string(c)
+    end
   end,
 })
 
@@ -274,8 +298,8 @@ api.nvim_create_autocmd("User", {
   group = augroup,
   pattern = "VeryLazy",
   callback = function()
-    for bufnr in pairs(cache) do
-      update_icon_cache(bufnr)
+    for bufnr, c in pairs(cache) do
+      update_icon_cache(bufnr, c)
     end
     redrawstatus()
   end,
@@ -309,8 +333,8 @@ api.nvim_create_autocmd("ColorScheme", {
   group = augroup,
   callback = function()
     refresh_hl_cache()
-    for bufnr in pairs(cache) do
-      update_icon_cache(bufnr)
+    for bufnr, c in pairs(cache) do
+      update_icon_cache(bufnr, c)
     end
     redrawstatus()
   end,
@@ -319,15 +343,39 @@ api.nvim_create_autocmd("ColorScheme", {
 api.nvim_create_autocmd("BufWipeout", {
   group = augroup,
   callback = function(args)
-    cache[args.buf] = nil
+    local bufnr = args.buf
+    cache[bufnr] = nil
+    for winid, bb in pairs(win_to_buf) do
+      if bb == bufnr then
+        win_to_buf[winid] = nil
+      end
+    end
+  end,
+})
+
+local is_global_stl = o.laststatus == 3
+api.nvim_create_autocmd("OptionSet", {
+  group = augroup,
+  pattern = "laststatus",
+  callback = function()
+    is_global_stl = o.laststatus == 3
+    redrawstatus()
   end,
 })
 
 _G.OptimizedStatusline = function()
   local winid = g.statusline_winid
-  local c = cache[win_to_buf[winid] or nvim_win_get_buf(winid)] or EMPTY_CACHE
+  if not winid or winid == 0 then
+    winid = nvim_get_current_win()
+  end
+  local bufnr = win_to_buf[winid]
+  if not bufnr then
+    bufnr = nvim_win_get_buf(winid)
+    win_to_buf[winid] = bufnr
+  end
+  local c = cache[bufnr] or EMPTY_CACHE
 
-  if winid == current_win_cache then
+  if is_global_stl or winid == current_win_cache then
     return c.active
   end
 
