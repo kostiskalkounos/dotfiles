@@ -54,15 +54,13 @@ return {
       return line_count > 5000 or vim.api.nvim_buf_get_offset(buf, line_count) > 102400
     end
 
-    local parser_cache = {}
-    local function has_parser(lang)
-      if parser_cache[lang] ~= nil then
-        return parser_cache[lang]
-      end
-      local ok = vim.treesitter.language.add(lang)
-      parser_cache[lang] = not not ok
-      return parser_cache[lang]
-    end
+    local parser_cache = setmetatable({}, {
+      __index = function(t, lang)
+        local ok = not not vim.treesitter.language.add(lang)
+        t[lang] = ok
+        return ok
+      end,
+    })
 
     local ts_group = vim.api.nvim_create_augroup("CustomTreesitterSetup", { clear = true })
     vim.api.nvim_create_autocmd("FileType", {
@@ -80,7 +78,7 @@ return {
         end
 
         local lang = vim.treesitter.language.get_lang(ft) or ft
-        if lang and has_parser(lang) then
+        if lang and parser_cache[lang] then
           vim.treesitter.start(buf, lang)
           vim.api.nvim_set_option_value("indentexpr", "v:lua.require'nvim-treesitter'.indentexpr()", { buf = buf })
         end
