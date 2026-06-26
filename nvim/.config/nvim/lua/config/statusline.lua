@@ -3,7 +3,6 @@ local b = vim.b
 local g = vim.g
 local o = vim.o
 
-local count_diag = vim.diagnostic.count
 local get_option_value = api.nvim_get_option_value
 local nvim_buf_get_name = api.nvim_buf_get_name
 local nvim_buf_is_valid = api.nvim_buf_is_valid
@@ -183,25 +182,27 @@ local function update_diag_cache(bufnr, c, defer_rebuild)
     return
   end
 
-  local counts = count_diag(bufnr)
   local s = EMPTY
-  if counts then
-    local err = counts[SEV_ERROR] or 0
-    local warn = counts[SEV_WARN] or 0
-    local info = counts[SEV_INFO] or 0
-    local hint = counts[SEV_HINT] or 0
+  if package.loaded["vim.diagnostic"] then
+    local counts = vim.diagnostic.count(bufnr)
+    if counts then
+      local err = counts[SEV_ERROR] or 0
+      local warn = counts[SEV_WARN] or 0
+      local info = counts[SEV_INFO] or 0
+      local hint = counts[SEV_HINT] or 0
 
-    if err > 0 then
-      s = s .. SIGN_ERROR .. err .. SPACE
-    end
-    if warn > 0 then
-      s = s .. SIGN_WARN .. warn .. SPACE
-    end
-    if info > 0 then
-      s = s .. SIGN_INFO .. info .. SPACE
-    end
-    if hint > 0 then
-      s = s .. SIGN_HINT .. hint .. SPACE
+      if err > 0 then
+        s = s .. SIGN_ERROR .. err .. SPACE
+      end
+      if warn > 0 then
+        s = s .. SIGN_WARN .. warn .. SPACE
+      end
+      if info > 0 then
+        s = s .. SIGN_INFO .. info .. SPACE
+      end
+      if hint > 0 then
+        s = s .. SIGN_HINT .. hint .. SPACE
+      end
     end
   end
 

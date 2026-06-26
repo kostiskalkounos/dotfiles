@@ -34,16 +34,13 @@ return {
     sources = {
       default = (function()
         local comment_nodes = { comment = true, line_comment = true, block_comment = true }
-        local get_node = vim.treesitter.get_node
-        local nvim_get_current_buf = vim.api.nvim_get_current_buf
-        local ts_highlighter_active = vim.treesitter.highlighter.active
         return function()
           local sources = { "lsp", "buffer" }
-          local buf = nvim_get_current_buf()
-          local has_parser = ts_highlighter_active[buf] ~= nil
+          local buf = vim.api.nvim_get_current_buf()
+          local has_parser = vim.treesitter.highlighter.active[buf] ~= nil
 
           if has_parser then
-            local ok, node = pcall(get_node)
+            local ok, node = pcall(vim.treesitter.get_node)
             if ok and node then
               local node_type = node:type()
               if not comment_nodes[node_type] then

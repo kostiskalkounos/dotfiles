@@ -1,6 +1,6 @@
 local g = vim.g
-local set = vim.keymap.set
 local vimv = vim.v
+local set = vim.keymap.set
 
 local default = { silent = true }
 local expr = { expr = true, silent = true }
