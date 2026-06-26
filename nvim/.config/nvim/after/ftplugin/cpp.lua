@@ -1,1 +1,2 @@
-vim.keymap.set("n", "<leader><Tab>", "<cmd>ClangdSwitchSourceHeader<cr>", { noremap = true, buffer = true })
+local set = vim.keymap.set
+set("n", "<leader><Tab>", "<cmd>ClangdSwitchSourceHeader<cr>", { buffer = true })

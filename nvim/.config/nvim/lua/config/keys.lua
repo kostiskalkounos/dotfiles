@@ -1,3 +1,4 @@
+local g = vim.g
 local set = vim.keymap.set
 local vimv = vim.v
 
@@ -5,8 +6,8 @@ local default = { silent = true }
 local expr = { expr = true, silent = true }
 local unique = { unique = true, silent = true }
 
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+g.mapleader = " "
+g.maplocalleader = " "
 
 set("n", "j", function()
   return vimv.count == 0 and "gj" or "j"

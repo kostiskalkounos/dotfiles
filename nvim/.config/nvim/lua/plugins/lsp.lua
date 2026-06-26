@@ -17,6 +17,7 @@ return {
     event = "VeryLazy",
     config = function()
       local prettier = { "prettier" }
+      local g = vim.g
       require("conform").setup({
         formatters_by_ft = {
           go = { "goimports", "gofumpt" },
@@ -32,7 +33,7 @@ return {
           typescriptreact = prettier,
         },
         format_on_save = function()
-          if vim.g.disable_autoformat then
+          if g.disable_autoformat then
             return
           end
           return { timeout_ms = 500, lsp_format = "fallback", quiet = true }
@@ -41,9 +42,11 @@ return {
     end,
     init = function()
       local g = vim.g
-      vim.api.nvim_create_user_command("FormatToggle", function()
+      local notify = vim.notify
+      local nvim_create_user_command = vim.api.nvim_create_user_command
+      nvim_create_user_command("FormatToggle", function()
         g.disable_autoformat = not g.disable_autoformat
-        vim.notify("Autoformatting: " .. tostring(not g.disable_autoformat))
+        notify("Autoformatting: " .. tostring(not g.disable_autoformat))
       end, {})
     end,
   },
@@ -109,14 +112,23 @@ return {
         "stylua",
       }
 
-      mason_registry.refresh(function()
-        for _, tool in ipairs(tools) do
-          local pkg = mason_registry.get_package(tool)
-          if not pkg:is_installed() then
-            pkg:install()
-          end
+      local missing_tools = {}
+      for _, tool in ipairs(tools) do
+        if not mason_registry.is_installed(tool) then
+          table.insert(missing_tools, tool)
         end
-      end)
+      end
+
+      if #missing_tools > 0 then
+        mason_registry.refresh(function()
+          for _, tool in ipairs(missing_tools) do
+            local pkg = mason_registry.get_package(tool)
+            if not pkg:is_installed() then
+              pkg:install()
+            end
+          end
+        end)
+      end
 
       local lsp = vim.lsp
 

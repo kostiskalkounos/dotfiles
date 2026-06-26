@@ -1,7 +1,11 @@
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+local fn = vim.fn
+local opt = vim.opt
+local uv = vim.uv
 
-if not vim.uv.fs_stat(lazypath) then
-  vim.fn.system({
+local lazypath = fn.stdpath("data") .. "/lazy/lazy.nvim"
+
+if not uv.fs_stat(lazypath) then
+  fn.system({
     "git",
     "clone",
     "--filter=blob:none",
@@ -11,7 +15,7 @@ if not vim.uv.fs_stat(lazypath) then
   })
 end
 
-vim.opt.rtp:prepend(lazypath)
+opt.rtp:prepend(lazypath)
 
 local options = {
   change_detection = { enabled = false },

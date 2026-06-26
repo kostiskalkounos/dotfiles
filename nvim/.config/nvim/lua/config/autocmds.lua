@@ -1,65 +1,77 @@
 local api = vim.api
+local env = vim.env
+local filetype = vim.filetype
+local fn = vim.fn
+local highlight = vim.highlight
+local json = vim.json
+local o = vim.o
+local open = io.open
+local schedule = vim.schedule
+local uv = vim.uv
 
-local api_nvim_command = api.nvim_command
-local api_nvim_create_augroup = api.nvim_create_augroup
-local api_nvim_create_autocmd = api.nvim_create_autocmd
-local api_nvim_create_user_command = api.nvim_create_user_command
+local getenv = os.getenv
+local remove = os.remove
 
-api_nvim_create_autocmd("TextYankPost", {
-  group = api_nvim_create_augroup("highlight_yank", { clear = true }),
+local nvim_command = api.nvim_command
+local nvim_create_augroup = api.nvim_create_augroup
+local nvim_create_autocmd = api.nvim_create_autocmd
+local nvim_create_user_command = api.nvim_create_user_command
+local nvim_set_option_value = api.nvim_set_option_value
+
+nvim_create_autocmd("TextYankPost", {
+  group = nvim_create_augroup("highlight_yank", { clear = true }),
   callback = function()
-    vim.highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = false })
+    highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = false })
   end,
 })
 
-vim.filetype.add({
+filetype.add({
   pattern = {
     ["Jenkinsfile.*"] = "groovy",
     ["Dockerfile.*"] = "dockerfile",
   },
 })
 
-local g = api_nvim_create_augroup("CursorLineControl", { clear = true })
-api_nvim_create_autocmd("WinLeave", {
+local g = nvim_create_augroup("CursorLineControl", { clear = true })
+nvim_create_autocmd("WinLeave", {
   group = g,
   callback = function()
-    vim.wo[0].cursorline = false
+    nvim_set_option_value("cursorline", false, { win = 0 })
   end,
 })
 
-api_nvim_create_autocmd("WinEnter", {
+nvim_create_autocmd("WinEnter", {
   group = g,
   callback = function()
-    vim.wo[0].cursorline = true
+    nvim_set_option_value("cursorline", true, { win = 0 })
   end,
 })
 
-api_nvim_create_user_command("Term", function(o)
-  api_nvim_command("split")
-  api_nvim_command("resize 15")
-  api_nvim_command("terminal " .. o.args)
+nvim_create_user_command("Term", function(opt)
+  nvim_command("split")
+  nvim_command("resize 15")
+  nvim_command("terminal " .. opt.args)
 end, { nargs = "*", complete = "file" })
 
-api_nvim_create_user_command("Vterm", function(o)
-  api_nvim_command("vsplit")
-  api_nvim_command("terminal " .. o.args)
+nvim_create_user_command("Vterm", function(opt)
+  nvim_command("vsplit")
+  nvim_command("terminal " .. opt.args)
 end, { nargs = "*", complete = "file" })
 
 local rpc_socket_path = nil
 
 local function setup_rpc_socket()
-  local uv = vim.uv or vim.loop
   local pid = uv.os_getpid()
-  local socket_dir = (os.getenv("HOME") or "") .. "/.cache/nvim/sockets"
-  vim.fn.mkdir(socket_dir, "p")
+  local socket_dir = (getenv("HOME") or "") .. "/.cache/nvim/sockets"
+  fn.mkdir(socket_dir, "p")
 
   rpc_socket_path = socket_dir .. "/nvim-" .. pid .. ".sock"
   if uv.fs_stat(rpc_socket_path) then
-    pcall(os.remove, rpc_socket_path)
+    pcall(remove, rpc_socket_path)
   end
-  pcall(vim.fn.serverstart, rpc_socket_path)
+  pcall(fn.serverstart, rpc_socket_path)
 
-  vim.schedule(function()
+  schedule(function()
     local req = uv.fs_scandir(socket_dir)
     if req then
       while true do
@@ -74,7 +86,7 @@ local function setup_rpc_socket()
             local success, _, err_name = uv.kill(socket_pid, 0)
             local is_running = (success == 0 or err_name == "EPERM")
             if not is_running then
-              pcall(os.remove, socket_dir .. "/" .. name)
+              pcall(remove, socket_dir .. "/" .. name)
             end
           end
         end
@@ -83,20 +95,20 @@ local function setup_rpc_socket()
   end)
 end
 
-local rpc_group = api_nvim_create_augroup("PredictableRpcSocket", { clear = true })
-api_nvim_create_autocmd("VimEnter", {
+local rpc_group = nvim_create_augroup("PredictableRpcSocket", { clear = true })
+nvim_create_autocmd("VimEnter", {
   group = rpc_group,
   desc = "Start RPC server on predictable socket for theme hot-reloads",
   callback = setup_rpc_socket,
 })
 
-api_nvim_create_autocmd("VimLeavePre", {
+nvim_create_autocmd("VimLeavePre", {
   group = rpc_group,
   desc = "Stop RPC server and clean up socket on exit",
   callback = function()
-    if rpc_socket_path and (vim.uv or vim.loop).fs_stat(rpc_socket_path) then
-      pcall(vim.fn.serverstop, rpc_socket_path)
-      pcall(os.remove, rpc_socket_path)
+    if rpc_socket_path and uv.fs_stat(rpc_socket_path) then
+      pcall(fn.serverstop, rpc_socket_path)
+      pcall(remove, rpc_socket_path)
     end
   end,
 })
@@ -108,12 +120,11 @@ local function load_vars_from_zsh()
     return cached_vars
   end
 
-  local home = os.getenv("HOME") or ""
+  local home = getenv("HOME") or ""
   local zshrc_path = home .. "/.zshrc"
   local cache_dir = home .. "/.cache/nvim"
   local cache_path = cache_dir .. "/fzf_bat_themes.json"
 
-  local uv = vim.uv or vim.loop
   local zshrc_stat = uv.fs_stat(zshrc_path)
   local cache_stat = uv.fs_stat(cache_path)
 
@@ -121,11 +132,11 @@ local function load_vars_from_zsh()
   local cache_mtime = cache_stat and cache_stat.mtime.sec or 0
 
   if cache_mtime >= zshrc_mtime and cache_mtime > 0 then
-    local f = io.open(cache_path, "r")
+    local f = open(cache_path, "r")
     if f then
       local content = f:read("*a")
       f:close()
-      local success, data = pcall(vim.json.decode, content)
+      local success, data = pcall(json.decode, content)
       if success and data then
         cached_vars = data
         return cached_vars
@@ -139,7 +150,7 @@ local function load_vars_from_zsh()
   local dark_bat = "Catppuccin Macchiato"
   local light_bat = "Catppuccin Latte"
 
-  local f = io.open(zshrc_path, "r")
+  local f = open(zshrc_path, "r")
   if f then
     local in_dark_func = false
     local in_light_func = false
@@ -210,10 +221,10 @@ local function load_vars_from_zsh()
     light = { fzf = light_opts, bat = light_bat },
   }
 
-  vim.fn.mkdir(cache_dir, "p")
-  local fc = io.open(cache_path, "w")
+  fn.mkdir(cache_dir, "p")
+  local fc = open(cache_path, "w")
   if fc then
-    fc:write(vim.json.encode(cached_vars))
+    fc:write(json.encode(cached_vars))
     fc:close()
   end
 
@@ -221,29 +232,29 @@ local function load_vars_from_zsh()
 end
 
 local function update_fzf_opts()
-  if vim.o.background == vim.env.FZF_THEME then
+  if o.background == env.FZF_THEME then
     return
   end
 
-  vim.schedule(function()
-    if vim.o.background == vim.env.FZF_THEME then
+  schedule(function()
+    if o.background == env.FZF_THEME then
       return
     end
     local vars = load_vars_from_zsh()
-    if vim.o.background == "dark" then
-      vim.env.FZF_DEFAULT_OPTS = vars.dark.fzf ~= "" and vars.dark.fzf or nil
-      vim.env.FZF_THEME = "dark"
-      vim.env.BAT_THEME = vars.dark.bat
+    if o.background == "dark" then
+      env.FZF_DEFAULT_OPTS = vars.dark.fzf ~= "" and vars.dark.fzf or nil
+      env.FZF_THEME = "dark"
+      env.BAT_THEME = vars.dark.bat
     else
-      vim.env.FZF_DEFAULT_OPTS = vars.light.fzf ~= "" and vars.light.fzf or nil
-      vim.env.FZF_THEME = "light"
-      vim.env.BAT_THEME = vars.light.bat
+      env.FZF_DEFAULT_OPTS = vars.light.fzf ~= "" and vars.light.fzf or nil
+      env.FZF_THEME = "light"
+      env.BAT_THEME = vars.light.bat
     end
   end)
 end
 
-local fzf_theme_group = api_nvim_create_augroup("FzfThemeUpdate", { clear = true })
-api_nvim_create_autocmd("OptionSet", {
+local fzf_theme_group = nvim_create_augroup("FzfThemeUpdate", { clear = true })
+nvim_create_autocmd("OptionSet", {
   group = fzf_theme_group,
   pattern = "background",
   callback = update_fzf_opts,

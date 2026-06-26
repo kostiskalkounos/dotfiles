@@ -5,24 +5,32 @@ return {
   priority = 1000,
   build = ":CatppuccinCompile",
   config = function()
-    local theme = os.getenv("NVIM_THEME")
+    local getenv = os.getenv
+    local open = io.open
+    local o = vim.o
+    local trim = vim.trim
+
+    local theme = getenv("NVIM_THEME")
     if not theme then
-      local cache_file = (os.getenv("HOME") or "") .. "/.cache/theme"
-      local f = io.open(cache_file, "r")
+      local cache_file = (getenv("HOME") or "") .. "/.cache/theme"
+      local f = open(cache_file, "r")
       if f then
-        theme = vim.trim(f:read("*l") or "")
+        theme = trim(f:read("*l") or "")
         f:close()
       end
     end
     if theme == "dark" or theme == "light" then
-      vim.o.background = theme
+      o.background = theme
     end
 
     local catppuccin = require("catppuccin")
+    local nvim_command = vim.api.nvim_command
+    local stdpath = vim.fn.stdpath
+
     catppuccin.setup({
       compile = {
         enabled = true,
-        path = vim.fn.stdpath("cache") .. "/catppuccin",
+        path = stdpath("cache") .. "/catppuccin",
       },
       flavour = "auto",
       background = { light = "latte", dark = "macchiato" },
@@ -34,7 +42,7 @@ return {
         mini = true,
       },
       custom_highlights = function(colors)
-        local is_light = vim.o.background == "light"
+        local is_light = o.background == "light"
         return {
           ["@attribute"] = { fg = colors.sapphire },
           ["@constant"] = { fg = colors.teal },
@@ -72,6 +80,6 @@ return {
       end,
     })
 
-    vim.api.nvim_command("colorscheme catppuccin-nvim")
+    nvim_command("colorscheme catppuccin-nvim")
   end,
 }
