@@ -2,11 +2,12 @@ local M = {}
 
 local api = vim.api
 local diag = vim.diagnostic
-local floor = math.floor
 local lsp_buf = vim.lsp.buf
+local o = vim.o
+
+local floor = math.floor
 local nvim_create_augroup = api.nvim_create_augroup
 local nvim_create_autocmd = api.nvim_create_autocmd
-local o = vim.o
 local set = vim.keymap.set
 
 local diag_cfg = {

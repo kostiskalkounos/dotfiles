@@ -1,13 +1,13 @@
-local fs = vim.fs
-local getenv = os.getenv
-local uv = vim.uv
-local expand = vim.fn.expand
-
 local bit = require("bit")
+local jdtls = require("jdtls")
+
+local fs = vim.fs
+local uv = vim.uv
+
 local bxor, lshift, tohex = bit.bxor, bit.lshift, bit.tohex
 local byte = string.byte
-
-local jdtls = require("jdtls")
+local expand = vim.fn.expand
+local getenv = os.getenv
 
 local home = getenv("HOME") or ""
 local mason = home .. "/.local/share/nvim/mason"
@@ -50,7 +50,6 @@ if not _G._jdtls_bundles then
 end
 
 local bundles = _G._jdtls_bundles
-
 local extendedClientCapabilities = jdtls.extendedClientCapabilities
 extendedClientCapabilities.resolveAdditionalTextEditsSupport = true
 

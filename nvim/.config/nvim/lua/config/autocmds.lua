@@ -1,16 +1,12 @@
 local api = vim.api
 local env = vim.env
-local filetype = vim.filetype
 local fn = vim.fn
-local highlight = vim.highlight
-local json = vim.json
 local o = vim.o
-local open = io.open
-local schedule = vim.schedule
-local uv = vim.uv
 
 local getenv = os.getenv
+local open = io.open
 local remove = os.remove
+local schedule = vim.schedule
 
 local nvim_command = api.nvim_command
 local nvim_create_augroup = api.nvim_create_augroup
@@ -21,11 +17,11 @@ local nvim_set_option_value = api.nvim_set_option_value
 nvim_create_autocmd("TextYankPost", {
   group = nvim_create_augroup("highlight_yank", { clear = true }),
   callback = function()
-    highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = false })
+    vim.highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = false })
   end,
 })
 
-filetype.add({
+vim.filetype.add({
   pattern = {
     ["Jenkinsfile.*"] = "groovy",
     ["Dockerfile.*"] = "dockerfile",
@@ -61,6 +57,7 @@ end, { nargs = "*", complete = "file" })
 local rpc_socket_path = nil
 
 local function setup_rpc_socket()
+  local uv = vim.uv
   local pid = uv.os_getpid()
   local socket_dir = (getenv("HOME") or "") .. "/.cache/nvim/sockets"
   fn.mkdir(socket_dir, "p")
@@ -106,6 +103,7 @@ nvim_create_autocmd("VimLeavePre", {
   group = rpc_group,
   desc = "Stop RPC server and clean up socket on exit",
   callback = function()
+    local uv = vim.uv
     if rpc_socket_path and uv.fs_stat(rpc_socket_path) then
       pcall(fn.serverstop, rpc_socket_path)
       pcall(remove, rpc_socket_path)
@@ -115,23 +113,20 @@ nvim_create_autocmd("VimLeavePre", {
 
 local cached_vars = nil
 
-local function load_vars_from_zsh()
-  if cached_vars then
+local function load_vars_from_zsh(force_reload)
+  if cached_vars and not force_reload then
     return cached_vars
   end
+
+  local uv = vim.uv
+  local json = vim.json
 
   local home = getenv("HOME") or ""
   local zshrc_path = home .. "/.zshrc"
   local cache_dir = home .. "/.cache/nvim"
   local cache_path = cache_dir .. "/fzf_bat_themes.json"
 
-  local zshrc_stat = uv.fs_stat(zshrc_path)
-  local cache_stat = uv.fs_stat(cache_path)
-
-  local zshrc_mtime = zshrc_stat and zshrc_stat.mtime.sec or 0
-  local cache_mtime = cache_stat and cache_stat.mtime.sec or 0
-
-  if cache_mtime >= zshrc_mtime and cache_mtime > 0 then
+  if not force_reload then
     local f = open(cache_path, "r")
     if f then
       local content = f:read("*a")
@@ -139,6 +134,22 @@ local function load_vars_from_zsh()
       local success, data = pcall(json.decode, content)
       if success and data then
         cached_vars = data
+
+        uv.fs_stat(zshrc_path, function(err, zshrc_stat)
+          if not err and zshrc_stat then
+            uv.fs_stat(cache_path, function(err2, cache_stat)
+              if not err2 and cache_stat then
+                if zshrc_stat.mtime.sec > cache_stat.mtime.sec then
+                  schedule(function()
+                    load_vars_from_zsh(true)
+                    update_fzf_opts(true)
+                  end)
+                end
+              end
+            end)
+          end
+        end)
+
         return cached_vars
       end
     end
@@ -231,13 +242,14 @@ local function load_vars_from_zsh()
   return cached_vars
 end
 
-local function update_fzf_opts()
-  if o.background == env.FZF_THEME then
+local function update_fzf_opts(force)
+  local is_forced = (force == true)
+  if not is_forced and o.background == env.FZF_THEME then
     return
   end
 
   schedule(function()
-    if o.background == env.FZF_THEME then
+    if not is_forced and o.background == env.FZF_THEME then
       return
     end
     local vars = load_vars_from_zsh()

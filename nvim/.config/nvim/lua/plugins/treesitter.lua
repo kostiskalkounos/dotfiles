@@ -12,7 +12,6 @@ return {
     local nvim_buf_line_count = api.nvim_buf_line_count
     local nvim_create_augroup = api.nvim_create_augroup
     local nvim_create_autocmd = api.nvim_create_autocmd
-    local nvim_set_option_value = api.nvim_set_option_value
     local schedule = vim.schedule
     local vim_ts = vim.treesitter
 
@@ -34,7 +33,8 @@ return {
       "javascript",
       "json",
       "lua",
-      "nix",
+      "markdown",
+      "markdown_inline",
       "python",
       "rust",
       "terraform",
@@ -91,7 +91,6 @@ return {
         local lang = vim_ts.language.get_lang(ft) or ft
         if lang and parser_cache[lang] then
           vim_ts.start(buf, lang)
-          nvim_set_option_value("indentexpr", "v:lua.require'nvim-treesitter'.indentexpr()", { buf = buf })
         end
       end,
     })

@@ -5,9 +5,10 @@ return {
   priority = 1000,
   build = ":CatppuccinCompile",
   config = function()
+    local o = vim.o
+
     local getenv = os.getenv
     local open = io.open
-    local o = vim.o
     local trim = vim.trim
 
     local theme = getenv("NVIM_THEME")
