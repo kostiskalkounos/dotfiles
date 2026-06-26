@@ -3,7 +3,11 @@ local M = {}
 local api = vim.api
 local diag = vim.diagnostic
 local floor = math.floor
+local lsp_buf = vim.lsp.buf
+local nvim_create_augroup = api.nvim_create_augroup
+local nvim_create_autocmd = api.nvim_create_autocmd
 local o = vim.o
+local set = vim.keymap.set
 
 local diag_cfg = {
   float = { focusable = true, style = "minimal", border = "rounded", source = true },
@@ -30,11 +34,11 @@ local function get_dims(width_ratio, height_ratio)
 end
 
 local function hover()
-  vim.lsp.buf.hover(get_dims(0.7, 0.7))
+  lsp_buf.hover(get_dims(0.7, 0.7))
 end
 
 local function signature_help()
-  vim.lsp.buf.signature_help(get_dims(0.4, 0.5))
+  lsp_buf.signature_help(get_dims(0.4, 0.5))
 end
 
 local SEV_ERR = diag.severity.ERROR
@@ -43,11 +47,10 @@ local SEV_WARN = diag.severity.WARN
 local function on_lsp_attach(ev)
   local buf = ev.buf
   local opt = { buffer = buf, silent = true }
-  local set = vim.keymap.set
 
   set("n", "K", hover, opt)
   set("n", "gH", signature_help, opt)
-  set("n", "<leader>r", vim.lsp.buf.rename, opt)
+  set("n", "<leader>r", lsp_buf.rename, opt)
 
   set("n", "[d", function()
     diag.jump({ count = -1, float = true })
@@ -96,8 +99,8 @@ function M.setup()
     pcall(del, { "n", "x" }, map_str)
   end
 
-  api.nvim_create_autocmd("LspAttach", {
-    group = api.nvim_create_augroup("FastLspAttach", { clear = true }),
+  nvim_create_autocmd("LspAttach", {
+    group = nvim_create_augroup("FastLspAttach", { clear = true }),
     callback = on_lsp_attach,
   })
 end

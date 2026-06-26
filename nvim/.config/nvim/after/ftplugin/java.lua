@@ -1,5 +1,7 @@
-local env = vim.env
 local fs = vim.fs
+local getenv = os.getenv
+local uv = vim.uv
+local expand = vim.fn.expand
 
 local bit = require("bit")
 local bxor, lshift, tohex = bit.bxor, bit.lshift, bit.tohex
@@ -7,8 +9,9 @@ local byte = string.byte
 
 local jdtls = require("jdtls")
 
-local mason = env.HOME .. "/.local/share/nvim/mason"
-local root_dir = fs.root(0, { ".git", "mvnw", "gradlew" }) or vim.uv.cwd()
+local home = getenv("HOME") or ""
+local mason = home .. "/.local/share/nvim/mason"
+local root_dir = fs.root(0, { ".git", "mvnw", "gradlew" }) or uv.cwd()
 local project_name = fs.basename(root_dir)
 
 local function djb2(str)
@@ -20,12 +23,12 @@ local function djb2(str)
 end
 
 local workspace_hash = djb2(root_dir)
-local workspace_dir = env.HOME .. "/.local/share/nvim/jdtls-workspace/" .. project_name .. "-" .. workspace_hash
+local workspace_dir = home .. "/.local/share/nvim/jdtls-workspace/" .. project_name .. "-" .. workspace_hash
 
 if not _G._jdtls_bundles then
   local bundles = {}
   local debug_jar = mason .. "/share/java-debug-adapter/com.microsoft.java.debug.plugin.jar"
-  if vim.uv.fs_stat(debug_jar) then
+  if uv.fs_stat(debug_jar) then
     table.insert(bundles, debug_jar)
   end
 
@@ -35,7 +38,7 @@ if not _G._jdtls_bundles then
   }
 
   local test_dir = mason .. "/share/java-test"
-  if vim.uv.fs_stat(test_dir) then
+  if uv.fs_stat(test_dir) then
     for name, type in fs.dir(test_dir) do
       if (type == "file" or type == "link") and name:sub(-4) == ".jar" and not exclude[name] then
         table.insert(bundles, test_dir .. "/" .. name)
@@ -140,7 +143,7 @@ config.on_attach = function(_, bufnr)
   require("jdtls.dap").setup_dap_main_class_configs()
 
   local set = vim.keymap.set
-  local opts = { noremap = true, silent = true, buffer = bufnr }
+  local opts = { silent = true, buffer = bufnr }
 
   set("n", "<F9>", jdtls.test_class, opts)
   set("n", "<F10>", jdtls.test_nearest_method, opts)

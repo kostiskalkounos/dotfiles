@@ -30,8 +30,19 @@ return {
       local default = { noremap = true, unique = true, silent = true }
 
       local api = vim.api
+      local bo = vim.bo
+      local del = vim.keymap.del
       local fn = vim.fn
+      local nvim_create_augroup = api.nvim_create_augroup
+      local nvim_create_autocmd = api.nvim_create_autocmd
+      local nvim_feedkeys = api.nvim_feedkeys
+      local nvim_replace_termcodes = api.nvim_replace_termcodes
+      local nvim_set_current_win = api.nvim_set_current_win
+      local nvim_tabpage_list_wins = api.nvim_tabpage_list_wins
+      local nvim_win_get_buf = api.nvim_win_get_buf
+      local schedule = vim.schedule
       local set = vim.keymap.set
+      local tbl_keys = vim.tbl_keys
 
       fn.sign_define("DapBreakpoint", { text = " ", texthl = "DiagnosticSignError", linehl = "", numhl = "" })
       fn.sign_define("DapBreakpointCondition", { text = "", texthl = "DiagnosticError", linehl = "", numhl = "" })
@@ -39,8 +50,8 @@ return {
       fn.sign_define("DapBreakpointRejected", { text = "", texthl = "DiagnosticError", linehl = "", numhl = "" })
       fn.sign_define("DapLogPoint", { text = "󰁕 ", texthl = "DiagnosticInfo", linehl = "", numhl = "" })
 
-      local dap_group = api.nvim_create_augroup("DapReplAutocomplete", { clear = true })
-      api.nvim_create_autocmd("FileType", {
+      local dap_group = nvim_create_augroup("DapReplAutocomplete", { clear = true })
+      nvim_create_autocmd("FileType", {
         group = dap_group,
         pattern = "dap-repl",
         callback = function()
@@ -110,12 +121,12 @@ return {
       })
 
       local function find_window_by_filetype(element)
-        for _, win in ipairs(api.nvim_tabpage_list_wins(0)) do
-          local buf = api.nvim_win_get_buf(win)
-          local filetype = vim.bo[buf].filetype
+        for _, win in ipairs(nvim_tabpage_list_wins(0)) do
+          local buf = nvim_win_get_buf(win)
+          local filetype = bo[buf].filetype
 
           if filetype == element or (element == "editor" and dap.configurations[filetype]) then
-            api.nvim_set_current_win(win)
+            nvim_set_current_win(win)
             return
           end
         end
@@ -136,7 +147,7 @@ return {
         E = "editor",
       }
 
-      local element_keys = vim.tbl_keys(element_map)
+      local element_keys = tbl_keys(element_map)
       local keymaps_active = false
       local keymap_opts = { silent = true }
 
@@ -154,7 +165,7 @@ return {
       local function cleanup_keymaps()
         if keymaps_active then
           for _, key in ipairs(element_keys) do
-            pcall(vim.keymap.del, "n", key)
+            pcall(del, "n", key)
           end
           keymaps_active = false
         end
@@ -189,13 +200,13 @@ return {
 
       set({ "n", "v" }, "<leader>:", function()
         dapui.eval(nil, { enter = true })
-        vim.schedule(function()
-          api.nvim_feedkeys(api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+        schedule(function()
+          nvim_feedkeys(nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
         end)
       end, default)
 
       set({ "n", "v" }, '<leader>"', function()
-        require("dapui").elements.watches.add()
+        dapui.elements.watches.add()
       end, default)
 
       dap.configurations.java = {
@@ -211,7 +222,7 @@ return {
           request = "attach",
           hostName = "127.0.0.1",
           port = function()
-            local port_str = vim.fn.input("Enter debug port: ")
+            local port_str = fn.input("Enter debug port: ")
             return tonumber(port_str)
           end,
         },

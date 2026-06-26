@@ -42,9 +42,11 @@ return {
     "stevearc/oil.nvim",
     event = "VeryLazy",
     init = function()
-      if vim.fn.argc() == 1 then
-        local arg = vim.fn.argv(0)
-        local stat = vim.uv.fs_stat(arg)
+      local fn = vim.fn
+      local uv = vim.uv
+      if fn.argc() == 1 then
+        local arg = fn.argv(0)
+        local stat = uv.fs_stat(arg)
         if stat and stat.type == "directory" then
           require("lazy").load({ plugins = { "oil.nvim" } })
         end

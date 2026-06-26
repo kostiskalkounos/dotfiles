@@ -3,8 +3,9 @@ return {
   event = "VeryLazy",
   dependencies = "nvim-mini/mini.icons",
   config = function()
+    local fn = vim.fn
     local f = require("fzf-lua")
-    local cache = vim.fn.stdpath("cache")
+    local cache = fn.stdpath("cache")
 
     if _G.update_fzf_opts then
       _G.update_fzf_opts()
