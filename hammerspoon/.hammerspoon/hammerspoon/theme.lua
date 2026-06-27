@@ -130,5 +130,4 @@ Hyper:bind({}, "/", function()
   zshTask:start()
 end)
 
---- Returning this to make the linter happy
 return activeTasks
