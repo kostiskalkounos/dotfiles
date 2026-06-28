@@ -157,11 +157,24 @@ Hyper:bind({ "alt" }, "3", function() moveWindowToDisplay(3) end)
 
 Hyper:bind({ "alt" }, "[", function()
   local win = window.focusedWindow()
-  if win then if win:moveOneScreenWest() then win:moveOneScreenWest() else win:moveOneScreenEast() end end
+  if win then
+    local screenBefore = win:screen()
+    win:moveOneScreenWest(false, true)
+    if win:screen() == screenBefore then
+      win:moveOneScreenEast(false, true)
+    end
+  end
 end)
+
 Hyper:bind({ "alt" }, "]", function()
   local win = window.focusedWindow()
-  if win then if win:moveOneScreenEast() then win:moveOneScreenEast() else win:moveOneScreenWest() end end
+  if win then
+    local screenBefore = win:screen()
+    win:moveOneScreenEast(false, true)
+    if win:screen() == screenBefore then
+      win:moveOneScreenWest(false, true)
+    end
+  end
 end)
 
 Hyper:bind({}, "h", function() focusWindowInDirection("west") end)
