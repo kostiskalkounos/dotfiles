@@ -6,7 +6,6 @@ local uv = vim.uv
 
 local bxor, lshift, tohex = bit.bxor, bit.lshift, bit.tohex
 local byte = string.byte
-local expand = vim.fn.expand
 local getenv = os.getenv
 
 local home = getenv("HOME") or ""
