@@ -6,7 +6,9 @@ local window = require("hs.window")
 
 local function createSpace(sp)
   local displays = screen.allScreens()
-  spaces.addSpaceToScreen(displays[sp], true)
+  if displays[sp] then
+    spaces.addSpaceToScreen(displays[sp], true)
+  end
 end
 
 local function removeSpace(sp)
@@ -44,7 +46,7 @@ Hyper:bind({ "shift" }, '6', function() removeSpace(6) end)
 Hyper:bind({ "shift" }, '7', function() removeSpace(7) end)
 Hyper:bind({ "shift" }, '8', function() removeSpace(8) end)
 Hyper:bind({ "shift" }, '9', function() removeSpace(9) end)
-Hyper:bind({ "shift" }, '0', function() removeSpace(0) end)
+Hyper:bind({ "shift" }, '0', function() removeSpace(10) end)
 
 Hyper:bind({ "cmd", "ctrl" }, '1', function() moveWindowToSpace(1) end)
 Hyper:bind({ "cmd", "ctrl" }, '2', function() moveWindowToSpace(2) end)
@@ -55,4 +57,4 @@ Hyper:bind({ "cmd", "ctrl" }, '6', function() moveWindowToSpace(6) end)
 Hyper:bind({ "cmd", "ctrl" }, '7', function() moveWindowToSpace(7) end)
 Hyper:bind({ "cmd", "ctrl" }, '8', function() moveWindowToSpace(8) end)
 Hyper:bind({ "cmd", "ctrl" }, '9', function() moveWindowToSpace(9) end)
-Hyper:bind({ "cmd", "ctrl" }, '0', function() moveWindowToSpace(0) end)
+Hyper:bind({ "cmd", "ctrl" }, '0', function() moveWindowToSpace(10) end)
