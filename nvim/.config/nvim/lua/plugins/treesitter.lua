@@ -5,16 +5,6 @@ return {
   dependencies = { { "windwp/nvim-ts-autotag", opts = {} } },
   config = function()
     local ts = require("nvim-treesitter")
-
-    local api = vim.api
-    local list_contains = vim.list_contains
-    local nvim_buf_get_offset = api.nvim_buf_get_offset
-    local nvim_buf_line_count = api.nvim_buf_line_count
-    local nvim_create_augroup = api.nvim_create_augroup
-    local nvim_create_autocmd = api.nvim_create_autocmd
-    local schedule = vim.schedule
-    local vim_ts = vim.treesitter
-
     ts.setup()
 
     local parsers = {
@@ -46,11 +36,11 @@ return {
       "yaml",
     }
 
-    schedule(function()
+    vim.schedule(function()
       local installed = ts.get_installed()
       local missing = {}
       for _, p in ipairs(parsers) do
-        if not list_contains(installed, p) then
+        if not vim.list_contains(installed, p) then
           table.insert(missing, p)
         end
       end
@@ -61,20 +51,20 @@ return {
     end)
 
     local function should_disable(buf)
-      local line_count = nvim_buf_line_count(buf)
-      return line_count > 5000 or nvim_buf_get_offset(buf, line_count) > 102400
+      local line_count = vim.api.nvim_buf_line_count(buf)
+      return line_count > 5000 or vim.api.nvim_buf_get_offset(buf, line_count) > 102400
     end
 
     local parser_cache = setmetatable({}, {
       __index = function(t, lang)
-        local ok = not not vim_ts.language.add(lang)
+        local ok = not not vim.treesitter.language.add(lang)
         t[lang] = ok
         return ok
       end,
     })
 
-    local ts_group = nvim_create_augroup("CustomTreesitterSetup", { clear = true })
-    nvim_create_autocmd("FileType", {
+    local ts_group = vim.api.nvim_create_augroup("CustomTreesitterSetup", { clear = true })
+    vim.api.nvim_create_autocmd("FileType", {
       group = ts_group,
       pattern = "*",
       callback = function(args)
@@ -88,9 +78,9 @@ return {
           return
         end
 
-        local lang = vim_ts.language.get_lang(ft) or ft
+        local lang = vim.treesitter.language.get_lang(ft) or ft
         if lang and parser_cache[lang] then
-          vim_ts.start(buf, lang)
+          vim.treesitter.start(buf, lang)
         end
       end,
     })

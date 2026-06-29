@@ -34,25 +34,29 @@ return {
     sources = {
       default = (function()
         local comment_nodes = { comment = true, line_comment = true, block_comment = true }
+        local nvim_get_current_buf = vim.api.nvim_get_current_buf
+        local ts_highlighter_active = vim.treesitter.highlighter.active
+        local ts_get_node = vim.treesitter.get_node
+        local table_insert = table.insert
         return function()
           local sources = { "lsp", "buffer" }
-          local buf = vim.api.nvim_get_current_buf()
-          local has_parser = vim.treesitter.highlighter.active[buf] ~= nil
+          local buf = nvim_get_current_buf()
+          local has_parser = ts_highlighter_active[buf] ~= nil
 
           if has_parser then
-            local ok, node = pcall(vim.treesitter.get_node)
+            local ok, node = pcall(ts_get_node)
             if ok and node then
               local node_type = node:type()
               if not comment_nodes[node_type] then
-                table.insert(sources, "path")
+                table_insert(sources, "path")
               end
               if node_type ~= "string" then
-                table.insert(sources, "snippets")
+                table_insert(sources, "snippets")
               end
             end
           else
-            table.insert(sources, "path")
-            table.insert(sources, "snippets")
+            table_insert(sources, "path")
+            table_insert(sources, "snippets")
           end
 
           return sources

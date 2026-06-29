@@ -4,9 +4,8 @@ return {
   dependencies = "nvim-mini/mini.icons",
   config = function()
     local f = require("fzf-lua")
-
-    local fn = vim.fn
-    local cache = fn.stdpath("cache")
+    local stdpath = vim.fn.stdpath
+    local cache = stdpath("cache")
 
     if _G.update_fzf_opts then
       _G.update_fzf_opts()
