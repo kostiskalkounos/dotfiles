@@ -5,10 +5,8 @@ local fs = vim.fs
 local uv = vim.uv
 
 local bxor, lshift, tohex = bit.bxor, bit.lshift, bit.tohex
-local byte = string.byte
-local getenv = os.getenv
 
-local home = getenv("HOME") or ""
+local home = os.getenv("HOME") or ""
 local mason = home .. "/.local/share/nvim/mason"
 local root_dir = fs.root(0, { ".git", "mvnw", "gradlew" }) or uv.cwd()
 local project_name = fs.basename(root_dir)
@@ -16,7 +14,7 @@ local project_name = fs.basename(root_dir)
 local function djb2(str)
   local hash = 5381
   for i = 1, #str do
-    hash = bxor(lshift(hash, 5) + hash, byte(str, i))
+    hash = bxor(lshift(hash, 5) + hash, string.byte(str, i))
   end
   return tohex(hash)
 end

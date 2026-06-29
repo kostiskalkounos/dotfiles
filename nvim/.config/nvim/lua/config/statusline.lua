@@ -1,28 +1,23 @@
 local api = vim.api
+local fn = vim.fn
 local b = vim.b
 local g = vim.g
 local o = vim.o
+local diagnostic = vim.diagnostic
 
-local get_option_value = api.nvim_get_option_value
-local nvim_buf_get_name = api.nvim_buf_get_name
+local nvim_get_current_win = api.nvim_get_current_win
+local nvim_win_get_buf = api.nvim_win_get_buf
 local nvim_buf_is_valid = api.nvim_buf_is_valid
+local nvim_buf_get_name = api.nvim_buf_get_name
+local nvim_get_hl = api.nvim_get_hl
+local nvim_set_hl = api.nvim_set_hl
+local nvim_get_option_value = api.nvim_get_option_value
 local nvim_command = api.nvim_command
 local nvim_create_augroup = api.nvim_create_augroup
 local nvim_create_autocmd = api.nvim_create_autocmd
 local nvim_get_current_buf = api.nvim_get_current_buf
-local nvim_get_current_win = api.nvim_get_current_win
-local nvim_get_hl = api.nvim_get_hl
-local nvim_set_hl = api.nvim_set_hl
-local nvim_win_get_buf = api.nvim_win_get_buf
-local win_gettype = vim.fn.win_gettype
-
-local redrawstatus = function()
-  nvim_command("redrawstatus")
-end
-
-local is_float = function(winid)
-  return win_gettype(winid or 0) == "popup"
-end
+local win_gettype = fn.win_gettype
+local fnamemodify = fn.fnamemodify
 
 local EMPTY = ""
 local SPACE = " "
@@ -100,6 +95,14 @@ local current_win_cache = nvim_get_current_win()
 local bg_active_cache = nil
 local generated_icon_hls = {}
 local mini_icons_module = nil
+
+local function redrawstatus()
+  nvim_command("redrawstatus")
+end
+
+local function is_float(winid)
+  return win_gettype(winid or 0) == "popup"
+end
 
 local function ensure_cache(bufnr)
   local c = cache[bufnr]
@@ -184,7 +187,7 @@ local function update_diag_cache(bufnr, c, defer_rebuild)
 
   local s = EMPTY
   if package.loaded["vim.diagnostic"] then
-    local counts = vim.diagnostic.count(bufnr)
+    local counts = diagnostic.count(bufnr)
     if counts then
       local err = counts[SEV_ERROR] or 0
       local warn = counts[SEV_WARN] or 0
@@ -254,11 +257,11 @@ local function update_buftype_cache(bufnr, c, defer_rebuild)
     return
   end
   c = c or ensure_cache(bufnr)
-  local bt = get_option_value("buftype", { buf = bufnr })
+  local bt = nvim_get_option_value("buftype", { buf = bufnr })
 
   if bt == "terminal" or bt == "nofile" or bt == "prompt" or bt == "help" or bt == "quickfix" then
     c.is_special = true
-    local ft = get_option_value("filetype", { buf = bufnr })
+    local ft = nvim_get_option_value("filetype", { buf = bufnr })
     local name = ft ~= EMPTY and ft or bt
 
     c.active = HL_ACTIVE .. SPACE .. name .. SEPARATOR

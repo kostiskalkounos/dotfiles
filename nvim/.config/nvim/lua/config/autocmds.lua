@@ -1,18 +1,16 @@
 local api = vim.api
-local env = vim.env
 local fn = vim.fn
+local uv = vim.uv
+local json = vim.json
 local o = vim.o
+local env = vim.env
 
-local getenv = os.getenv
-local open = io.open
-local remove = os.remove
-local schedule = vim.schedule
-
-local nvim_command = api.nvim_command
 local nvim_create_augroup = api.nvim_create_augroup
 local nvim_create_autocmd = api.nvim_create_autocmd
 local nvim_create_user_command = api.nvim_create_user_command
 local nvim_set_option_value = api.nvim_set_option_value
+local nvim_command = api.nvim_command
+local schedule = vim.schedule
 
 nvim_create_autocmd("TextYankPost", {
   group = nvim_create_augroup("highlight_yank", { clear = true }),
@@ -57,14 +55,13 @@ end, { nargs = "*", complete = "file" })
 local rpc_socket_path = nil
 
 local function setup_rpc_socket()
-  local uv = vim.uv
   local pid = uv.os_getpid()
-  local socket_dir = (getenv("HOME") or "") .. "/.cache/nvim/sockets"
+  local socket_dir = (os.getenv("HOME") or "") .. "/.cache/nvim/sockets"
   fn.mkdir(socket_dir, "p")
 
   rpc_socket_path = socket_dir .. "/nvim-" .. pid .. ".sock"
   if uv.fs_stat(rpc_socket_path) then
-    pcall(remove, rpc_socket_path)
+    pcall(os.remove, rpc_socket_path)
   end
   pcall(fn.serverstart, rpc_socket_path)
 
@@ -83,7 +80,7 @@ local function setup_rpc_socket()
             local success, _, err_name = uv.kill(socket_pid, 0)
             local is_running = (success == 0 or err_name == "EPERM")
             if not is_running then
-              pcall(remove, socket_dir .. "/" .. name)
+              pcall(os.remove, socket_dir .. "/" .. name)
             end
           end
         end
@@ -103,10 +100,9 @@ nvim_create_autocmd("VimLeavePre", {
   group = rpc_group,
   desc = "Stop RPC server and clean up socket on exit",
   callback = function()
-    local uv = vim.uv
     if rpc_socket_path and uv.fs_stat(rpc_socket_path) then
       pcall(fn.serverstop, rpc_socket_path)
-      pcall(remove, rpc_socket_path)
+      pcall(os.remove, rpc_socket_path)
     end
   end,
 })
@@ -118,16 +114,13 @@ local function load_vars_from_zsh(force_reload)
     return cached_vars
   end
 
-  local uv = vim.uv
-  local json = vim.json
-
-  local home = getenv("HOME") or ""
+  local home = os.getenv("HOME") or ""
   local zshrc_path = home .. "/.zshrc"
   local cache_dir = home .. "/.cache/nvim"
   local cache_path = cache_dir .. "/fzf_bat_themes.json"
 
   if not force_reload then
-    local f = open(cache_path, "r")
+    local f = io.open(cache_path, "r")
     if f then
       local content = f:read("*a")
       f:close()
@@ -161,7 +154,7 @@ local function load_vars_from_zsh(force_reload)
   local dark_bat = "Catppuccin Macchiato"
   local light_bat = "Catppuccin Latte"
 
-  local f = open(zshrc_path, "r")
+  local f = io.open(zshrc_path, "r")
   if f then
     local in_dark_func = false
     local in_light_func = false
@@ -233,7 +226,7 @@ local function load_vars_from_zsh(force_reload)
   }
 
   fn.mkdir(cache_dir, "p")
-  local fc = open(cache_path, "w")
+  local fc = io.open(cache_path, "w")
   if fc then
     fc:write(json.encode(cached_vars))
     fc:close()

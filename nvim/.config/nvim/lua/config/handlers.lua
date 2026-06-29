@@ -4,11 +4,12 @@ local api = vim.api
 local diag = vim.diagnostic
 local lsp_buf = vim.lsp.buf
 local o = vim.o
+local keymap = vim.keymap
 
 local floor = math.floor
 local nvim_create_augroup = api.nvim_create_augroup
 local nvim_create_autocmd = api.nvim_create_autocmd
-local set = vim.keymap.set
+local set = keymap.set
 
 local diag_cfg = {
   float = { focusable = true, style = "minimal", border = "rounded", source = true },
@@ -21,9 +22,6 @@ local diag_cfg = {
     },
   },
   severity_sort = true,
-  underline = true,
-  update_in_insert = false,
-  virtual_text = false,
 }
 
 local function get_dims(width_ratio, height_ratio)
@@ -95,9 +93,8 @@ end
 function M.setup()
   diag.config(diag_cfg)
   local default_maps = { "gra", "gri", "grn", "grr", "grt", "grx" }
-  local del = vim.keymap.del
   for _, map_str in ipairs(default_maps) do
-    pcall(del, { "n", "x" }, map_str)
+    pcall(keymap.del, { "n", "x" }, map_str)
   end
 
   nvim_create_autocmd("LspAttach", {
