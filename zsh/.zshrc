@@ -43,11 +43,11 @@ else
 fi
 unset _theme
 
-export PATH="$PATH:$HOME/go/bin"
-export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
 export MANPAGER='nvim +Man!'
-
+export PATH="$PATH:$HOME/go/bin"
 export XDG_CONFIG_HOME="$HOME/.config"
+export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
+
 export ZSH_CACHE_DIR="$HOME/.cache/zsh"
 [[ -d "$ZSH_CACHE_DIR" ]] || mkdir -p "$ZSH_CACHE_DIR"
 
