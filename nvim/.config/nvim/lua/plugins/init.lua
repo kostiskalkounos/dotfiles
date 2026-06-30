@@ -3,23 +3,6 @@ return {
   { "MagicDuck/grug-far.nvim", event = "VeryLazy" },
   { "mbbill/undotree", event = "VeryLazy" },
   {
-    "catgoose/nvim-colorizer.lua",
-    event = "VeryLazy",
-    config = function()
-      require("colorizer").setup({
-        options = {
-          parsers = {
-            css = true,
-            css_fn = true,
-            names = {
-              enable = false,
-            },
-          },
-        },
-      })
-    end,
-  },
-  {
     "MeanderingProgrammer/render-markdown.nvim",
     event = "VeryLazy",
     dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.icons" },

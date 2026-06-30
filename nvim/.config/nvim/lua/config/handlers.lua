@@ -47,6 +47,11 @@ local function on_lsp_attach(ev)
   local buf = ev.buf
   local opt = { buffer = buf, silent = true }
 
+  local client = vim.lsp.get_client_by_id(ev.data.client_id)
+  if client and client:supports_method("textDocument/documentColor") then
+    vim.lsp.document_color.enable(true, { bufnr = buf })
+  end
+
   set("n", "K", hover, opt)
   set("n", "gH", signature_help, opt)
   set("n", "<leader>r", lsp_buf.rename, opt)

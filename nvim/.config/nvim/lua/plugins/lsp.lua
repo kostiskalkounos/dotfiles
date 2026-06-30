@@ -42,11 +42,10 @@ return {
     end,
     init = function()
       local g = vim.g
-      local notify = vim.notify
       local nvim_create_user_command = vim.api.nvim_create_user_command
       nvim_create_user_command("FormatToggle", function()
         g.disable_autoformat = not g.disable_autoformat
-        notify("Autoformatting: " .. tostring(not g.disable_autoformat))
+        vim.notify("Autoformat " .. (g.disable_autoformat and "disabled" or "enabled"))
       end, {})
     end,
   },

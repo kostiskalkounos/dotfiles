@@ -27,7 +27,7 @@ if [[ -n "$FZF_THEME" ]]; then
 elif [[ -f $HOME/.cache/theme ]]; then
   _theme=$(<$HOME/.cache/theme)
 else
-  if defaults read -g AppleInterfaceStyle &>/dev/null; then
+  if plutil -extract "AppleInterfaceStyle" raw ~/Library/Preferences/.GlobalPreferences.plist &>/dev/null; then
     _theme="dark"
   else
     _theme="light"
