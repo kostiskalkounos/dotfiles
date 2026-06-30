@@ -4,13 +4,7 @@ if [[ -z "$theme" && -f "$HOME/.cache/theme" ]]; then
     read -r theme < "$HOME/.cache/theme"
 fi
 if [[ -z "$theme" ]]; then
-    if defaults read -g AppleInterfaceStyle &>/dev/null; then
-        theme="dark"
-    else
-        theme="light"
-    fi
-    mkdir -p "$HOME/.cache"
-    echo "$theme" > "$HOME/.cache/theme"
+    theme="dark"
 fi
 
 if [[ "$theme" == "light" ]]; then
