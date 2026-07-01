@@ -9,3 +9,7 @@ macos-option-as-alt = true
 macos-titlebar-style = tabs
 mouse-hide-while-typing = true
 shell-integration-features = no-cursor
+
+keybind = alt+backspace=text:\x17
+keybind = cmd+backspace=text:\x15
+keybind = ctrl+backspace=text:\x17

@@ -30,10 +30,7 @@ set("c", "<M-b>", "<S-Left>", unique)
 set("c", "<M-f>", "<S-Right>", unique)
 set("c", "Q", "q", unique)
 
-set("i", "<space>", "<space><c-g>u", default)
 set("i", "<M-bs>", "<C-W>", default)
-set("i", "<M-j>", "<esc><cmd>m .+1<cr>==gi", unique)
-set("i", "<M-k>", "<esc><cmd>m .-2<cr>==gi", unique)
 
 set("v", "<M-j>", ":m '>+1<cr>gv=gv", default)
 set("v", "<M-k>", ":m '<-2<cr>gv=gv", default)
