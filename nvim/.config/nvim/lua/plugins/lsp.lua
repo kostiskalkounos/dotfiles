@@ -3,6 +3,7 @@ return {
   { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = {} },
   { "mfussenegger/nvim-jdtls", event = "VeryLazy" },
   { "towolf/vim-helm", event = "VeryLazy" },
+  { "windwp/nvim-ts-autotag", event = "VeryLazy", opts = {} },
   {
     "folke/lazydev.nvim",
     event = "VeryLazy",
