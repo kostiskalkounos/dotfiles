@@ -66,7 +66,7 @@ local function setup_rpc_socket()
   end
   pcall(fn.serverstart, rpc_socket_path)
 
-  schedule(function()
+  vim.defer_fn(function()
     local req = uv.fs_scandir(socket_dir)
     if req then
       while true do
@@ -87,7 +87,7 @@ local function setup_rpc_socket()
         end
       end
     end
-  end)
+  end, 2000)
 end
 
 local rpc_group = nvim_create_augroup("PredictableRpcSocket", { clear = true })

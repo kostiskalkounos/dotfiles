@@ -284,8 +284,8 @@ local function initialize_cache(bufnr, c)
   c.initialized = true
 end
 
-local function get_or_create_cache(bufnr)
-  local c = cache[bufnr]
+local function get_or_create_cache(bufnr, c)
+  c = c or cache[bufnr]
   if not c then
     c = create_empty_cache()
     cache[bufnr] = c
@@ -464,7 +464,7 @@ global_statusline = function()
   if c and c.initialized then
     return c.active
   end
-  return get_or_create_cache(bufnr).active
+  return get_or_create_cache(bufnr, c).active
 end
 
 local_statusline = function()
@@ -483,7 +483,7 @@ local_statusline = function()
     if c and c.initialized then
       return c.active
     end
-    return get_or_create_cache(bufnr).active
+    return get_or_create_cache(bufnr, c).active
   end
 
   local bufnr = nvim_win_get_buf(winid)
@@ -491,7 +491,7 @@ local_statusline = function()
   if c and c.initialized then
     return c.inactive
   end
-  return get_or_create_cache(bufnr).inactive
+  return get_or_create_cache(bufnr, c).inactive
 end
 
 _G.OptimizedStatusline = is_global_stl and global_statusline or local_statusline
