@@ -22,7 +22,7 @@ return {
         formatters_by_ft = {
           go = { "goimports", "gofumpt" },
           lua = { "stylua" },
-          python = { "black" },
+          python = { "isort", "black" },
           css = prettier,
           html = prettier,
           yaml = prettier,
@@ -39,14 +39,6 @@ return {
           return { timeout_ms = 500, lsp_format = "fallback", quiet = true }
         end,
       })
-    end,
-    init = function()
-      local g = vim.g
-      local nvim_create_user_command = vim.api.nvim_create_user_command
-      nvim_create_user_command("FormatToggle", function()
-        g.disable_autoformat = not g.disable_autoformat
-        vim.notify("Autoformat " .. (g.disable_autoformat and "disabled" or "enabled"))
-      end, {})
     end,
   },
   {
@@ -101,7 +93,6 @@ return {
         ensure_installed = servers,
       })
 
-      local mason_registry = require("mason-registry")
       local tools = {
         "black",
         "gofumpt",
@@ -110,23 +101,39 @@ return {
         "prettier",
         "stylua",
       }
+      local flag_file = _G.stdpaths.cache .. "/mason_tools_" .. table.concat(tools, "_")
+      local uv = vim.uv or vim.loop
+      if not uv.fs_stat(flag_file) then
+        local mason_registry = require("mason-registry")
 
-      local missing_tools = {}
-      for _, tool in ipairs(tools) do
-        if not mason_registry.is_installed(tool) then
-          table.insert(missing_tools, tool)
-        end
-      end
-
-      if #missing_tools > 0 then
-        mason_registry.refresh(function()
-          for _, tool in ipairs(missing_tools) do
-            local pkg = mason_registry.get_package(tool)
-            if not pkg:is_installed() then
-              pkg:install()
-            end
+        local missing_tools = {}
+        for _, tool in ipairs(tools) do
+          if not mason_registry.is_installed(tool) then
+            table.insert(missing_tools, tool)
           end
-        end)
+        end
+
+        if #missing_tools > 0 then
+          mason_registry.refresh(function()
+            for _, tool in ipairs(missing_tools) do
+              local pkg = mason_registry.get_package(tool)
+              if not pkg:is_installed() then
+                pkg:install()
+              end
+            end
+            local f = io.open(flag_file, "w")
+            if f then
+              f:write("ok")
+              f:close()
+            end
+          end)
+        else
+          local f = io.open(flag_file, "w")
+          if f then
+            f:write("ok")
+            f:close()
+          end
+        end
       end
 
       local lsp = vim.lsp

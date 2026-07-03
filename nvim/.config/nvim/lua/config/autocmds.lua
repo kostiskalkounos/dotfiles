@@ -4,6 +4,7 @@ local uv = vim.uv
 local json = vim.json
 local o = vim.o
 local env = vim.env
+local string_byte = string.byte
 
 local nvim_create_augroup = api.nvim_create_augroup
 local nvim_create_autocmd = api.nvim_create_autocmd
@@ -56,7 +57,7 @@ local rpc_socket_path = nil
 
 local function setup_rpc_socket()
   local pid = uv.os_getpid()
-  local socket_dir = (os.getenv("HOME") or "") .. "/.cache/nvim/sockets"
+  local socket_dir = _G.stdpaths.cache .. "/sockets"
   fn.mkdir(socket_dir, "p")
 
   rpc_socket_path = socket_dir .. "/nvim-" .. pid .. ".sock"
@@ -116,7 +117,7 @@ local function load_vars_from_zsh(force_reload)
 
   local home = os.getenv("HOME") or ""
   local zshrc_path = home .. "/.zshrc"
-  local cache_dir = home .. "/.cache/nvim"
+  local cache_dir = _G.stdpaths.cache
   local cache_path = cache_dir .. "/fzf_bat_themes.json"
 
   if not force_reload then
@@ -165,7 +166,7 @@ local function load_vars_from_zsh(force_reload)
     local found_light_bat = false
 
     for line in f:lines() do
-      local b1 = line:byte(1)
+      local b1 = string_byte(line, 1)
       if b1 == 70 then
         local common = line:match('^FZF_COMMON_OPTS=[\x27"](.*)[\x27"]')
         if common then

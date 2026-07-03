@@ -1,8 +1,7 @@
 local fn = vim.fn
-local opt = vim.opt
 local uv = vim.uv
 
-local lazypath = fn.stdpath("data") .. "/lazy/lazy.nvim"
+local lazypath = _G.stdpaths.data .. "/lazy/lazy.nvim"
 
 if not uv.fs_stat(lazypath) then
   fn.system({
@@ -15,7 +14,7 @@ if not uv.fs_stat(lazypath) then
   })
 end
 
-opt.rtp:prepend(lazypath)
+vim.o.rtp = lazypath .. "," .. vim.o.rtp
 
 local options = {
   change_detection = { enabled = false },
