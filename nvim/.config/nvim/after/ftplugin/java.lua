@@ -14,7 +14,7 @@ local project_name = fs.basename(root_dir)
 local function djb2(str)
   local hash = 5381
   for i = 1, #str do
-    hash = bxor(lshift(hash, 5) + hash, string.byte(str, i))
+    hash = bxor(lshift(hash, 5) + hash, str:byte(i))
   end
   return tohex(hash)
 end
@@ -130,6 +130,14 @@ local config = {
   },
 }
 
+local function jdtls_goto_subjects()
+  require("jdtls.tests").goto_subjects()
+end
+
+local function jdtls_generate()
+  require("jdtls.tests").generate()
+end
+
 config.on_attach = function(_, bufnr)
   jdtls.setup_dap({
     hotcodereplace = "auto",
@@ -143,8 +151,8 @@ config.on_attach = function(_, bufnr)
 
   set("n", "<F9>", jdtls.test_class, opts)
   set("n", "<F10>", jdtls.test_nearest_method, opts)
-  set("n", "<leader><Tab>", "<cmd>lua require('jdtls.tests').goto_subjects()<cr>", opts)
-  set("n", "<leader><S-Tab>", "<cmd>lua require('jdtls.tests').generate()<cr>", opts)
+  set("n", "<leader><Tab>", jdtls_goto_subjects, opts)
+  set("n", "<leader><S-Tab>", jdtls_generate, opts)
 end
 
 jdtls.start_or_attach(config)

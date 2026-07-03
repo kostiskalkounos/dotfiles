@@ -5,28 +5,11 @@ return {
   priority = 1000,
   build = ":CatppuccinCompile",
   config = function()
-    local theme = os.getenv("NVIM_THEME")
-    if not theme then
-      local cache_file = (os.getenv("HOME") or "") .. "/.cache/theme"
-      local f = io.open(cache_file, "r")
-      if f then
-        local first_line = f:read("*l")
-        f:close()
-        if first_line then
-          theme = vim.trim(first_line)
-        end
-      end
-    end
-
-    if theme == "dark" or theme == "light" then
-      vim.o.background = theme
-    end
-
     local catppuccin = require("catppuccin")
     catppuccin.setup({
       compile = {
         enabled = true,
-        path = vim.fn.stdpath("cache") .. "/catppuccin",
+        path = _G.stdpaths.cache .. "/catppuccin",
       },
       flavour = "auto",
       background = { light = "latte", dark = "macchiato" },
