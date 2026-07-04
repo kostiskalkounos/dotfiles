@@ -75,7 +75,6 @@ return {
     })
 
     local ft_lang_cache = {}
-
     local function get_ft_lang(ft)
       local cached = ft_lang_cache[ft]
       if cached ~= nil then

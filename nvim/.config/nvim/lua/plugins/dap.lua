@@ -35,7 +35,7 @@ return {
       local tbl_keys = vim.tbl_keys
       local set = vim.keymap.set
       local del = vim.keymap.del
-      local sched = vim.schedule
+      local schedule = vim.schedule
 
       fn.sign_define("DapBreakpoint", { text = " ", texthl = "DiagnosticSignError", linehl = "", numhl = "" })
       fn.sign_define("DapBreakpointCondition", { text = "", texthl = "DiagnosticError", linehl = "", numhl = "" })
@@ -176,7 +176,7 @@ return {
         ["<F4>"] = dap.step_back,
         ["<F5>"] = dap.continue,
         ["<F6>"] = function()
-          dapui.toggle(2)
+          dapui.toggle({ layout = 2 })
         end,
         ["<F7>"] = dap.toggle_breakpoint,
         ["<F8>"] = function()
@@ -193,7 +193,7 @@ return {
 
       set({ "n", "v" }, "<leader>:", function()
         dapui.eval(nil, { enter = true })
-        sched(function()
+        schedule(function()
           api.nvim_feedkeys(api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
         end)
       end, default)

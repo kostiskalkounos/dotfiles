@@ -17,7 +17,10 @@ return {
       defaults = {
         git_icons = false,
         hidden = true,
-        actions = {
+      },
+      actions = {
+        files = {
+          true,
           ["ctrl-q"] = { fn = f.actions.file_sel_to_qf, prefix = "select-all" },
         },
       },

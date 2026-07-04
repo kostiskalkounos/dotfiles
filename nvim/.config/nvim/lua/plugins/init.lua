@@ -2,6 +2,7 @@ return {
   { "almo7aya/openingh.nvim", event = "VeryLazy" },
   { "MagicDuck/grug-far.nvim", event = "VeryLazy" },
   { "mbbill/undotree", event = "VeryLazy" },
+  { "stevearc/oil.nvim", event = "VeryLazy", opts = {} },
   {
     "MeanderingProgrammer/render-markdown.nvim",
     event = "VeryLazy",
@@ -72,21 +73,5 @@ return {
     config = function(_, o)
       require("nvim-tree").setup(o)
     end,
-  },
-  {
-    "stevearc/oil.nvim",
-    event = "VeryLazy",
-    init = function()
-      local fn = vim.fn
-      local uv = vim.uv
-      if fn.argc() == 1 then
-        local arg = fn.argv(0)
-        local stat = uv.fs_stat(arg)
-        if stat and stat.type == "directory" then
-          require("lazy").load({ plugins = { "oil.nvim" } })
-        end
-      end
-    end,
-    opts = {},
   },
 }

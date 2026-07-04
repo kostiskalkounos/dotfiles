@@ -80,7 +80,10 @@ return {
         lua_ls = {
           settings = {
             Lua = {
-              diagnostics = { globals = { "hs", "jit", "require", "vim" } },
+              diagnostics = {
+                disable = { "missing-fields" },
+                globals = { "hs", "jit", "require", "vim" },
+              },
               telemetry = { enable = false },
               workspace = { checkThirdParty = false },
             },
