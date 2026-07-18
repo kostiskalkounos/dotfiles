@@ -60,6 +60,8 @@ local config = {
     "-Dlog.level=WARNING",
     "-javaagent:" .. mason .. "/share/jdtls/lombok.jar",
     "-Xmx4g",
+    "-XX:+UseG1GC",
+    "-XX:+UseStringDeduplication",
     "--add-modules=ALL-SYSTEM",
     "--add-opens",
     "java.base/java.util=ALL-UNNAMED",
