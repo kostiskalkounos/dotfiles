@@ -23,7 +23,7 @@ local SPACE = " "
 local TAB = "          "
 local SEPARATOR = "%="
 
-local FILENAME = "%f%<"
+local FILENAME = "%F%<"
 local FLAGS = "%( %m%r%)"
 local LOCATION = "%10l:%-9c"
 local PROGRESS = "%3p%%"
