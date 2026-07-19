@@ -8,7 +8,6 @@ return {
 
     local parsers = {
       "bash",
-      "c",
       "cpp",
       "css",
       "dockerfile",
@@ -21,9 +20,6 @@ return {
       "java",
       "javascript",
       "json",
-      "lua",
-      "markdown",
-      "markdown_inline",
       "python",
       "rust",
       "terraform",
