@@ -7,6 +7,7 @@ return {
   config = function()
     local catppuccin = require("catppuccin")
     catppuccin.setup({
+      auto_integrations = true,
       compile = {
         enabled = true,
         path = _G.stdpaths.cache .. "/catppuccin",
@@ -16,9 +17,6 @@ return {
       color_overrides = {
         latte = { pink = "#d154a5" },
         macchiato = { blue = "#89b4fa", lavender = "#b4befe", sapphire = "#74c7ec" },
-      },
-      integrations = {
-        mini = true,
       },
       highlight_overrides = {
         all = function(colors)
