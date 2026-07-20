@@ -42,6 +42,7 @@ return {
             ["PreProc"] = { fg = colors.sapphire },
             ["javaTypedef"] = { fg = colors.mauve },
 
+            BlinkCmpMenuSelection = { bg = colors.surface0 },
             NvimTreeStatusLine = { fg = colors.text, bg = colors.base },
             NvimTreeStatusLineNC = { fg = colors.surface1, bg = colors.base },
             StatusLine = { fg = colors.text, bg = colors.base },

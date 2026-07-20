@@ -20,13 +20,11 @@ return {
       menu = {
         auto_show = true,
         border = "rounded",
-        winhighlight = "Normal:BlinkCmpLabel",
       },
       documentation = {
         auto_show = true,
         window = {
           border = "rounded",
-          winhighlight = "Normal:BlinkCmpDocBorder",
         },
       },
     },
