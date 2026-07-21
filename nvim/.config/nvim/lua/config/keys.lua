@@ -23,6 +23,8 @@ for i = 1, 9 do
 end
 
 set("i", "<M-bs>", "<C-W>", default)
+set("t", "<Esc>", "<C-\\><C-n>")
+set({ "n", "t" }, "<C-;>", "<cmd>Fterm<cr>", default)
 
 set("c", "<C-a>", "<Home>", unique)
 set("c", "<C-e>", "<End>", unique)
@@ -88,8 +90,6 @@ set("n", "<leader>e", "vip:sort u<cr>", default)
 set("v", "<leader>E", ":sort iu<cr>", default)
 set("v", "<leader>e", ":sort u<cr>", default)
 
-set("n", "<leader>T", "<cmd>Vterm<cr>", unique)
-set("n", "<leader>t", "<cmd>Term<cr>", unique)
 set("n", "<leader>O", "<cmd>OpenInGHFileLines<cr>", unique)
 set("n", "<leader>u", "<cmd>UndotreeToggle<cr>", unique)
 

@@ -42,16 +42,38 @@ nvim_create_autocmd("WinEnter", {
   end,
 })
 
-nvim_create_user_command("Term", function(opt)
-  nvim_command("split")
-  nvim_command("resize 15")
-  nvim_command("terminal " .. opt.args)
-end, { nargs = "*", complete = "file" })
+local fterm = { buf = -1, win = -1 }
 
-nvim_create_user_command("Vterm", function(opt)
-  nvim_command("vsplit")
-  nvim_command("terminal " .. opt.args)
-end, { nargs = "*", complete = "file" })
+local function fterm_toggle()
+  if api.nvim_win_is_valid(fterm.win) then
+    api.nvim_win_hide(fterm.win)
+    return
+  end
+
+  local fresh = not api.nvim_buf_is_valid(fterm.buf)
+  if fresh then
+    fterm.buf = api.nvim_create_buf(false, true)
+  end
+
+  local width = math.floor(o.columns * 0.8)
+  local height = math.floor(o.lines * 0.8)
+  fterm.win = api.nvim_open_win(fterm.buf, true, {
+    relative = "editor",
+    width = width,
+    height = height,
+    col = math.floor((o.columns - width) / 2),
+    row = math.floor((o.lines - height) / 2),
+    style = "minimal",
+    border = "rounded",
+  })
+
+  if fresh then
+    nvim_command("terminal")
+  end
+  nvim_command("startinsert")
+end
+
+nvim_create_user_command("Fterm", fterm_toggle, {})
 
 local rpc_socket_path = nil
 
