@@ -86,8 +86,6 @@ local function on_lsp_attach(ev)
 
   set("n", "<M-cr>", function() require("fzf-lua").lsp_code_actions() end, opt)
   set("n", "gD", function() require("fzf-lua").lsp_declarations() end, opt)
-  set("n", "gI", function() require("fzf-lua").lsp_type_super() end, opt)
-  set("n", "gR", function() require("fzf-lua").lsp_finder() end, opt)
   set("n", "gd", function() require("fzf-lua").lsp_definitions() end, opt)
   set("n", "gh", function() require("fzf-lua").lsp_typedefs() end, opt)
   set("n", "gi", function() require("fzf-lua").lsp_implementations() end, opt)
@@ -102,6 +100,7 @@ local function on_lsp_attach(ev)
   set("n", "<leader>m", function() require("fzf-lua").diagnostics_document() end, opt)
   set("n", "<leader>t", function() require("fzf-lua").lsp_live_workspace_symbols() end, opt)
   set("n", "<leader>u", function() require("fzf-lua").lsp_type_sub() end, opt)
+  set("n", "<leader>z", function() require("fzf-lua").lsp_finder() end, opt)
 end
 
 function M.setup()

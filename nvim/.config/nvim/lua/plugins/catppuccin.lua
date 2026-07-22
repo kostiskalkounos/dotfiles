@@ -7,7 +7,24 @@ return {
   config = function()
     local catppuccin = require("catppuccin")
     catppuccin.setup({
-      auto_integrations = true,
+      auto_integrations = false,
+      integrations = {
+        blink_cmp = true,
+        dap = true,
+        dap_ui = true,
+        diffview = true,
+        fidget = true,
+        fzf = true,
+        gitsigns = true,
+        grug_far = true,
+        mason = true,
+        mini = true,
+        native_lsp = { enabled = true },
+        neogit = true,
+        nvimtree = true,
+        render_markdown = true,
+        treesitter = true,
+      },
       compile = {
         enabled = true,
         path = _G.stdpaths.cache .. "/catppuccin",

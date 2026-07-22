@@ -68,7 +68,6 @@ return {
         "lua_ls",
         "pyright",
         "rust_analyzer",
-        "stylua",
         "taplo",
         "terraformls",
         "ts_ls",
@@ -105,10 +104,9 @@ return {
         "isort",
         "prettier",
         "stylua",
+        "vscode-spring-boot-tools",
       }
-      local flag_file = _G.stdpaths.cache .. "/mason_tools_" .. table.concat(tools, "_")
-      local uv = vim.uv or vim.loop
-      if not uv.fs_stat(flag_file) then
+      vim.defer_fn(function()
         local mason_registry = require("mason-registry")
 
         local missing_tools = {}
@@ -119,27 +117,31 @@ return {
         end
 
         if #missing_tools > 0 then
+          vim.notify(
+            "Installing missing tools: " .. table.concat(missing_tools, ", "),
+            vim.log.levels.INFO,
+            { title = "Mason" }
+          )
           mason_registry.refresh(function()
             for _, tool in ipairs(missing_tools) do
               local pkg = mason_registry.get_package(tool)
               if not pkg:is_installed() then
+                pkg:once("install:success", function()
+                  vim.schedule(function()
+                    vim.notify(tool .. " installed", vim.log.levels.INFO, { title = "Mason" })
+                  end)
+                end)
+                pkg:once("install:failed", function()
+                  vim.schedule(function()
+                    vim.notify(tool .. " failed to install", vim.log.levels.ERROR, { title = "Mason" })
+                  end)
+                end)
                 pkg:install()
               end
             end
-            local f = io.open(flag_file, "w")
-            if f then
-              f:write("ok")
-              f:close()
-            end
           end)
-        else
-          local f = io.open(flag_file, "w")
-          if f then
-            f:write("ok")
-            f:close()
-          end
         end
-      end
+      end, 1000)
 
       local lsp = vim.lsp
 

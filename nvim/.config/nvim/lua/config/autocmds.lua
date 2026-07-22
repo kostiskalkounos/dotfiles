@@ -131,6 +131,7 @@ nvim_create_autocmd("VimLeavePre", {
 })
 
 local cached_vars = nil
+local update_fzf_opts
 
 local function load_vars_from_zsh(force_reload)
   if cached_vars and not force_reload then
@@ -258,7 +259,7 @@ local function load_vars_from_zsh(force_reload)
   return cached_vars
 end
 
-local function update_fzf_opts(force)
+function update_fzf_opts(force)
   local is_forced = (force == true)
   if not is_forced and o.background == env.FZF_THEME then
     return

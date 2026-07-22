@@ -37,7 +37,7 @@ return {
         local ts_get_node = vim.treesitter.get_node
         local table_insert = table.insert
         return function()
-          local sources = { "lsp", "buffer" }
+          local sources = { "lsp", "lazydev", "buffer" }
           local buf = nvim_get_current_buf()
           local has_parser = ts_highlighter_active[buf] ~= nil
 
@@ -60,6 +60,13 @@ return {
           return sources
         end
       end)(),
+      providers = {
+        lazydev = {
+          name = "LazyDev",
+          module = "lazydev.integrations.blink",
+          score_offset = 100,
+        },
+      },
     },
     appearance = {
       kind_icons = {
