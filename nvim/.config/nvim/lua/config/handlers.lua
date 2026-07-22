@@ -100,7 +100,6 @@ local function on_lsp_attach(ev)
   set("n", "<leader>m", function() require("fzf-lua").diagnostics_document() end, opt)
   set("n", "<leader>t", function() require("fzf-lua").lsp_live_workspace_symbols() end, opt)
   set("n", "<leader>u", function() require("fzf-lua").lsp_type_sub() end, opt)
-  set("n", "<leader>z", function() require("fzf-lua").lsp_finder() end, opt)
 end
 
 function M.setup()
