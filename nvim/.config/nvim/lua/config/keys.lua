@@ -78,7 +78,6 @@ set("n", "<leader>V", "<cmd>set paste!<cr>", unique)
 set("n", "<leader>Z", "<cmd>setlocal spell! spelllang=en_us<cr>", unique)
 set("n", "<leader>w", "<cmd>w<cr>", unique)
 set("n", "<leader>x", "<cmd>x<cr>", unique)
-set("n", "<leader>z", "za", default)
 
 set("n", "<leader>v", [["+p]], default)
 set("v", "<leader>c", [["+y]], default)
