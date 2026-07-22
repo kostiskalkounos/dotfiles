@@ -1,4 +1,5 @@
 return {
+  { "JavaHello/spring-boot.nvim", opts = {} },
   { "j-hui/fidget.nvim", event = "VeryLazy", opts = {} },
   { "lewis6991/gitsigns.nvim", event = "VeryLazy", opts = {} },
   { "mfussenegger/nvim-jdtls", event = "VeryLazy" },

@@ -43,6 +43,10 @@ if not _G._jdtls_bundles then
     end
   end
   table.sort(bundles)
+
+  local spring_boot = require("spring_boot")
+  vim.list_extend(bundles, spring_boot.java_extensions())
+
   _G._jdtls_bundles = bundles
 end
 

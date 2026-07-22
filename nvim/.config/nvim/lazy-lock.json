@@ -29,6 +29,7 @@
   "oil.nvim": { "branch": "master", "commit": "b73018b75affd13fa38e2fc94ef753b465f770d7" },
   "openingh.nvim": { "branch": "main", "commit": "7cc8c897cb6b34d8ed28e99d95baccef609ed251" },
   "render-markdown.nvim": { "branch": "main", "commit": "f422cb5c6855f150e2ddcfaf44e7157b98b34f6a" },
+  "spring-boot.nvim": { "branch": "main", "commit": "98c6ff1dcdda943d341bba3c00ae9d190a2e5f7d" },
   "undotree": { "branch": "master", "commit": "6fa6b57cda8459e1e4b2ca34df702f55242f4e4d" },
   "vim-helm": { "branch": "master", "commit": "2c8525fd98e57472769d137317bca83e477858ce" }
 }
