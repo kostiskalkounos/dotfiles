@@ -402,4 +402,12 @@ ZSH_HIGHLIGHT_STYLES[double-quoted-argument-unclosed]='fg=red'
   if [[ ! -f "$zwc" || "$zrc" -nt "$zwc" ]]; then
     { zcompile "$zrc" } &>/dev/null &!
   fi
+
+  local zprof="${ZDOTDIR:-$HOME}/.zprofile"
+  local zpwc="$zprof.zwc"
+  if [[ -f "$zprof" ]]; then
+    if [[ ! -f "$zpwc" || "$zprof" -nt "$zpwc" ]]; then
+      { zcompile "$zprof" } &>/dev/null &!
+    fi
+  fi
 }
