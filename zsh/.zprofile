@@ -7,6 +7,17 @@ export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
 export HOMEBREW_REPOSITORY="/opt/homebrew";
 fpath[1,0]="/opt/homebrew/share/zsh/site-functions";
 export FPATH;
-eval "$(/usr/bin/env PATH_HELPER_ROOT="/opt/homebrew" /usr/libexec/path_helper -s)"
+
+if [[ -f $HOME/.cache/path_helper.zsh ]]; then
+  source $HOME/.cache/path_helper.zsh
+else
+  mkdir -p $HOME/.cache
+  local out
+  out=$(/usr/libexec/path_helper -s)
+  eval "$out"
+  echo "$out" > $HOME/.cache/path_helper.zsh 2>/dev/null
+  zcompile $HOME/.cache/path_helper.zsh 2>/dev/null
+fi
+
 [ -z "${MANPATH-}" ] || export MANPATH=":${MANPATH#:}";
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
