@@ -47,9 +47,7 @@ export MANPAGER='nvim +Man!'
 export PATH="$PATH:$HOME/go/bin"
 export XDG_CONFIG_HOME="$HOME/.config"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
-
 export ZSH_CACHE_DIR="$HOME/.cache/zsh"
-[[ -d "$ZSH_CACHE_DIR" ]] || mkdir -p "$ZSH_CACHE_DIR"
 
 export HOMEBREW_BUNDLE_NO_DESCRIBE=1
 export HOMEBREW_NO_ANALYTICS=1
@@ -122,7 +120,7 @@ alias snykt='snyk test --maven-aggregate-project -- -P Symphony'
 alias sudo='sudo '
 
 HISTFILE="$HOME/.zsh_history"
-HISTSIZE=10000
+HISTSIZE=100000
 SAVEHIST=$HISTSIZE
 
 setopt AUTO_CD
@@ -132,6 +130,8 @@ setopt GLOBDOTS
 setopt HIST_FIND_NO_DUPS
 setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_IGNORE_SPACE
+setopt HIST_REDUCE_BLANKS
+setopt HIST_SAVE_NO_DUPS
 setopt HIST_VERIFY
 setopt INTERACTIVE_COMMENTS
 setopt PROMPT_SUBST
@@ -158,7 +158,7 @@ fpath=("$ZSH_CACHE_DIR/completions" $fpath)
   if zstat -A mtime +mtime "${ZDOTDIR:-$HOME}/.zcompdump" 2>/dev/null && (( EPOCHSECONDS - mtime < 86400 )); then
     compinit -C -u
   else
-    compinit -u
+    compinit -i
     { zcompile "${ZDOTDIR:-$HOME}/.zcompdump" } &>/dev/null &!
   fi
 
@@ -175,7 +175,6 @@ fpath=("$ZSH_CACHE_DIR/completions" $fpath)
     real_path=$(/usr/libexec/java_home 2>/dev/null)
     if [[ -n "$real_path" ]]; then
       export JAVA_HOME="$real_path"
-      mkdir -p "$HOME/.cache"
       echo "$real_path" > "$cached" 2>/dev/null
     fi
   fi
@@ -183,7 +182,6 @@ fpath=("$ZSH_CACHE_DIR/completions" $fpath)
   if (( $+commands[zoxide] )); then
     local _zoxide_path=$commands[zoxide]
     if [[ ! -f $HOME/.cache/zoxide_init.zsh || "$_zoxide_path" -nt $HOME/.cache/zoxide_init.zsh ]]; then
-      mkdir -p $HOME/.cache
       zoxide init zsh > $HOME/.cache/zoxide_init.zsh 2>/dev/null
       zcompile $HOME/.cache/zoxide_init.zsh 2>/dev/null
     fi
@@ -193,7 +191,6 @@ fpath=("$ZSH_CACHE_DIR/completions" $fpath)
   if (( $+commands[fzf] )); then
     local _fzf_path=$commands[fzf]
     if [[ ! -f $HOME/.cache/fzf_init.zsh || "$_fzf_path" -nt $HOME/.cache/fzf_init.zsh ]]; then
-      mkdir -p $HOME/.cache
       fzf --zsh > $HOME/.cache/fzf_init.zsh 2>/dev/null
       zcompile $HOME/.cache/fzf_init.zsh 2>/dev/null
     fi
@@ -217,6 +214,7 @@ bindkey '^P' up-line-or-beginning-search
 bindkey '^X^E' edit-command-line
 bindkey '^[[A' up-line-or-beginning-search
 bindkey '^[[B' down-line-or-beginning-search
+bindkey '^[[Z' reverse-menu-complete
 bindkey '^[e' edit-command-line
 bindkey '^[h' backward-char
 bindkey '^[j' down-line-or-beginning-search
