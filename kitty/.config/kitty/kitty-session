@@ -56,6 +56,15 @@ close_launch_tab() {
   [[ -n "${tab_id}" ]] && "${kitty_cmd[@]}" close-tab --match "id:${tab_id}" >/dev/null 2>&1 || true
 }
 
+current_session() {
+  [[ -n "${launch_window_id}" ]] || return 0
+  kitty_ls | jq -r --arg w "${launch_window_id}" '
+    .[]?.tabs[]?
+    | select(any(.windows[]?; (.id|tostring) == $w))
+    | ([ .windows[]?.session_name | select(. != null and . != "") ][0]) // empty
+  ' 2>/dev/null | head -1 || true
+}
+
 active_sessions_data=""
 active_sessions_fetched=false
 typeset -g -A active_session_names=()
@@ -110,8 +119,12 @@ if [[ "${1:-}" == "--active" ]]; then
     exit 0
   fi
 
+  typeset cur_session
+  cur_session="$(current_session)"
+
   typeset -A visited
   typeset -a lines
+  typeset cur_line=""
   for line in "${(f)active_sessions_data}"; do
     typeset sname="${line%%$'\t'*}"
     typeset pwd_dir="${line#*$'\t'}"
@@ -119,11 +132,21 @@ if [[ "${1:-}" == "--active" ]]; then
     [[ -n "${visited[$sname]:-}" ]] && continue
     visited[$sname]=1
 
-    lines+=("${${sname:t}%.kitty-session}  (${(D)pwd_dir})"$'\t'"${sname}")
+    typeset disp="${${sname:t}%.kitty-session}  (${(D)pwd_dir})"
+    if [[ -n "${cur_session}" && "${sname}" == "${cur_session}" ]]; then
+      cur_line="${active_color}${disp}${reset_color}"$'\t'"${sname}"
+    else
+      lines+=("${disp}"$'\t'"${sname}")
+    fi
   done
 
+  typeset -i header_lines=0
+  typeset -a picker=()
+  [[ -n "${cur_line}" ]] && { picker+=("${cur_line}"); header_lines=1; }
+  picker+=("${lines[@]}")
+
   set +e
-  selected="$(print -l "${lines[@]}" | fzf --height=40% --reverse -d $'\t' --with-nth=1 --prompt="Switch Session > " --no-multi)"
+  selected="$(print -l -r -- "${picker[@]}" | fzf --height=40% --reverse --ansi --header-lines=${header_lines} -d $'\t' --with-nth=1 --prompt="Switch Session > " --no-multi)"
   fzf_rc=$?
   set -e
 
@@ -139,14 +162,47 @@ fi
 
 run_cleanup
 
-typeset -a paths lines_display zipped
+typeset -a paths zipped
 paths=( ${(f)"$(zoxide query -l 2>/dev/null)"} )
 paths=( "${paths[@]:#}" )
-lines_display=( "${(@D)paths}" )
-zipped=( ${lines_display:^paths} )
+
+typeset cur_dir="" cur_sess
+cur_sess="$(current_session)"
+if [[ -n "${cur_sess}" ]]; then
+  typeset sf="${session_dir}/${cur_sess}.kitty-session" line
+  if [[ -r "${sf}" ]]; then
+    while IFS= read -r line; do
+      [[ "${line}" == cd\ * ]] && { cur_dir="${${line#cd }:A}"; break; }
+    done < "${sf}"
+  fi
+fi
+
+typeset p disp canon cur_line=""
+typeset -A seen_canon=()
+for p in "${paths[@]}"; do
+  canon="${p:A}"
+  [[ -n "${seen_canon[$canon]:-}" ]] && continue
+  seen_canon[$canon]=1
+  disp="${(D)p}"
+  if [[ -n "${cur_dir}" && "${canon}" == "${cur_dir}" ]]; then
+    cur_line="${active_color}${disp}${reset_color}"$'\t'"${p}"
+  else
+    zipped+=("${disp}"$'\t'"${p}")
+  fi
+done
+
+typeset -i header_lines=0
+typeset -a picker=()
+[[ -n "${cur_line}" ]] && { picker+=("${cur_line}"); header_lines=1; }
+picker+=("${zipped[@]}")
+
+if (( ${#picker} == 0 )); then
+  echo "No directories found."
+  exit 0
+fi
 
 set +e
-selected="$(printf '%s\t%s\n' "${zipped[@]}" | fzf --height=40% --reverse --no-sort -d $'\t' --with-nth=1 --prompt="Select Session > " --no-multi)"
+selected="$(print -l -r -- "${picker[@]}" | fzf --height=40% --reverse --no-sort --ansi --header-lines=${header_lines} -d $'\t' --with-nth=1 --prompt="Select Session > " --no-multi)"
 fzf_rc=$?
 set -e
 
