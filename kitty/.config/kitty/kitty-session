@@ -5,19 +5,7 @@ setopt nullglob extendedglob
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
 
-fzf_theme="dark"
-if [[ -f "$HOME/.cache/theme" ]]; then
-  fzf_theme="$(< "$HOME/.cache/theme")"
-  fzf_theme="${fzf_theme//[[:space:]]/}"
-fi
-
-fzf_common_opts='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=fg:-1,bg:-1,hl:magenta,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
-
-if [[ "${fzf_theme}" == "light" ]]; then
-  export FZF_DEFAULT_OPTS="--color=light ${fzf_common_opts} --color=fg+:black,bg+:#ccd0da,gutter:#eff1f5"
-else
-  export FZF_DEFAULT_OPTS="--color=dark ${fzf_common_opts} --color=fg+:white,bg+:#363a4f,gutter:#24273A"
-fi
+source "${0:A:h}/fzf-theme.sh"
 
 kitty_bin="${KITTY_BIN:-kitty}"
 kitty_cmd=("$kitty_bin" @)
