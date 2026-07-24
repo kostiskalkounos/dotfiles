@@ -19,5 +19,7 @@ else
   zcompile $HOME/.cache/path_helper.zsh 2>/dev/null
 fi
 
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}";
+
 [ -z "${MANPATH-}" ] || export MANPATH=":${MANPATH#:}";
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
