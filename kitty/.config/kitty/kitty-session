@@ -3,14 +3,15 @@
 set -euo pipefail
 setopt nullglob extendedglob
 
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+typeset -U path
+path=(/opt/homebrew/bin /usr/local/bin /usr/bin /bin /usr/sbin /sbin $path)
 
-source "${0:A:h}/fzf-theme.sh"
+source "${0:A:h}/fzf-theme"
 
 kitty_bin="${KITTY_BIN:-kitty}"
 kitty_cmd=("$kitty_bin" @)
 
-session_dir="${XDG_RUNTIME_DIR:-$HOME/.cache}/kitty-sessions"
+session_dir="$HOME/.cache/kitty-sessions"
 
 raw_ls_data=""
 raw_ls_fetched=false
@@ -119,7 +120,7 @@ if [[ "${1:-}" == "--active" ]]; then
     exit 0
   fi
 
-  typeset cur_session
+  typeset cur_session=""
   cur_session="$(current_session)"
 
   typeset -A visited
@@ -166,11 +167,10 @@ typeset -a paths zipped
 paths=( ${(f)"$(zoxide query -l 2>/dev/null)"} )
 paths=( "${paths[@]:#}" )
 
-typeset cur_dir="" cur_sess
+typeset cur_dir="" cur_sess=""
 cur_sess="$(current_session)"
 if [[ -n "${cur_sess}" ]]; then
-  # pin the session's canonical dir (its `cd` line), stable across tabs/cwds
-  typeset sf="${session_dir}/${cur_sess}.kitty-session" line
+  typeset sf="${session_dir}/${cur_sess}.kitty-session" line=""
   if [[ -r "${sf}" ]]; then
     while IFS= read -r line; do
       [[ "${line}" == cd\ * ]] && { cur_dir="${${line#cd }:A}"; break; }
@@ -178,11 +178,10 @@ if [[ -n "${cur_sess}" ]]; then
   fi
 fi
 
-typeset p disp canon cur_line=""
+typeset p="" disp="" canon="" cur_line=""
 typeset -A seen_canon=()
 for p in "${paths[@]}"; do
   canon="${p:A}"
-  # collapse symlink + real (e.g. stow) into one row, keep first (frecency order)
   [[ -n "${seen_canon[$canon]:-}" ]] && continue
   seen_canon[$canon]=1
   disp="${(D)p}"

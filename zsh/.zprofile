@@ -2,11 +2,13 @@
 # Avoids spawning the brew Ruby process on every login shell (kitty runs --login per tab/split).
 # Regenerate with `brew shellenv` if Homebrew ever relocates.
 
+typeset -U path fpath
+
 export HOMEBREW_PREFIX="/opt/homebrew";
 export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
 export HOMEBREW_REPOSITORY="/opt/homebrew";
-fpath[1,0]="/opt/homebrew/share/zsh/site-functions";
-export FPATH;
+
+fpath=("/opt/homebrew/share/zsh/site-functions" $fpath)
 
 if [[ -f $HOME/.cache/path_helper.zsh ]]; then
   source $HOME/.cache/path_helper.zsh
@@ -19,7 +21,8 @@ else
   zcompile $HOME/.cache/path_helper.zsh 2>/dev/null
 fi
 
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}";
+path=("/opt/homebrew/bin" "/opt/homebrew/sbin" $path)
+export PATH
 
 [ -z "${MANPATH-}" ] || export MANPATH=":${MANPATH#:}";
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";

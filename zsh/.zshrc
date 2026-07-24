@@ -43,11 +43,13 @@ else
 fi
 unset _theme
 
+[[ -f ~/.artifactory ]] && source ~/.artifactory
+
 export MANPAGER='nvim +Man!'
-export PATH="$PATH:$HOME/go/bin"
+path+=("$HOME/go/bin")
 export XDG_CONFIG_HOME="$HOME/.config"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
-export ZSH_CACHE_DIR="$HOME/.cache/zsh"
+ZSH_CACHE_DIR="$HOME/.cache/zsh"
 
 export HOMEBREW_BUNDLE_NO_DESCRIBE=1
 export HOMEBREW_NO_ANALYTICS=1
