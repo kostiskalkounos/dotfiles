@@ -92,7 +92,7 @@ typeset prompt_label="Switch Tab > "
 [[ "${all_mode}" == "1" ]] && prompt_label="Switch Tab (all) > "
 
 set +e
-selected="$(print -r -- "${lines}" | fzf --height=40% --reverse --no-sort \
+selected="$(print -r -- "${lines}" | fzf --no-sort \
   --ansi --header-lines=${header_lines} \
   -d $'\t' --with-nth=1 --prompt="${prompt_label}" --no-multi \
   --header='ctrl-x: to close' \
