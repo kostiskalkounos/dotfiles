@@ -1,0 +1,228 @@
+#!/usr/bin/env zsh
+
+set -euo pipefail
+setopt nullglob extendedglob
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+
+fzf_theme="dark"
+if [[ -f "$HOME/.cache/theme" ]]; then
+  fzf_theme="$(< "$HOME/.cache/theme")"
+  fzf_theme="${fzf_theme//[[:space:]]/}"
+fi
+
+fzf_common_opts='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=fg:-1,bg:-1,hl:magenta,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
+
+if [[ "${fzf_theme}" == "light" ]]; then
+  export FZF_DEFAULT_OPTS="--color=light ${fzf_common_opts} --color=fg+:black,bg+:#ccd0da,gutter:#eff1f5"
+else
+  export FZF_DEFAULT_OPTS="--color=dark ${fzf_common_opts} --color=fg+:white,bg+:#363a4f,gutter:#24273A"
+fi
+
+kitty_bin="${KITTY_BIN:-kitty}"
+kitty_cmd=("$kitty_bin" @)
+
+session_dir="${XDG_RUNTIME_DIR:-$HOME/.cache}/kitty-sessions"
+
+raw_ls_data=""
+raw_ls_fetched=false
+kitty_ls() {
+  if [[ "${raw_ls_fetched}" == "false" ]]; then
+    raw_ls_data="$("${kitty_cmd[@]}" ls 2>/dev/null || true)"
+    raw_ls_fetched=true
+  fi
+  printf '%s' "${raw_ls_data}"
+}
+
+cleanup_done=false
+run_cleanup() {
+  [[ "${cleanup_done}" == "true" ]] && return 0
+  cleanup_done=true
+  mkdir -p "${session_dir}"
+  cleanup_stale_sessions "${session_dir}"
+}
+
+sanitize() {
+  local s="${1//[^A-Za-z0-9._-]/_}"
+  REPLY="${s//_##/_}"
+}
+
+launch_window_id="${KITTY_WINDOW_ID:-}"
+
+close_launch_tab() {
+  [[ -n "${launch_window_id}" ]] || return 0
+  local info tab_id session_windows
+  info="$(
+    kitty_ls | jq -r --arg w "${launch_window_id}" '
+      .[]?.tabs[]?
+      | select(any(.windows[]?; (.id|tostring) == $w))
+      | [ (.id|tostring),
+          ([.windows[]?.session_name | select(. != null and . != "")] | length | tostring) ]
+      | @tsv
+    ' 2>/dev/null | head -1 || true
+  )"
+  [[ -n "${info}" ]] || return 0
+  tab_id="${info%%$'\t'*}"
+  session_windows="${info#*$'\t'}"
+  [[ "${session_windows}" == "0" ]] || return 0
+  [[ -n "${tab_id}" ]] && "${kitty_cmd[@]}" close-tab --match "id:${tab_id}" >/dev/null 2>&1 || true
+}
+
+active_sessions_data=""
+active_sessions_fetched=false
+typeset -g -A active_session_names=()
+
+ensure_active_sessions() {
+  if [[ "${active_sessions_fetched}" == "false" ]]; then
+    active_sessions_data="$(
+      kitty_ls | jq -r '
+        .[]?.tabs[]?.windows[]?
+        | select(.session_name != null and .session_name != "")
+        | [(.session_name|tostring), (.env.PWD // .cwd // "")]
+        | @tsv
+      ' || true
+    )"
+
+    if [[ -n "${active_sessions_data}" ]]; then
+      for line in "${(f)active_sessions_data}"; do
+        local sname="${line%%$'\t'*}"
+        [[ -z "$sname" ]] && continue
+        active_session_names[${${sname:t}%.kitty-session}]=1
+      done
+    fi
+    active_sessions_fetched=true
+  fi
+}
+
+session_exists() {
+  ensure_active_sessions
+  [[ -n "${active_session_names[$1]:-}" ]]
+}
+
+cleanup_stale_sessions() {
+  local dir="$1" f base
+  [[ -d "$dir" ]] || return 0
+  typeset -a to_delete=()
+  for f in "$dir"/*.kitty-session; do
+    [[ -e "$f" ]] || continue
+    base="${f:t:r}"
+    session_exists "$base" && continue
+    to_delete+=("$f")
+  done
+  if (( ${#to_delete} > 0 )); then
+    rm -f "${to_delete[@]}"
+  fi
+}
+
+if [[ "${1:-}" == "--active" ]]; then
+  ensure_active_sessions
+  run_cleanup
+  if [[ -z "${active_sessions_data}" ]]; then
+    echo "No active sessions found."
+    exit 0
+  fi
+
+  typeset -A visited
+  typeset -a lines
+  for line in "${(f)active_sessions_data}"; do
+    typeset sname="${line%%$'\t'*}"
+    typeset pwd_dir="${line#*$'\t'}"
+    [[ -z "$sname" ]] && continue
+    [[ -n "${visited[$sname]:-}" ]] && continue
+    visited[$sname]=1
+
+    lines+=("${${sname:t}%.kitty-session}  (${(D)pwd_dir})"$'\t'"${sname}")
+  done
+
+  set +e
+  selected="$(print -l "${lines[@]}" | fzf --height=40% --reverse -d $'\t' --with-nth=1 --prompt="Switch Session > " --no-multi)"
+  fzf_rc=$?
+  set -e
+
+  if [[ $fzf_rc -ne 0 || -z "${selected}" ]]; then
+    exit 0
+  fi
+
+  selected_session="${selected#*$'\t'}"
+  "${kitty_cmd[@]}" action goto_session "${selected_session}"
+  close_launch_tab
+  exit 0
+fi
+
+run_cleanup
+
+typeset -a paths lines_display zipped
+paths=( ${(f)"$(zoxide query -l 2>/dev/null)"} )
+paths=( "${paths[@]:#}" )
+lines_display=( "${(@D)paths}" )
+zipped=( ${lines_display:^paths} )
+
+set +e
+selected="$(printf '%s\t%s\n' "${zipped[@]}" | fzf --height=40% --reverse --no-sort -d $'\t' --with-nth=1 --prompt="Select Session > " --no-multi)"
+fzf_rc=$?
+set -e
+
+if [[ $fzf_rc -ne 0 || -z "${selected}" ]]; then
+  exit 0
+fi
+
+selected_path="${selected#*$'\t'}"
+
+if [[ ! -d "${selected_path}" ]]; then
+  echo "Directory not found: ${selected_path}"
+  exit 1
+fi
+
+real_target="${selected_path%/}"
+[[ -z "${real_target}" ]] && real_target="/"
+
+base_name="${real_target:t}"
+
+sanitize "${base_name}"; safe_base="${REPLY}"
+
+existing_session=""
+ensure_active_sessions
+if [[ -n "${active_sessions_data}" ]]; then
+  for line in "${(f)active_sessions_data}"; do
+    typeset session_name="${line%%$'\t'*}"
+    typeset pwd_dir="${line#*$'\t'}"
+    [[ -z "$session_name" || -z "$pwd_dir" ]] && continue
+
+    if [[ "${pwd_dir:A}" == "${real_target:A}" ]]; then
+      existing_session="$session_name"
+      break
+    fi
+  done
+fi
+
+if [[ -n "${existing_session}" ]]; then
+  zoxide add "${real_target}" >/dev/null 2>&1 || true
+  "${kitty_cmd[@]}" action goto_session "${existing_session}"
+  close_launch_tab
+  exit 0
+fi
+
+session_name="${safe_base}"
+if session_exists "${session_name}"; then
+  parent_name="${real_target:h:t}"
+  parent_name="${parent_name#.}"
+  if [[ -n "${parent_name}" ]]; then
+    sanitize "${parent_name}"; safe_parent="${REPLY}"
+    session_name="${safe_parent}-${safe_base}"
+  fi
+
+  if session_exists "${session_name}"; then
+    session_name="${safe_base}-$$"
+  fi
+fi
+
+session_file="${session_dir}/${session_name}.kitty-session"
+
+cat >"${session_file}" <<EOF
+cd ${real_target}
+launch
+EOF
+
+zoxide add "${real_target}" >/dev/null 2>&1 || true
+"${kitty_cmd[@]}" action goto_session "${session_file}"
+close_launch_tab
