@@ -1,0 +1,90 @@
+#!/usr/bin/env zsh
+
+set -euo pipefail
+
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+
+source "${0:A:h}/fzf-theme.sh"
+
+kitty_bin="${KITTY_BIN:-kitty}"
+kitty_cmd=("$kitty_bin" @)
+
+launch_window_id="${KITTY_WINDOW_ID:-}"
+
+build_lines() {
+  local tabs_data
+  tabs_data="$(
+    "${kitty_cmd[@]}" ls 2>/dev/null | jq -r --arg w "${launch_window_id}" '
+      . as $root
+      | ( [ $root[]?.tabs[]?
+            | select(any(.windows[]?; (.id|tostring) == $w))
+            | ([ .windows[]?.session_name | select(. != null and . != "") ][0]) ]
+          | map(select(. != null)) | .[0] ) as $sess
+      | $root[]?.tabs[]?
+      | ([ .windows[]?.session_name | select(. != null and . != "") ][0]) as $tabsess
+      | select( ($sess == null) or ($tabsess == $sess) )
+      | (any(.windows[]?; (.id|tostring) == $w)) as $cur
+      | ([ .windows[] | select(($w == "") or ((.id|tostring) != $w)) ]) as $ws
+      | [ (.id|tostring),
+          (if $cur then "1" else "0" end),
+          (if $cur then
+             (($ws[] | select(.is_active == true) | .title) // $ws[0].title // .title)
+           else .title end),
+          (($ws[] | select(.is_active == true) | (.env.PWD // .cwd))
+            // $ws[0].cwd // .windows[0].cwd // "") ]
+      | @tsv
+    ' || true
+  )"
+
+  [[ -z "${tabs_data}" ]] && return 0
+
+  local tab_id is_current title cwd marker
+  local -i idx=0
+  while IFS=$'\t' read -r tab_id is_current title cwd; do
+    idx+=1
+    marker="  "
+    [[ "${is_current}" == "1" ]] && marker="● "
+    print -r -- "${marker}${idx}: ${title}  (${(D)cwd})"$'\t'"${tab_id}"
+  done <<< "${tabs_data}"
+}
+
+if [[ "${1:-}" == "--close-and-list" ]]; then
+  target="${2:-}"
+  cur="${3:-}"
+  if [[ -n "${target}" && "${target}" != "${cur}" ]]; then
+    "${kitty_cmd[@]}" close-tab --match "id:${target}" 2>/dev/null || true
+  fi
+  build_lines
+  exit 0
+fi
+
+lines="$(build_lines)"
+if [[ -z "${lines}" ]]; then
+  echo "No tabs found."
+  exit 0
+fi
+
+current=""
+for _l in "${(f)lines}"; do
+  if [[ "${_l}" == "● "* ]]; then
+    current="${_l##*$'\t'}"
+    break
+  fi
+done
+
+export KT_SELF="${0:A}" KT_CURRENT="${current}"
+
+set +e
+selected="$(print -r -- "${lines}" | fzf --height=40% --reverse --no-sort \
+  -d $'\t' --with-nth=1 --prompt="Switch Tab > " --no-multi \
+  --header='ctrl-x: to close' \
+  --bind='ctrl-x:reload("$KT_SELF" --close-and-list {2} "$KT_CURRENT")')"
+fzf_rc=$?
+set -e
+
+if [[ $fzf_rc -ne 0 || -z "${selected}" ]]; then
+  exit 0
+fi
+
+selected_tab="${selected#*$'\t'}"
+"${kitty_cmd[@]}" focus-tab --match "id:${selected_tab}" 2>/dev/null || true

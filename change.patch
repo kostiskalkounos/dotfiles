@@ -1,0 +1,185 @@
+diff --git a/kitty/.config/kitty/fzf-theme.sh b/kitty/.config/kitty/fzf-theme.sh
+new file mode 100644
+index 0000000..5630915
+--- /dev/null
++++ b/kitty/.config/kitty/fzf-theme.sh
+@@ -0,0 +1,13 @@
++fzf_theme="dark"
++if [[ -f "$HOME/.cache/theme" ]]; then
++  fzf_theme="$(< "$HOME/.cache/theme")"
++  fzf_theme="${fzf_theme//[[:space:]]/}"
++fi
++
++FZF_COMMON_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=fg:-1,bg:-1,hl:magenta,hl+:blue,info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
++
++if [[ "${fzf_theme}" == "light" ]]; then
++  export FZF_DEFAULT_OPTS="--color=light ${FZF_COMMON_OPTS} --color=fg+:black,bg+:#ccd0da,gutter:#eff1f5"
++else
++  export FZF_DEFAULT_OPTS="--color=dark ${FZF_COMMON_OPTS} --color=fg+:white,bg+:#363a4f,gutter:#24273A"
++fi
+diff --git a/kitty/.config/kitty/keys.conf b/kitty/.config/kitty/keys.conf
+index aea2547..35b36ca 100644
+--- a/kitty/.config/kitty/keys.conf
++++ b/kitty/.config/kitty/keys.conf
+@@ -54,5 +54,5 @@ map cmd+f show_last_command_output
+ map cmd+g show_scrollback
+ 
+ map cmd+a launch --type=overlay $HOME/.config/kitty/kitty-session --active
+-map cmd+d launch --type=overlay $HOME/.config/kitty/kitty-session --active
++map cmd+d launch --type=overlay $HOME/.config/kitty/kitty-tabs
+ map cmd+s launch --type=overlay $HOME/.config/kitty/kitty-session
+diff --git a/kitty/.config/kitty/kitty-session b/kitty/.config/kitty/kitty-session
+index 3642a44..aaa5f4c 100755
+--- a/kitty/.config/kitty/kitty-session
++++ b/kitty/.config/kitty/kitty-session
+@@ -5,19 +5,7 @@ setopt nullglob extendedglob
+ 
+ export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+ 
+-fzf_theme="dark"
+-if [[ -f "$HOME/.cache/theme" ]]; then
+-  fzf_theme="$(< "$HOME/.cache/theme")"
+-  fzf_theme="${fzf_theme//[[:space:]]/}"
+-fi
+-
+-fzf_common_opts='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=fg:-1,bg:-1,hl:magenta,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
+-
+-if [[ "${fzf_theme}" == "light" ]]; then
+-  export FZF_DEFAULT_OPTS="--color=light ${fzf_common_opts} --color=fg+:black,bg+:#ccd0da,gutter:#eff1f5"
+-else
+-  export FZF_DEFAULT_OPTS="--color=dark ${fzf_common_opts} --color=fg+:white,bg+:#363a4f,gutter:#24273A"
+-fi
++source "${0:A:h}/fzf-theme.sh"
+ 
+ kitty_bin="${KITTY_BIN:-kitty}"
+ kitty_cmd=("$kitty_bin" @)
+diff --git a/kitty/.config/kitty/kitty-tabs b/kitty/.config/kitty/kitty-tabs
+new file mode 100755
+index 0000000..5393277
+--- /dev/null
++++ b/kitty/.config/kitty/kitty-tabs
+@@ -0,0 +1,90 @@
++#!/usr/bin/env zsh
++
++set -euo pipefail
++
++export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
++
++source "${0:A:h}/fzf-theme.sh"
++
++kitty_bin="${KITTY_BIN:-kitty}"
++kitty_cmd=("$kitty_bin" @)
++
++launch_window_id="${KITTY_WINDOW_ID:-}"
++
++build_lines() {
++  local tabs_data
++  tabs_data="$(
++    "${kitty_cmd[@]}" ls 2>/dev/null | jq -r --arg w "${launch_window_id}" '
++      . as $root
++      | ( [ $root[]?.tabs[]?
++            | select(any(.windows[]?; (.id|tostring) == $w))
++            | ([ .windows[]?.session_name | select(. != null and . != "") ][0]) ]
++          | map(select(. != null)) | .[0] ) as $sess
++      | $root[]?.tabs[]?
++      | ([ .windows[]?.session_name | select(. != null and . != "") ][0]) as $tabsess
++      | select( ($sess == null) or ($tabsess == $sess) )
++      | (any(.windows[]?; (.id|tostring) == $w)) as $cur
++      | ([ .windows[] | select(($w == "") or ((.id|tostring) != $w)) ]) as $ws
++      | [ (.id|tostring),
++          (if $cur then "1" else "0" end),
++          (if $cur then
++             (($ws[] | select(.is_active == true) | .title) // $ws[0].title // .title)
++           else .title end),
++          (($ws[] | select(.is_active == true) | (.env.PWD // .cwd))
++            // $ws[0].cwd // .windows[0].cwd // "") ]
++      | @tsv
++    ' || true
++  )"
++
++  [[ -z "${tabs_data}" ]] && return 0
++
++  local tab_id is_current title cwd marker
++  local -i idx=0
++  while IFS=$'\t' read -r tab_id is_current title cwd; do
++    idx+=1
++    marker="  "
++    [[ "${is_current}" == "1" ]] && marker="● "
++    print -r -- "${marker}${idx}: ${title}  (${(D)cwd})"$'\t'"${tab_id}"
++  done <<< "${tabs_data}"
++}
++
++if [[ "${1:-}" == "--close-and-list" ]]; then
++  target="${2:-}"
++  cur="${3:-}"
++  if [[ -n "${target}" && "${target}" != "${cur}" ]]; then
++    "${kitty_cmd[@]}" close-tab --match "id:${target}" 2>/dev/null || true
++  fi
++  build_lines
++  exit 0
++fi
++
++lines="$(build_lines)"
++if [[ -z "${lines}" ]]; then
++  echo "No tabs found."
++  exit 0
++fi
++
++current=""
++for _l in "${(f)lines}"; do
++  if [[ "${_l}" == "● "* ]]; then
++    current="${_l##*$'\t'}"
++    break
++  fi
++done
++
++export KT_SELF="${0:A}" KT_CURRENT="${current}"
++
++set +e
++selected="$(print -r -- "${lines}" | fzf --height=40% --reverse --no-sort \
++  -d $'\t' --with-nth=1 --prompt="Switch Tab > " --no-multi \
++  --header='ctrl-x: to close' \
++  --bind='ctrl-x:reload("$KT_SELF" --close-and-list {2} "$KT_CURRENT")')"
++fzf_rc=$?
++set -e
++
++if [[ $fzf_rc -ne 0 || -z "${selected}" ]]; then
++  exit 0
++fi
++
++selected_tab="${selected#*$'\t'}"
++"${kitty_cmd[@]}" focus-tab --match "id:${selected_tab}" 2>/dev/null || true
+diff --git a/kitty/.config/kitty/kitty.conf b/kitty/.config/kitty/kitty.conf
+index b0b73d3..3e3e914 100644
+--- a/kitty/.config/kitty/kitty.conf
++++ b/kitty/.config/kitty/kitty.conf
+@@ -15,7 +15,7 @@ tab_bar_filter session:~ or session:^$
+ tab_bar_margin_height 2 0
+ tab_bar_margin_width 12
+ tab_bar_min_tabs 1
+-tab_bar_style separator
++tab_bar_style hidden
+ tab_separator "    "
+ 
+ active_tab_title_template "{fmt.fg._9697d4}{session_name + '    ' if (session_name and index == 1) else ''}{fmt.fg._9697d4}{index}{fmt.fg.default}:{fmt.fg.tab}{title.split()[0].rsplit('/', 1)[-1] or '/'}{fmt.fg._38acec}*"
+@@ -36,6 +36,7 @@ enabled_layouts splits, tall, fat, grid, horizontal, vertical, stack
+ focus_follows_mouse no
+ hide_window_decorations titlebar-only
+ input_delay 1
++listen_on unix:${HOME}/.cache/kitty-{kitty_pid}
+ macos_option_as_alt yes
+ macos_quit_when_last_window_closed no
+ macos_show_window_title_in window
+diff --git a/zsh/.zshrc b/zsh/.zshrc
+index e0a5e18..47e90cc 100644
+--- a/zsh/.zshrc
++++ b/zsh/.zshrc
+@@ -2,7 +2,7 @@ typeset -U path fpath cdpath mailpath
+ 
+ bindkey -e
+ 
+-FZF_COMMON_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=fg:-1,bg:-1,hl:magenta,hl+:blue --color=info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
++FZF_COMMON_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=fg:-1,bg:-1,hl:magenta,hl+:blue,info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
+ DARK_FZF_OPTS="--color=dark ${FZF_COMMON_OPTS} --color=fg+:white,bg+:#363a4f,gutter:#24273A"
+ LIGHT_FZF_OPTS="--color=light ${FZF_COMMON_OPTS} --color=fg+:black,bg+:#ccd0da,gutter:#eff1f5"
+ 
