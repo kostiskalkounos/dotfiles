@@ -11,10 +11,16 @@ kitty_cmd=("$kitty_bin" @)
 
 launch_window_id="${KITTY_WINDOW_ID:-}"
 
+all_mode="${KT_ALL:-0}"
+if [[ "${1:-}" == "--all" ]]; then
+  all_mode=1
+  shift
+fi
+
 build_lines() {
   local tabs_data
   tabs_data="$(
-    "${kitty_cmd[@]}" ls 2>/dev/null | jq -r --arg w "${launch_window_id}" '
+    "${kitty_cmd[@]}" ls 2>/dev/null | jq -r --arg w "${launch_window_id}" --arg all "${all_mode}" '
       . as $root
       | ( [ $root[]?.tabs[]?
             | select(any(.windows[]?; (.id|tostring) == $w))
@@ -22,7 +28,7 @@ build_lines() {
           | map(select(. != null)) | .[0] ) as $sess
       | $root[]?.tabs[]?
       | ([ .windows[]?.session_name | select(. != null and . != "") ][0]) as $tabsess
-      | select( ($sess == null) or ($tabsess == $sess) )
+      | select( ($all == "1") or ($sess == null) or ($tabsess == $sess) )
       | (any(.windows[]?; (.id|tostring) == $w)) as $cur
       | ([ .windows[] | select(($w == "") or ((.id|tostring) != $w)) ]) as $ws
       | [ (.id|tostring),
@@ -31,21 +37,29 @@ build_lines() {
              (($ws[] | select(.is_active == true) | .title) // $ws[0].title // .title)
            else .title end),
           (($ws[] | select(.is_active == true) | (.env.PWD // .cwd))
-            // $ws[0].cwd // .windows[0].cwd // "") ]
+            // ($ws[0] | .env.PWD // .cwd)
+            // (.windows[0] | .env.PWD // .cwd) // "") ]
       | @tsv
     ' || true
   )"
 
   [[ -z "${tabs_data}" ]] && return 0
 
-  local tab_id is_current title cwd marker
+  local tab_id is_current title cwd disp cur_line=""
+  local -a rest=()
   local -i idx=0
   while IFS=$'\t' read -r tab_id is_current title cwd; do
     idx+=1
-    marker="  "
-    [[ "${is_current}" == "1" ]] && marker="● "
-    print -r -- "${marker}${idx}: ${title}  (${(D)cwd})"$'\t'"${tab_id}"
+    disp="${idx}: ${title}  (${(D)cwd})"
+    if [[ "${is_current}" == "1" ]]; then
+      cur_line="${active_color}${disp}${reset_color}"$'\t'"${tab_id}"
+    else
+      rest+=("${disp}"$'\t'"${tab_id}")
+    fi
   done <<< "${tabs_data}"
+
+  [[ -n "${cur_line}" ]] && print -r -- "${cur_line}"
+  (( ${#rest} )) && print -l -r -- "${rest[@]}"
 }
 
 if [[ "${1:-}" == "--close-and-list" ]]; then
@@ -64,19 +78,23 @@ if [[ -z "${lines}" ]]; then
   exit 0
 fi
 
+typeset -a _lines=( "${(f)lines}" )
+typeset -i header_lines=0
 current=""
-for _l in "${(f)lines}"; do
-  if [[ "${_l}" == "● "* ]]; then
-    current="${_l##*$'\t'}"
-    break
-  fi
-done
+if [[ "${_lines[1]}" == $'\033'* ]]; then
+  header_lines=1
+  current="${_lines[1]##*$'\t'}"
+fi
 
-export KT_SELF="${0:A}" KT_CURRENT="${current}"
+export KT_SELF="${0:A}" KT_CURRENT="${current}" KT_ALL="${all_mode}"
+
+typeset prompt_label="Switch Tab > "
+[[ "${all_mode}" == "1" ]] && prompt_label="Switch Tab (all) > "
 
 set +e
 selected="$(print -r -- "${lines}" | fzf --height=40% --reverse --no-sort \
-  -d $'\t' --with-nth=1 --prompt="Switch Tab > " --no-multi \
+  --ansi --header-lines=${header_lines} \
+  -d $'\t' --with-nth=1 --prompt="${prompt_label}" --no-multi \
   --header='ctrl-x: to close' \
   --bind='ctrl-x:reload("$KT_SELF" --close-and-list {2} "$KT_CURRENT")')"
 fzf_rc=$?
