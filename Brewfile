@@ -1,3 +1,4 @@
+brew "bash"
 brew "bat"
 brew "btop"
 brew "colima"
