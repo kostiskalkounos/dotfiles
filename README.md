@@ -11,3 +11,8 @@ defaults write -g InitialKeyRepeat -int 10
 
 ### Speed up Mission Control animations
 defaults write com.apple.dock expose-animation-duration -float 0.1 && killall Dock
+
+### Setup Homebrew shells
+echo $(which zsh) | sudo tee -a /etc/shells
+echo $(which bash) | sudo tee -a /etc/shells
+sudo chsh -s $(which zsh) $USER
