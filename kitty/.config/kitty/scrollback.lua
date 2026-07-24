@@ -28,6 +28,7 @@ o.signcolumn = "no"
 o.smartcase = true
 o.termguicolors = true
 o.scrollback = 100000
+o.shada = "'0,<0,f0,:100,@0,/100"
 
 api.nvim_set_hl(0, "NonText", { ctermbg = "none" })
 api.nvim_set_hl(0, "Normal", { ctermbg = "none" })
@@ -76,7 +77,7 @@ api.nvim_create_autocmd("VimEnter", {
         if end_idx == last_non_empty then
           api.nvim_chan_send(term_io, table.concat(chunk_lines, "\r\n"))
         else
-          chunk_lines[end_idx - i + 1] = ""
+          chunk_lines[#chunk_lines + 1] = ""
           api.nvim_chan_send(term_io, table.concat(chunk_lines, "\r\n"))
         end
       end
