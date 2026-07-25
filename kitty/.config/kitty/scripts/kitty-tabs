@@ -24,8 +24,6 @@ build_lines() {
   fi
   [[ -z "${json}" ]] && return 0
 
-  "${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${json}" &!
-
   local tabs_data
   tabs_data="$(
     jq -r --arg w "${launch_window_id}" --arg all "${all_mode}" '
@@ -77,17 +75,25 @@ if [[ "${1:-}" == "--close-and-list" ]]; then
   if [[ -n "${target}" && "${target}" != "${cur}" ]]; then
     json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
     if ! jq --arg target "${target}" -e '
-      any(.[]?.tabs[]? | select((.id|tostring) == $target).windows[]?; .pid as $wpid | any(.foreground_processes[]?; .pid != $wpid))
+      any(
+        .[]?.tabs[]? | select((.id|tostring) == $target).windows[]?.foreground_processes[]?;
+        ((.cmdline[0] // "") | sub("^-"; "") | sub(".*/"; "")) as $c
+        | ($c | test("^(zsh|bash|sh|fish|dash|tcsh|ksh)$")) | not
+      )
     ' <<< "${json}" >/dev/null 2>&1; then
       "${KITTY_BIN}" @ close-tab --match "id:${target}" 2>/dev/null || true
-      json=""
+      json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
+      nohup "${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${json}" &!
     fi
   fi
   build_lines "${json}"
   exit 0
 fi
 
-lines="$(build_lines)"
+main_json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
+nohup "${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${main_json}" &!
+
+lines="$(build_lines "${main_json}")"
 if [[ -z "${lines}" ]]; then
   echo "No tabs found."
   exit 0
