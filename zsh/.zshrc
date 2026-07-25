@@ -371,7 +371,7 @@ autoload -Uz add-zsh-hook
 add-zsh-hook precmd _update_git_branch
 
 PROMPT_NL=$'\n'
-PROMPT='%(!.%F{red}.%F{blue})${PWD/#$HOME/~}%f ${__CURRENT_GIT_BRANCH}%(1j.%F{yellow}* %f.)%(0?;;%F{red} %f)${PROMPT_NL}'
+PROMPT='%(!.%F{red}root %f.)%F{blue}${PWD/#$HOME/~}%f ${__CURRENT_GIT_BRANCH}%(1j.%F{yellow}* %f.)${PROMPT_NL}%(?.%F{magenta}.%F{red})❯%f '
 
 if [[ -n "$KITTY_INSTALLATION_DIR" ]]; then
   export KITTY_SHELL_INTEGRATION="enabled"
