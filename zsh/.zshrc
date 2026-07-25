@@ -12,6 +12,7 @@ _set_dark_theme() {
   export KUBECOLOR_PRESET=dark
   export NVIM_THEME=dark
   export BAT_THEME="Catppuccin Macchiato"
+  export COMPLETION_HIGHLIGHT_COLOR="ma=1;48;2;54;58;79;38;2;255;255;255"
   export GIT_BRANCH_COLOR="#f5bde6"
   export GIT_SEPARATOR_COLOR="#8bd5ca"
 }
@@ -22,6 +23,7 @@ _set_light_theme() {
   export KUBECOLOR_PRESET=light
   export NVIM_THEME=light
   export BAT_THEME="Catppuccin Latte"
+  export COMPLETION_HIGHLIGHT_COLOR="ma=1;48;2;204;208;218;38;2;0;0;0"
   export GIT_BRANCH_COLOR="#ea76cb"
   export GIT_SEPARATOR_COLOR="#179299"
 }
@@ -230,11 +232,11 @@ bindkey '^[n' down-line-or-beginning-search
 bindkey '^[p' up-line-or-beginning-search
 
 zstyle ':completion:*' cache-path $ZSH_CACHE_DIR
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' matcher-list '' '+m:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}' '+m:{_-}={-_}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' menu select
 zstyle ':completion:*' use-cache yes
 zstyle ':completion:*:complete:(cd|pushd):*' tag-order 'local-directories named-directories'
+zstyle -e ':completion:*' list-colors 'reply=( "$COMPLETION_HIGHLIGHT_COLOR" ${(s.:.)LS_COLORS} )'
 zstyle -e ':completion:*' special-dirs '[[ $PREFIX = (../)#(..) ]] && reply=(..)'
 
 TRAPUSR1() {
