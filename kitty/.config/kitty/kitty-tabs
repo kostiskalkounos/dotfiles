@@ -2,9 +2,10 @@
 
 set -euo pipefail
 
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH:-}"
+typeset -U path
+path=(/opt/homebrew/bin /usr/local/bin /usr/bin /bin /usr/sbin /sbin $path)
 
-source "${0:A:h}/fzf-theme.sh"
+source "${0:A:h}/fzf-theme"
 
 kitty_bin="${KITTY_BIN:-kitty}"
 kitty_cmd=("$kitty_bin" @)
