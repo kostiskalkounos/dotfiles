@@ -24,8 +24,6 @@ build_lines() {
   fi
   [[ -z "${json}" ]] && return 0
 
-  "${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${json}" &!
-
   local tabs_data
   tabs_data="$(
     jq -r --arg w "${launch_window_id}" --arg all "${all_mode}" '
@@ -87,7 +85,10 @@ if [[ "${1:-}" == "--close-and-list" ]]; then
   exit 0
 fi
 
-lines="$(build_lines)"
+main_json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
+"${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${main_json}" &!
+
+lines="$(build_lines "${main_json}")"
 if [[ -z "${lines}" ]]; then
   echo "No tabs found."
   exit 0
