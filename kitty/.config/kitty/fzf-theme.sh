@@ -4,7 +4,7 @@ if [[ -f "$HOME/.cache/theme" ]]; then
   fzf_theme="${fzf_theme//[[:space:]]/}"
 fi
 
-FZF_COMMON_OPTS='--bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=fg:-1,bg:-1,hl:magenta,hl+:blue,info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue'
+FZF_COMMON_OPTS='--layout=reverse --border=rounded --margin=22%,32% --padding=0,1 --bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden --color=fg:-1,bg:-1,hl:magenta,hl+:blue,info:blue,prompt:blue,pointer:magenta,marker:blue,spinner:blue,header:blue,border:blue,label:blue'
 
 reset_color=$'\033[0m'
 
