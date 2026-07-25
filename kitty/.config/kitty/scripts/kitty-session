@@ -81,8 +81,6 @@ session_exists() {
   [[ -n "${active_session_names[$1]:-}" ]]
 }
 
-
-
 sanitize() {
   local s="${1//[^A-Za-z0-9._-]/_}"
   REPLY="${s//_##/_}"
