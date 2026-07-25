@@ -96,7 +96,7 @@ close_launch_tab() {
 }
 
 if [[ "${active_mode}" == "true" ]]; then
-  "${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${raw_ls_data}" &!
+  nohup "${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${raw_ls_data}" &!
   if [[ -z "${active_sessions_data}" ]]; then
     echo "No active sessions found."
     exit 0
@@ -140,7 +140,7 @@ if [[ "${active_mode}" == "true" ]]; then
   exit 0
 fi
 
-"${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${raw_ls_data}" &!
+nohup "${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${raw_ls_data}" &!
 
 typeset cur_dir=""
 if [[ -n "${cur_sess}" ]]; then
