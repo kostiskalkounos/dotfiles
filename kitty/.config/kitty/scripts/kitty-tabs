@@ -82,7 +82,8 @@ if [[ "${1:-}" == "--close-and-list" ]]; then
       )
     ' <<< "${json}" >/dev/null 2>&1; then
       "${KITTY_BIN}" @ close-tab --match "id:${target}" 2>/dev/null || true
-      json=""
+      json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
+      nohup "${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${json}" &!
     fi
   fi
   build_lines "${json}"
