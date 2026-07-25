@@ -69,26 +69,21 @@ build_lines() {
 }
 
 if [[ "${1:-}" == "--close-and-list" ]]; then
-  DBG="$HOME/.cache/kitty-tabs-debug.log"
-  dbg() { print -r -- "[$(date '+%H:%M:%S')] $*" >> "${DBG}" 2>/dev/null || true; }
   target="${2:-}"
   cur="${3:-}"
-  dbg "ENTER target='${target}' cur='${cur}' KITTY_BIN='${KITTY_BIN:-UNSET}' argc=$#"
   json=""
   if [[ -n "${target}" && "${target}" != "${cur}" ]]; then
     json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
-    dbg "ls bytes=${#json}"
     if ! jq --arg target "${target}" -e '
-      any(.[]?.tabs[]? | select((.id|tostring) == $target).windows[]?; .pid as $wpid | any(.foreground_processes[]?; .pid != $wpid))
+      any(
+        .[]?.tabs[]? | select((.id|tostring) == $target).windows[]?.foreground_processes[]?;
+        ((.cmdline[0] // "") | sub("^-"; "") | sub(".*/"; "")) as $c
+        | ($c | test("^(zsh|bash|sh|fish|dash|tcsh|ksh)$")) | not
+      )
     ' <<< "${json}" >/dev/null 2>&1; then
-      rc=0; "${KITTY_BIN}" @ close-tab --match "id:${target}" 2>>"${DBG}" || rc=$?
-      dbg "close-tab rc=${rc}"
+      "${KITTY_BIN}" @ close-tab --match "id:${target}" 2>/dev/null || true
       json=""
-    else
-      dbg "SKIP close (busy)"
     fi
-  else
-    dbg "SKIP close (target empty or == cur)"
   fi
   build_lines "${json}"
   exit 0
