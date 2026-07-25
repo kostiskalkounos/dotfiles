@@ -10,7 +10,7 @@ mkdir -p $HOME/.cache
 echo "{{THEME_LOWER}}" > $HOME/.cache/theme
 
 # 1. Set macOS System Appearance asynchronously (avoids spawning a separate Hammerspoon task)
-osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to {{DARK_MODE}}' >/dev/null 2>&1 &!
+osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to {{DARK_MODE}}' >/dev/null 2>&1 < /dev/null &!
 
 # 2. Hot-reload active terminal zsh shells to update their FZF/Bat themes
 {
@@ -25,7 +25,7 @@ osascript -e 'tell app "System Events" to tell appearance preferences to set dar
     if (interactive) print $1
   }')
   [ -n "$pids" ] && kill -{{SIGNAL}} ${=pids}
-} >/dev/null 2>&1 &!
+} >/dev/null 2>&1 < /dev/null &!
 
 # 3. Command all active Neovim instances to set background mode (bypasses all configs, defaults, and Shada)
 {
@@ -35,19 +35,19 @@ osascript -e 'tell app "System Events" to tell appearance preferences to set dar
       pid=${filename#nvim-}
       pid=${pid%.sock}
       if [[ "$pid" =~ ^[0-9]+$ ]] && kill -0 "$pid" 2>/dev/null; then
-        nvim --headless -u NONE -i NONE --server "$s" --remote-expr "luaeval('pcall(function() vim.o.background=\"{{THEME_LOWER}}\" end)', '')" 2>/dev/null &!
+        nvim --headless -u NONE -i NONE --server "$s" --remote-expr "luaeval('pcall(function() vim.o.background=\"{{THEME_LOWER}}\" end)', '')" >/dev/null 2>&1 < /dev/null &!
       else
         rm "$s" # Kept synchronous within the backgrounded loop to avoid process-forking overhead
       fi
     fi
   done
-} >/dev/null 2>&1 &!
+} >/dev/null 2>&1 < /dev/null &!
 
 # 4. Hot-reload Tmux config
 pgrep tmux >/dev/null && {
   tmux source-file $HOME/.tmux/{{THEME_LOWER}}.conf
   tmux list-clients -F '#{client_name}' 2>/dev/null | xargs -I {} tmux refresh-client -t '{}'
-} >/dev/null 2>&1 &!
+} >/dev/null 2>&1 < /dev/null &!
 
 # 5. Update other file-based app configurations (Consolidated to save 3 process forks)
 {
@@ -75,7 +75,7 @@ pgrep tmux >/dev/null && {
   [ -f $HOME/.config/kitty/kitty.conf ] && {
     cp -f $HOME/.config/kitty/{{THEME_LOWER}}-theme.auto.conf $HOME/.config/kitty/current-theme.conf && pkill -USR1 -x kitty
   }
-} >/dev/null 2>&1 &!
+} >/dev/null 2>&1 < /dev/null &!
 ]=]
 
 Hyper:bind({}, "/", function()

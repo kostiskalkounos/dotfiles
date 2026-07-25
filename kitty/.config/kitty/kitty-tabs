@@ -2,13 +2,12 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="${0:a:h}"
+
 typeset -U path
 path=(/opt/homebrew/bin /usr/local/bin /usr/bin /bin /usr/sbin /sbin $path)
 
-source "${0:A:h}/fzf-theme"
-
-kitty_bin="${KITTY_BIN:-kitty}"
-kitty_cmd=("$kitty_bin" @)
+[[ -z "${KITTY_BIN:-}" || -z "${FZF_DEFAULT_OPTS:-}" || -z "${active_color:-}" || -z "${reset_color:-}" ]] && source "${SCRIPT_DIR}/fzf-theme"
 
 launch_window_id="${KITTY_WINDOW_ID:-}"
 
@@ -19,37 +18,45 @@ if [[ "${1:-}" == "--all" ]]; then
 fi
 
 build_lines() {
+  local json="${1:-}"
+  if [[ -z "${json}" ]]; then
+    json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
+  fi
+  [[ -z "${json}" ]] && return 0
+
+  "${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${json}" &!
+
   local tabs_data
   tabs_data="$(
-    "${kitty_cmd[@]}" ls 2>/dev/null | jq -r --arg w "${launch_window_id}" --arg all "${all_mode}" '
-      . as $root
-      | ( [ $root[]?.tabs[]?
-            | select(any(.windows[]?; (.id|tostring) == $w))
-            | ([ .windows[]?.session_name | select(. != null and . != "") ][0]) ]
-          | map(select(. != null)) | .[0] ) as $sess
-      | $root[]?.tabs[]?
-      | ([ .windows[]?.session_name | select(. != null and . != "") ][0]) as $tabsess
+    jq -r --arg w "${launch_window_id}" --arg all "${all_mode}" '
+      (first(.[]?.tabs[]? | select(any(.windows[]?; (.id|tostring) == $w))) // null) as $launch_tab
+      | (first($launch_tab.windows[]?.session_name | select(. != null and . != "")) // null) as $sess
+      | .[]?.tabs[]?
+      | (first(.windows[]?.session_name | select(. != null and . != "")) // null) as $tabsess
       | select( ($all == "1") or ($sess == null) or ($tabsess == $sess) )
       | (any(.windows[]?; (.id|tostring) == $w)) as $cur
-      | ([ .windows[] | select(($w == "") or ((.id|tostring) != $w)) ]) as $ws
+      | [ .windows[] | select(($w == "") or ((.id|tostring) != $w)) ] as $wins
       | [ (.id|tostring),
           (if $cur then "1" else "0" end),
           (if $cur then
-             (($ws[] | select(.is_active == true) | .title) // $ws[0].title // .title)
+             (first($wins[] | select(.is_active == true) | .title) // $wins[0]?.title // .title)
            else .title end),
-          (($ws[] | select(.is_active == true) | (.env.PWD // .cwd))
-            // ($ws[0] | .env.PWD // .cwd)
-            // (.windows[0] | .env.PWD // .cwd) // "") ]
+          (first($wins[] | select(.is_active == true) | (.env.PWD // .cwd)) // $wins[0]?.env.PWD // $wins[0]?.cwd // .windows[0].env.PWD // .windows[0].cwd // "") ]
       | @tsv
-    ' || true
+    ' <<< "${json}" || true
   )"
 
   [[ -z "${tabs_data}" ]] && return 0
 
-  local tab_id is_current title cwd disp cur_line=""
-  local -a rest=()
+  local tab_id is_current title cwd disp cur_line="" line
+  local -a rest=() parts=()
   local -i idx=0
-  while IFS=$'\t' read -r tab_id is_current title cwd; do
+  for line in "${(f)tabs_data}"; do
+    parts=( "${(@ps:\t:)line}" )
+    tab_id="${parts[1]:-}"
+    is_current="${parts[2]:-}"
+    title="${parts[3]:-}"
+    cwd="${parts[4]:-}"
     idx+=1
     disp="${idx}: ${title}  (${(D)cwd})"
     if [[ "${is_current}" == "1" ]]; then
@@ -57,7 +64,7 @@ build_lines() {
     else
       rest+=("${disp}"$'\t'"${tab_id}")
     fi
-  done <<< "${tabs_data}"
+  done
 
   [[ -n "${cur_line}" ]] && print -r -- "${cur_line}"
   (( ${#rest} )) && print -l -r -- "${rest[@]}"
@@ -66,10 +73,17 @@ build_lines() {
 if [[ "${1:-}" == "--close-and-list" ]]; then
   target="${2:-}"
   cur="${3:-}"
+  json=""
   if [[ -n "${target}" && "${target}" != "${cur}" ]]; then
-    "${kitty_cmd[@]}" close-tab --match "id:${target}" 2>/dev/null || true
+    json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
+    if ! jq --arg target "${target}" -e '
+      any(.[]?.tabs[]? | select((.id|tostring) == $target).windows[]?; .pid as $wpid | any(.foreground_processes[]?; .pid != $wpid))
+    ' <<< "${json}" >/dev/null 2>&1; then
+      "${KITTY_BIN}" @ close-tab --match "id:${target}" 2>/dev/null || true
+      json=""
+    fi
   fi
-  build_lines
+  build_lines "${json}"
   exit 0
 fi
 
@@ -79,15 +93,15 @@ if [[ -z "${lines}" ]]; then
   exit 0
 fi
 
-typeset -a _lines=( "${(f)lines}" )
 typeset -i header_lines=0
 current=""
-if [[ "${_lines[1]}" == $'\033'* ]]; then
+first_line="${lines%%$'\n'*}"
+if [[ "${first_line}" == $'\033'* ]]; then
   header_lines=1
-  current="${_lines[1]##*$'\t'}"
+  current="${first_line##*$'\t'}"
 fi
 
-export KT_SELF="${0:A}" KT_CURRENT="${current}" KT_ALL="${all_mode}"
+export KT_SELF="${0:a}" KT_CURRENT="${current}" KT_ALL="${all_mode}"
 
 typeset prompt_label="Switch Tab > "
 [[ "${all_mode}" == "1" ]] && prompt_label="Switch Tab (all) > "
@@ -106,4 +120,4 @@ if [[ $fzf_rc -ne 0 || -z "${selected}" ]]; then
 fi
 
 selected_tab="${selected#*$'\t'}"
-"${kitty_cmd[@]}" focus-tab --match "id:${selected_tab}" 2>/dev/null || true
+"${KITTY_BIN}" @ focus-tab --match "id:${selected_tab}" 2>/dev/null || true
