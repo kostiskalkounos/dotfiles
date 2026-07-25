@@ -146,7 +146,7 @@ if [[ "${1:-}" == "--active" ]]; then
   picker+=("${lines[@]}")
 
   set +e
-  selected="$(print -l -r -- "${picker[@]}" | fzf --height=40% --reverse --ansi --header-lines=${header_lines} -d $'\t' --with-nth=1 --prompt="Switch Session > " --no-multi)"
+  selected="$(print -l -r -- "${picker[@]}" | fzf --ansi --header-lines=${header_lines} -d $'\t' --with-nth=1 --prompt="Switch Session > " --no-multi)"
   fzf_rc=$?
   set -e
 
@@ -169,6 +169,7 @@ paths=( "${paths[@]:#}" )
 typeset cur_dir="" cur_sess
 cur_sess="$(current_session)"
 if [[ -n "${cur_sess}" ]]; then
+  # pin the session's canonical dir (its `cd` line), stable across tabs/cwds
   typeset sf="${session_dir}/${cur_sess}.kitty-session" line
   if [[ -r "${sf}" ]]; then
     while IFS= read -r line; do
@@ -181,6 +182,7 @@ typeset p disp canon cur_line=""
 typeset -A seen_canon=()
 for p in "${paths[@]}"; do
   canon="${p:A}"
+  # collapse symlink + real (e.g. stow) into one row, keep first (frecency order)
   [[ -n "${seen_canon[$canon]:-}" ]] && continue
   seen_canon[$canon]=1
   disp="${(D)p}"
@@ -202,7 +204,7 @@ if (( ${#picker} == 0 )); then
 fi
 
 set +e
-selected="$(print -l -r -- "${picker[@]}" | fzf --height=40% --reverse --no-sort --ansi --header-lines=${header_lines} -d $'\t' --with-nth=1 --prompt="Select Session > " --no-multi)"
+selected="$(print -l -r -- "${picker[@]}" | fzf --no-sort --ansi --header-lines=${header_lines} -d $'\t' --with-nth=1 --prompt="Select Session > " --no-multi)"
 fzf_rc=$?
 set -e
 
