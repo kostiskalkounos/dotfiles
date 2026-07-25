@@ -86,7 +86,7 @@ if [[ "${1:-}" == "--close-and-list" ]]; then
 fi
 
 main_json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
-"${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${main_json}" || true
+nohup "${SCRIPT_DIR}/kitty-session-cleanup" >/dev/null 2>&1 <<< "${main_json}" &!
 
 lines="$(build_lines "${main_json}")"
 if [[ -z "${lines}" ]]; then
