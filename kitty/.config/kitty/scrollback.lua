@@ -74,12 +74,11 @@ api.nvim_create_autocmd("VimEnter", {
       for i = 0, last_non_empty - 1, chunk_size do
         local end_idx = math.min(i + chunk_size, last_non_empty)
         local chunk_lines = api.nvim_buf_get_lines(ev.buf, i, end_idx, false)
-        if end_idx == last_non_empty then
-          api.nvim_chan_send(term_io, table.concat(chunk_lines, "\r\n"))
-        else
-          chunk_lines[#chunk_lines + 1] = ""
-          api.nvim_chan_send(term_io, table.concat(chunk_lines, "\r\n"))
+        local text = table.concat(chunk_lines, "\r\n")
+        if end_idx < last_non_empty then
+          text = text .. "\r\n"
         end
+        api.nvim_chan_send(term_io, text)
       end
     end
 
@@ -97,6 +96,8 @@ api.nvim_create_autocmd("VimEnter", {
           elseif retries < 50 then
             retries = retries + 1
             vim.defer_fn(try_set_cursor, 2)
+          else
+            pcall(api.nvim_win_set_cursor, 0, { cur_lines, 0 })
           end
         end
       end

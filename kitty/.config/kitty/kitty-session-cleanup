@@ -1,0 +1,33 @@
+#!/usr/bin/env zsh
+
+set -euo pipefail
+setopt nullglob
+
+[[ -t 0 ]] && exit 0
+
+json="$(</dev/stdin)"
+[[ -n "${json}" ]] || exit 0
+
+session_dir="$HOME/.cache/kitty-sessions"
+[[ -d "${session_dir}" ]] || exit 0
+
+jq_output="$(jq -r '.[]?.tabs[]?.windows[]? | select(.session_name != null and .session_name != "") | .session_name' 2>/dev/null <<< "${json}" || true)"
+
+typeset -A active_session_names
+local line
+for line in ${(f)jq_output}; do
+  [[ -z "${line}" ]] && continue
+  active_session_names[${${line:t}%.kitty-session}]=1
+done
+
+local f base
+typeset -a to_delete=()
+for f in "${session_dir}"/*.kitty-session(ms+10); do
+  base="${f:t:r}"
+  [[ -n "${active_session_names[$base]:-}" ]] && continue
+  to_delete+=("${f}")
+done
+
+if (( ${#to_delete} > 0 )); then
+  rm -f "${to_delete[@]}"
+fi
