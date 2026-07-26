@@ -145,7 +145,7 @@ local function jdtls_generate()
 end
 
 config.on_attach = function(_, bufnr)
-  -- vim.lsp.log.set_level(vim.log.levels.OFF)
+  vim.lsp.log.set_level(vim.log.levels.OFF)
   jdtls.setup_dap({
     hotcodereplace = "auto",
     config_overrides = {},
