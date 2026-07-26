@@ -5,7 +5,6 @@ return {
     dependencies = {
       "nvim-neotest/nvim-nio",
       "rcarriga/nvim-dap-ui",
-      "mason-org/mason.nvim",
       {
         "leoluz/nvim-dap-go",
         config = function()
@@ -15,13 +14,6 @@ return {
       {
         "theHamsta/nvim-dap-virtual-text",
         opts = { virt_text_pos = "eol" },
-      },
-      {
-        "jay-babu/mason-nvim-dap.nvim",
-        opts = {
-          automatic_installation = true,
-          ensure_installed = { "delve", "javadbg", "javatest" },
-        },
       },
     },
     config = function()

@@ -92,28 +92,40 @@ return {
       }
 
       require("mason").setup()
-      require("mason-lspconfig").setup({
-        automatic_enable = false,
-        ensure_installed = servers,
-      })
 
       local tools = {
+        "delve",
         "gofumpt",
         "goimports",
+        "java-debug-adapter",
+        "java-test",
         "prettier",
         "ruff",
         "stylua",
         "vscode-spring-boot-tools",
       }
+
+      local lsp = vim.lsp
+      for _, server_name in ipairs(servers) do
+        if server_name ~= "jdtls" then
+          if servers_settings[server_name] then
+            lsp.config[server_name] = servers_settings[server_name]
+          end
+          lsp.enable(server_name)
+        end
+      end
+
       vim.defer_fn(function()
+        require("mason-lspconfig").setup({
+          automatic_enable = false,
+          ensure_installed = servers,
+        })
+
         local mason_registry = require("mason-registry")
 
-        local missing_tools = {}
-        for _, tool in ipairs(tools) do
-          if not mason_registry.is_installed(tool) then
-            table.insert(missing_tools, tool)
-          end
-        end
+        local missing_tools = vim.tbl_filter(function(tool)
+          return not mason_registry.is_installed(tool)
+        end, tools)
 
         if #missing_tools > 0 then
           vim.notify(
@@ -124,42 +136,25 @@ return {
           mason_registry.refresh(function()
             for _, tool in ipairs(missing_tools) do
               local pkg = mason_registry.get_package(tool)
-              if not pkg:is_installed() then
-                pkg:once("install:success", function()
-                  vim.schedule(function()
-                    vim.notify(
-                      "[mason-registry] " .. tool .. " was installed",
-                      vim.log.levels.INFO,
-                      { title = "Mason" }
-                    )
-                  end)
+              pkg:once("install:success", function()
+                vim.schedule(function()
+                  vim.notify("[mason-registry] " .. tool .. " was installed", vim.log.levels.INFO, { title = "Mason" })
                 end)
-                pkg:once("install:failed", function()
-                  vim.schedule(function()
-                    vim.notify(
-                      "[mason-registry] " .. tool .. " failed to install",
-                      vim.log.levels.ERROR,
-                      { title = "Mason" }
-                    )
-                  end)
+              end)
+              pkg:once("install:failed", function()
+                vim.schedule(function()
+                  vim.notify(
+                    "[mason-registry] " .. tool .. " failed to install",
+                    vim.log.levels.ERROR,
+                    { title = "Mason" }
+                  )
                 end)
-                pkg:install()
-              end
+              end)
+              pkg:install()
             end
           end)
         end
       end, 1000)
-
-      local lsp = vim.lsp
-
-      for _, server_name in ipairs(servers) do
-        if server_name ~= "jdtls" then
-          if servers_settings[server_name] then
-            lsp.config[server_name] = servers_settings[server_name]
-          end
-          lsp.enable(server_name)
-        end
-      end
     end,
   },
 }

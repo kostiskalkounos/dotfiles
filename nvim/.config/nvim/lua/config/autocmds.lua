@@ -16,7 +16,7 @@ local schedule = vim.schedule
 nvim_create_autocmd("TextYankPost", {
   group = nvim_create_augroup("highlight_yank", { clear = true }),
   callback = function()
-    vim.highlight.on_yank({ higroup = "Visual", timeout = 150, on_macro = false })
+    vim.hl.on_yank({ higroup = "Visual", timeout = 150, on_macro = false })
   end,
 })
 
