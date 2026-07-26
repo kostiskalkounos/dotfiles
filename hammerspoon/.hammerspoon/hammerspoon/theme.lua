@@ -82,38 +82,34 @@ local isDark = hs.host.interfaceStyle() == "Dark"
 
 Hyper:bind({}, "/", function()
   isDark = not isDark
-  local newMode = isDark
 
-  local theme = newMode and "Dark" or "Light"
-  local wallpaper = newMode and darkWallpaper or lightWallpaper
-  local signal = newMode and "USR1" or "USR2"
-  local plutilTheme = newMode and "Default" or "Default Light"
-  local btopTheme = newMode and "tokyo-storm" or "kanagawa-lotus"
+  local theme = isDark and "Dark" or "Light"
+  local wallpaper = isDark and darkWallpaper or lightWallpaper
+  local signal = isDark and "USR1" or "USR2"
+  local plutilTheme = isDark and "Default" or "Default Light"
+  local btopTheme = isDark and "tokyo-storm" or "kanagawa-lotus"
 
-  hs.console.darkMode(newMode)
+  hs.console.darkMode(isDark)
 
-  if wallpaper then
-    local targetURL = hs.fs.urlFromPath(wallpaper)
-    if targetURL then
-      -- Defer heavy GUI wallpaper operations to the next loop tick for instant tactile hotkey feedback
-      hs.timer.doAfter(0, function()
-        for _, screen in ipairs(hs.screen.allScreens()) do
-          if screen:desktopImageURL() ~= targetURL then
-            screen:desktopImageURL(targetURL)
-          end
+  local targetURL = hs.fs.urlFromPath(wallpaper)
+  if targetURL then
+    -- Defer heavy GUI wallpaper operations to the next loop tick for instant tactile hotkey feedback
+    hs.timer.doAfter(0, function()
+      for _, screen in ipairs(hs.screen.allScreens()) do
+        if screen:desktopImageURL() ~= targetURL then
+          screen:desktopImageURL(targetURL)
         end
-      end)
-    end
+      end
+    end)
   end
 
   -- Spawn ONE single asynchronous background zsh task for all global actions
   local themeLower = theme:lower()
   local replacements = {
     BTOP_THEME = btopTheme,
-    DARK_MODE = tostring(newMode),
+    DARK_MODE = tostring(isDark),
     PLUTIL_THEME = plutilTheme,
     SIGNAL = signal,
-    THEME = theme,
     THEME_LOWER = themeLower,
   }
   local cmd = cmdTemplate:gsub("{{([%w_]+)}}", replacements)
