@@ -1,7 +1,6 @@
 return {
   { "almo7aya/openingh.nvim", event = "VeryLazy" },
   { "MagicDuck/grug-far.nvim", event = "VeryLazy" },
-  { "mbbill/undotree", event = "VeryLazy" },
   { "stevearc/oil.nvim", event = "VeryLazy", opts = {} },
   {
     "MeanderingProgrammer/render-markdown.nvim",
