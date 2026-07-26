@@ -144,14 +144,22 @@ local function jdtls_generate()
   require("jdtls.tests").generate()
 end
 
-config.on_attach = function(_, bufnr)
-  vim.lsp.log.set_level(vim.log.levels.OFF)
-  jdtls.setup_dap({
-    hotcodereplace = "auto",
-    config_overrides = {},
-  })
+_G._jdtls_dap_done = _G._jdtls_dap_done or {}
 
-  require("jdtls.dap").setup_dap_main_class_configs()
+config.on_attach = function(_, bufnr)
+  if not _G._jdtls_log_set then
+    vim.lsp.log.set_level(vim.log.levels.OFF)
+    _G._jdtls_log_set = true
+  end
+
+  if not _G._jdtls_dap_done[workspace_dir] then
+    _G._jdtls_dap_done[workspace_dir] = true
+    jdtls.setup_dap({
+      hotcodereplace = "auto",
+      config_overrides = {},
+    })
+    require("jdtls.dap").setup_dap_main_class_configs()
+  end
 
   local set = vim.keymap.set
   local opts = { silent = true, buffer = bufnr }

@@ -57,7 +57,6 @@ o.complete = ".,w,b"
 o.completeopt = "fuzzy,menuone,noinsert,preview"
 o.shada = "!,'100,<50,s10,h"
 o.diffopt = "internal,filler,closeoff,linematch:60,foldcolumn:0"
-o.directory = o.directory .. ",."
 if not o.isfname:find("@-@", 1, true) then
   o.isfname = o.isfname .. ",@-@"
 end
