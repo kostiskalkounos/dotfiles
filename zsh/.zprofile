@@ -10,17 +10,8 @@ export HOMEBREW_REPOSITORY="/opt/homebrew";
 
 fpath=("/opt/homebrew/share/zsh/site-functions" $fpath)
 
-if [[ -f $HOME/.cache/path_helper.zsh ]]; then
-  source $HOME/.cache/path_helper.zsh
-else
-  mkdir -p $HOME/.cache
-  local out
-  out=$(/usr/libexec/path_helper -s)
-  eval "$out"
-  echo "$out" > $HOME/.cache/path_helper.zsh 2>/dev/null
-  zcompile $HOME/.cache/path_helper.zsh 2>/dev/null
-fi
-
+# /etc/zprofile already ran path_helper before this file, so $path holds the macOS
+# base PATH. Just prepend Homebrew's bin/sbin.
 path=("/opt/homebrew/bin" "/opt/homebrew/sbin" $path)
 export PATH
 
