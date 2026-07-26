@@ -78,9 +78,11 @@ pgrep tmux >/dev/null && {
 } >/dev/null 2>&1 < /dev/null &!
 ]=]
 
+local isDark = hs.host.interfaceStyle() == "Dark"
+
 Hyper:bind({}, "/", function()
-  local darkMode = hs.host.interfaceStyle() == "Dark"
-  local newMode = not darkMode
+  isDark = not isDark
+  local newMode = isDark
 
   local theme = newMode and "Dark" or "Light"
   local wallpaper = newMode and darkWallpaper or lightWallpaper
@@ -126,7 +128,7 @@ Hyper:bind({}, "/", function()
     activeTasks[zshTask] = nil
   end, { "-c", cmd })
 
-  activeTasks[zshTask] = zshTask
+  activeTasks[zshTask] = true
   zshTask:start()
 end)
 

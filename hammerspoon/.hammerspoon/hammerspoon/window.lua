@@ -10,6 +10,11 @@ local whitelist = {
   ["kitty"] = true,
 }
 
+local function withFocused(fn)
+  local win = window.focusedWindow()
+  if win then return fn(win) end
+end
+
 local function focusScreen(iScreen)
   local windowToFocus = window.desktop()
   for _, win in ipairs(window.orderedWindows()) do
@@ -22,44 +27,41 @@ local function focusScreen(iScreen)
 end
 
 local function moveWindowToDisplay(d)
-  local displays = screen.allScreens()
-  local win = window.focusedWindow()
-  if not win or not displays[d] then return end
-
-  win:moveToScreen(displays[d], false, true)
+  withFocused(function(win)
+    local displays = screen.allScreens()
+    if not displays[d] then return end
+    win:moveToScreen(displays[d], false, true)
+  end)
 end
 
 local function resizeWindow(deltaX, deltaY)
-  local win = window.focusedWindow()
-  if not win then return end
+  withFocused(function(win)
+    local frame = win:frame()
+    frame.w = frame.w + deltaX
+    frame.h = frame.h + deltaY
 
-  local frame = win:frame()
-  frame.w = frame.w + deltaX
-  frame.h = frame.h + deltaY
-
-  win:setFrame(frame)
+    win:setFrame(frame)
+  end)
 end
 
 local function moveWindow(deltaX, deltaY)
-  local win = window.focusedWindow()
-  if not win then return end
+  withFocused(function(win)
+    local frame = win:frame()
+    frame.x = frame.x + deltaX
+    frame.y = frame.y + deltaY
 
-  local frame = win:frame()
-  frame.x = frame.x + deltaX
-  frame.y = frame.y + deltaY
-
-  win:setFrame(frame)
+    win:setFrame(frame)
+  end)
 end
 
 local function moveWindowToFixedSize(width, height)
-  local win = window.focusedWindow()
-  if not win then return end
+  withFocused(function(win)
+    local frame = win:screen():frame()
+    local x = (frame.w - width) / 2 + frame.x
+    local y = (frame.h - height) / 2 + frame.y
 
-  local frame = win:screen():frame()
-  local x = (frame.w - width) / 2 + frame.x
-  local y = (frame.h - height) / 2 + frame.y
-
-  win:setFrame({ x = x, y = y, w = width, h = height })
+    win:setFrame({ x = x, y = y, w = width, h = height })
+  end)
 end
 
 local function moveWindowToFraction(x1, y1, x2, y2, win)
@@ -86,16 +88,15 @@ local function moveWindowToFraction(x1, y1, x2, y2, win)
 end
 
 local function centerWindow()
-  local win = window.focusedWindow()
-  if not win then return end
+  withFocused(function(win)
+    local winFrame = win:frame()
+    local screenFrame = win:screen():frame()
 
-  local winFrame = win:frame()
-  local screenFrame = win:screen():frame()
+    local newX = screenFrame.x + (screenFrame.w - winFrame.w) / 2
+    local newY = screenFrame.y + (screenFrame.h - winFrame.h) / 2
 
-  local newX = screenFrame.x + (screenFrame.w - winFrame.w) / 2
-  local newY = screenFrame.y + (screenFrame.h - winFrame.h) / 2
-
-  win:setFrame(geometry.rect(newX, newY, winFrame.w, winFrame.h))
+    win:setFrame(geometry.rect(newX, newY, winFrame.w, winFrame.h))
+  end)
 end
 
 local function maximizeWindows(x1, y1, x2, y2)
@@ -115,40 +116,37 @@ local function maximizeWindows(x1, y1, x2, y2)
 end
 
 local function focusWindowInDirection(direction)
-  local win = window.focusedWindow()
-  if not win then return end
+  withFocused(function(win)
+    local allWindows = window.visibleWindows()
+    local focusedScreen = win:screen()
+    local candidateWindows = {}
 
-  local allWindows = window.visibleWindows()
-  local focusedScreen = win:screen()
-  local candidateWindows = {}
-
-  for _, w in ipairs(allWindows) do
-    if w:screen() == focusedScreen then
-      local app = w:application()
-      if app and whitelist[app:name()] then
-        table.insert(candidateWindows, w)
+    for _, w in ipairs(allWindows) do
+      if w:screen() == focusedScreen then
+        local app = w:application()
+        if app and whitelist[app:name()] then
+          table.insert(candidateWindows, w)
+        end
       end
     end
-  end
 
-  local directionMethods = {
-    east = "focusWindowEast",
-    west = "focusWindowWest",
-    north = "focusWindowNorth",
-    south = "focusWindowSouth",
-  }
+    local directionMethods = {
+      east = "focusWindowEast",
+      west = "focusWindowWest",
+      north = "focusWindowNorth",
+      south = "focusWindowSouth",
+    }
 
-  local method = directionMethods[direction]
-  win[method](win, candidateWindows)
+    local method = directionMethods[direction]
+    win[method](win, candidateWindows)
+  end)
 end
 
 Hyper:bind({}, "[", function()
-  local win = window.focusedWindow()
-  if win then focusScreen(win:screen():previous()) end
+  withFocused(function(win) focusScreen(win:screen():previous()) end)
 end)
 Hyper:bind({}, "]", function()
-  local win = window.focusedWindow()
-  if win then focusScreen(win:screen():next()) end
+  withFocused(function(win) focusScreen(win:screen():next()) end)
 end)
 
 Hyper:bind({ "alt" }, "1", function() moveWindowToDisplay(1) end)
@@ -156,25 +154,23 @@ Hyper:bind({ "alt" }, "2", function() moveWindowToDisplay(2) end)
 Hyper:bind({ "alt" }, "3", function() moveWindowToDisplay(3) end)
 
 Hyper:bind({ "alt" }, "[", function()
-  local win = window.focusedWindow()
-  if win then
+  withFocused(function(win)
     local screenBefore = win:screen()
     win:moveOneScreenWest(false, true)
     if win:screen() == screenBefore then
       win:moveOneScreenEast(false, true)
     end
-  end
+  end)
 end)
 
 Hyper:bind({ "alt" }, "]", function()
-  local win = window.focusedWindow()
-  if win then
+  withFocused(function(win)
     local screenBefore = win:screen()
     win:moveOneScreenEast(false, true)
     if win:screen() == screenBefore then
       win:moveOneScreenWest(false, true)
     end
-  end
+  end)
 end)
 
 Hyper:bind({}, "h", function() focusWindowInDirection("west") end)
@@ -190,8 +186,9 @@ Hyper:bind({ "ctrl" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) en
 Hyper:bind({ "shift" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) end)
 
 Hyper:bind({}, "'", function()
-  local win = window.focusedWindow()
-  if win then win:moveToUnit("[100,0,0,100]") end
+  withFocused(function(win)
+    win:moveToUnit("[0,0,100,100]")
+  end)
 end)
 Hyper:bind({}, ";", function() moveWindowToFraction(0, 0, 1, 1) end)
 
