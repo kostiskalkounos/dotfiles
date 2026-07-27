@@ -14,6 +14,3 @@ Hyper:bind({}, "v", function() application.launchOrFocus("Reminders") end)
 Hyper:bind({}, "w", function() application.launchOrFocus("WhatsApp") end)
 Hyper:bind({}, "x", function() application.launchOrFocus("App Store") end)
 Hyper:bind({}, "z", function() application.launchOrFocus("Activity Monitor") end)
-
-Hyper:bind({ "cmd", "ctrl" }, "r", function() hs.reload() end)
-Hyper:bind({ "cmd", "shift" }, "r", function() hs.reload() end)

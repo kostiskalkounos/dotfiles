@@ -147,11 +147,6 @@ end
 _G._jdtls_dap_done = _G._jdtls_dap_done or {}
 
 config.on_attach = function(_, bufnr)
-  if not _G._jdtls_log_set then
-    vim.lsp.log.set_level(vim.log.levels.OFF)
-    _G._jdtls_log_set = true
-  end
-
   if not _G._jdtls_dap_done[workspace_dir] then
     _G._jdtls_dap_done[workspace_dir] = true
     jdtls.setup_dap({
