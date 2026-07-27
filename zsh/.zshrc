@@ -52,6 +52,7 @@ unset _theme
 [[ -f ~/.artifactory ]] && source ~/.artifactory
 
 export MANPAGER='nvim +Man!'
+export NVIM_LOG_FILE=/dev/null
 path+=("$HOME/go/bin")
 export XDG_CONFIG_HOME="$HOME/.config"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
@@ -151,23 +152,47 @@ setopt SHARE_HISTORY
 [[ -d "$ZSH_CACHE_DIR/completions" ]] || mkdir -p "$ZSH_CACHE_DIR/completions"
 fpath=("$ZSH_CACHE_DIR/completions" $fpath)
 
+_zwc() {
+  emulate -L zsh
+  local src="$1" zwc="$2"
+  local tmp="$zwc.$$.tmp.zwc"
+  if zcompile "$tmp" "$src" 2>/dev/null; then
+    mv -f "$tmp" "$zwc" 2>/dev/null || rm -f "$tmp"
+  else
+    rm -f "$tmp"
+  fi
+}
+
+_zcache() {
+  emulate -L zsh
+  local dest="$1"; shift
+  local tmp="$dest.$$.tmp"
+  "$@" > "$tmp" 2>/dev/null || { rm -f "$tmp"; return 1 }
+  mv -f "$tmp" "$dest" 2>/dev/null || { rm -f "$tmp"; return 1 }
+  _zwc "$dest" "$dest.zwc"
+}
+
 () {
+  local _regen=0
   if (( $+commands[kubectl] )); then
     local _kubectl_path=$commands[kubectl]
     if [[ ! -f "$ZSH_CACHE_DIR/completions/_kubectl" || "$_kubectl_path" -nt "$ZSH_CACHE_DIR/completions/_kubectl" ]]; then
-      kubectl completion zsh > "$ZSH_CACHE_DIR/completions/_kubectl" 2>/dev/null
+      _zcache "$ZSH_CACHE_DIR/completions/_kubectl" kubectl completion zsh && _regen=1
     fi
   fi
 
   autoload -U compinit
-  local mtime
-  zmodload -F zsh/stat b:zstat
-  zmodload zsh/datetime 2>/dev/null
-  if zstat -A mtime +mtime "${ZDOTDIR:-$HOME}/.zcompdump" 2>/dev/null && (( EPOCHSECONDS - mtime < 86400 )); then
-    compinit -C -u
+  local brew_completions="/opt/homebrew/share/zsh/site-functions"
+  local custom_completions="$ZSH_CACHE_DIR/completions"
+
+  if (( ! _regen )) && [[ -f "${ZDOTDIR:-$HOME}/.zcompdump" && \
+        ! "${ZDOTDIR:-$HOME}/.zshrc" -nt "${ZDOTDIR:-$HOME}/.zcompdump" && \
+        ( ! -d "$brew_completions" || ! "$brew_completions" -nt "${ZDOTDIR:-$HOME}/.zcompdump" ) && \
+        ( ! -d "$custom_completions" || ! "$custom_completions" -nt "${ZDOTDIR:-$HOME}/.zcompdump" ) ]]; then
+    compinit -C
   else
     compinit -i
-    { zcompile "${ZDOTDIR:-$HOME}/.zcompdump" } &>/dev/null &!
+    { _zwc "${ZDOTDIR:-$HOME}/.zcompdump" "${ZDOTDIR:-$HOME}/.zcompdump.zwc" } &>/dev/null &!
   fi
 
   local cached="$HOME/.cache/java_home"
@@ -189,20 +214,18 @@ fpath=("$ZSH_CACHE_DIR/completions" $fpath)
 
   if (( $+commands[zoxide] )); then
     local _zoxide_path=$commands[zoxide]
-    if [[ ! -f $HOME/.cache/zoxide_init.zsh || "$_zoxide_path" -nt $HOME/.cache/zoxide_init.zsh ]]; then
-      zoxide init zsh > $HOME/.cache/zoxide_init.zsh 2>/dev/null
-      zcompile $HOME/.cache/zoxide_init.zsh 2>/dev/null
+    if [[ ! -f "$HOME/.cache/zoxide_init.zsh" || "$_zoxide_path" -nt "$HOME/.cache/zoxide_init.zsh" ]]; then
+      _zcache "$HOME/.cache/zoxide_init.zsh" zoxide init zsh
     fi
-    source $HOME/.cache/zoxide_init.zsh
+    [[ -r "$HOME/.cache/zoxide_init.zsh" ]] && source "$HOME/.cache/zoxide_init.zsh"
   fi
 
   if (( $+commands[fzf] )); then
     local _fzf_path=$commands[fzf]
-    if [[ ! -f $HOME/.cache/fzf_init.zsh || "$_fzf_path" -nt $HOME/.cache/fzf_init.zsh ]]; then
-      fzf --zsh > $HOME/.cache/fzf_init.zsh 2>/dev/null
-      zcompile $HOME/.cache/fzf_init.zsh 2>/dev/null
+    if [[ ! -f "$HOME/.cache/fzf_init.zsh" || "$_fzf_path" -nt "$HOME/.cache/fzf_init.zsh" ]]; then
+      _zcache "$HOME/.cache/fzf_init.zsh" fzf --zsh
     fi
-    source $HOME/.cache/fzf_init.zsh
+    [[ -r "$HOME/.cache/fzf_init.zsh" ]] && source "$HOME/.cache/fzf_init.zsh"
   fi
 
   if (( $+commands[kubectl] )); then
@@ -253,13 +276,10 @@ TRAPUSR2() {
   fi
 }
 
-man() {
-  LESS_TERMCAP_md=$'\e[00;34m' \
-  LESS_TERMCAP_me=$'\e[0m' \
-  LESS_TERMCAP_se=$'\e[0m' \
-  LESS_TERMCAP_ue=$'\e[0m' \
-  LESS_TERMCAP_us=$'\e[00;32m' \
-  command man "$@"
+jt() {
+  unset -f jt
+  source $HOME/Dotfiles/scripts/jt
+  jt "$@"
 }
 
 j() {
@@ -386,6 +406,17 @@ if [[ -n "$KITTY_INSTALLATION_DIR" ]]; then
   unfunction kitty-integration
 fi
 
+() {
+  local inc
+  for inc in "$HOME/google-cloud-sdk/path.zsh.inc" "$HOME/google-cloud-sdk/completion.zsh.inc"; do
+    [[ -f "$inc" ]] || continue
+    if [[ ! -f "$inc.zwc" || "$inc" -nt "$inc.zwc" ]]; then
+      _zwc "$inc" "$inc.zwc"
+    fi
+    source "$inc"
+  done
+}
+
 if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
   source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 elif [[ -f /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
@@ -405,17 +436,14 @@ ZSH_HIGHLIGHT_STYLES[single-quoted-argument-unclosed]='fg=red'
 ZSH_HIGHLIGHT_STYLES[double-quoted-argument-unclosed]='fg=red'
 
 () {
-  local zrc="${ZDOTDIR:-$HOME}/.zshrc"
-  local zwc="$zrc.zwc"
-  if [[ ! -f "$zwc" || "$zrc" -nt "$zwc" ]]; then
-    { zcompile "$zrc" } &>/dev/null &!
-  fi
-
-  local zprof="${ZDOTDIR:-$HOME}/.zprofile"
-  local zpwc="$zprof.zwc"
-  if [[ -f "$zprof" ]]; then
-    if [[ ! -f "$zpwc" || "$zprof" -nt "$zpwc" ]]; then
-      { zcompile "$zprof" } &>/dev/null &!
+  local f zwc
+  for f in "${ZDOTDIR:-$HOME}/.zshrc" "${ZDOTDIR:-$HOME}/.zprofile"; do
+    [[ -f "$f" ]] || continue
+    zwc="$f.zwc"
+    if [[ ! -f "$zwc" || "$f" -nt "$zwc" ]]; then
+      { _zwc "$f" "$zwc" } &>/dev/null &!
     fi
-  fi
+  done
 }
+
+unfunction _zcache _zwc

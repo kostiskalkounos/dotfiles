@@ -106,6 +106,8 @@ return {
       }
 
       local lsp = vim.lsp
+      lsp.log.set_level(vim.log.levels.OFF)
+
       for _, server_name in ipairs(servers) do
         if server_name ~= "jdtls" then
           if servers_settings[server_name] then

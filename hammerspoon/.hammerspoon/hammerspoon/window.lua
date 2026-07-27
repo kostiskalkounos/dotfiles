@@ -4,7 +4,6 @@ local window = require("hs.window")
 
 local whitelist = {
   ["Brave Browser"] = true,
-  ["Ghostty"] = true,
   ["IntelliJ IDEA"] = true,
   ["Safari"] = true,
   ["kitty"] = true,
@@ -106,7 +105,7 @@ local function maximizeWindows(x1, y1, x2, y2)
     local app = win:application()
 
     if win:isStandard() and app and whitelist[app:name()] then
-      if (x1 and y1 and x2 and y2) then
+      if x1 and y1 and x2 and y2 then
         moveWindowToFraction(x1, y1, x2, y2, win)
       else
         win:maximize()
@@ -143,10 +142,15 @@ local function focusWindowInDirection(direction)
 end
 
 Hyper:bind({}, "[", function()
-  withFocused(function(win) focusScreen(win:screen():previous()) end)
+  withFocused(function(win)
+    focusScreen(win:screen():previous())
+  end)
 end)
+
 Hyper:bind({}, "]", function()
-  withFocused(function(win) focusScreen(win:screen():next()) end)
+  withFocused(function(win)
+    focusScreen(win:screen():next())
+  end)
 end)
 
 Hyper:bind({ "alt" }, "1", function() moveWindowToDisplay(1) end)
@@ -173,6 +177,13 @@ Hyper:bind({ "alt" }, "]", function()
   end)
 end)
 
+Hyper:bind({}, ";", function() moveWindowToFraction(0, 0, 1, 1) end)
+Hyper:bind({}, "'", function()
+  withFocused(function(win)
+    win:moveToUnit("[0,0,100,100]")
+  end)
+end)
+
 Hyper:bind({}, "h", function() focusWindowInDirection("west") end)
 Hyper:bind({}, "j", function() focusWindowInDirection("south") end)
 Hyper:bind({}, "k", function() focusWindowInDirection("north") end)
@@ -183,14 +194,7 @@ Hyper:bind({}, "p", function() moveWindowToFixedSize(1300, 810) end)
 
 Hyper:bind({ "alt" }, "p", function() moveWindowToFraction(0.33, 0, 0.67, 1) end)
 Hyper:bind({ "ctrl" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) end)
-Hyper:bind({ "shift" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) end)
 
-Hyper:bind({}, "'", function()
-  withFocused(function(win)
-    win:moveToUnit("[0,0,100,100]")
-  end)
-end)
-Hyper:bind({}, ";", function() moveWindowToFraction(0, 0, 1, 1) end)
 
 Hyper:bind({ "cmd" }, "'", function() maximizeWindows() end)
 Hyper:bind({ "cmd" }, ";", function() maximizeWindows(0, 0, 1, 1) end)
@@ -215,10 +219,10 @@ Hyper:bind({ "alt" }, "u", function() moveWindowToFraction(0, 0.67, 1, 1) end)
 Hyper:bind({ "alt" }, "i", function() moveWindowToFraction(0, 0, 1, 0.33) end)
 Hyper:bind({ "alt" }, "o", function() moveWindowToFraction(0.67, 0, 1, 1) end)
 
-Hyper:bind({ "shift" }, "h", function() resizeWindow(-20, 0) end)
-Hyper:bind({ "shift" }, "j", function() resizeWindow(0, 20) end)
-Hyper:bind({ "shift" }, "k", function() resizeWindow(0, -20) end)
-Hyper:bind({ "shift" }, "l", function() resizeWindow(20, 0) end)
+Hyper:bind({}, "y", function() resizeWindow(-20, 0) end)
+Hyper:bind({}, "u", function() resizeWindow(0, 20) end)
+Hyper:bind({}, "i", function() resizeWindow(0, -20) end)
+Hyper:bind({}, "o", function() resizeWindow(20, 0) end)
 
 Hyper:bind({ "ctrl" }, "h", function() moveWindow(-20, 0) end)
 Hyper:bind({ "ctrl" }, "j", function() moveWindow(0, 20) end)

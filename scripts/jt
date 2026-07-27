@@ -1,0 +1,65 @@
+#!/usr/bin/env zsh
+
+jt() {
+  _jt_info() {
+    echo -e "\033[1;34m==>\033[0m \033[1m$*\033[0m"
+  }
+
+  _jt_error() {
+    echo -e "\033[1;31mError:\033[0m $*" >&2
+    return 1
+  }
+
+  {
+    setopt local_options err_return no_unset pipe_fail
+
+    local script_dir="$(cd "$(dirname "${(%):-%x}")" && pwd)"
+    local vsix_path="${script_dir}/java-test.vsix"
+
+    if [[ ! -f "$vsix_path" ]]; then
+      _jt_error "Could not find VSIX file at '$vsix_path'."
+    fi
+
+    local mason_dir="${HOME}/.local/share/nvim/mason"
+    local packages_dir="${mason_dir}/packages/java-test"
+    local share_dir="${mason_dir}/share/java-test"
+
+    if [[ ! -d "$packages_dir" ]]; then
+      _jt_error "Mason package directory '$packages_dir' does not exist. Is java-test installed via Mason?"
+    fi
+
+    _jt_info "Removing old extension files..."
+    rm -rf "${packages_dir}/extension" \
+           "${packages_dir}/[Content_Types].xml" \
+           "${packages_dir}/extension.vsixmanifest"
+
+    _jt_info "Extracting new VSIX contents..."
+    tar -C "$packages_dir" -zxf "$vsix_path"
+
+    _jt_info "Updating symbolic links in share/..."
+    if [[ -d "$share_dir" ]]; then
+      rm -f "${share_dir}"/*
+    else
+      mkdir -p "$share_dir"
+    fi
+
+    for jar in "${packages_dir}"/extension/server/*.jar; do
+      [[ -e "$jar" ]] || continue
+      local name="$(basename "$jar")"
+      ln -s "../../packages/java-test/extension/server/${name}" "${share_dir}/${name}"
+    done
+
+    local plugin_jar=$(find "${packages_dir}/extension/server" -name "com.microsoft.java.test.plugin-*.jar" -print -quit)
+    if [[ -n "$plugin_jar" ]]; then
+      local plugin_name="$(basename "$plugin_jar")"
+      _jt_info "Found plugin jar: ${plugin_name}"
+      ln -s "../../packages/java-test/extension/server/${plugin_name}" "${share_dir}/com.microsoft.java.test.plugin.jar"
+    else
+      _jt_info "Warning: Could not find main plugin jar to create alias link."
+    fi
+
+    _jt_info "java-test upgrade complete!"
+  } always {
+    unfunction _jt_info _jt_error
+  }
+}
