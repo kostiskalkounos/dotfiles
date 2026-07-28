@@ -29,6 +29,7 @@ return {
       "vim",
       "xml",
       "yaml",
+      "zsh",
     }
 
     for ft, lang in pairs({ typescriptreact = "tsx", javascriptreact = "tsx", jsonc = "json" }) do

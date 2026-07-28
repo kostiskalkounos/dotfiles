@@ -7,13 +7,9 @@ vim.g.maplocalleader = " "
 local set = vim.keymap.set
 local o = vim.o
 
-local home = os.getenv("HOME") or ""
-local theme = "dark"
-local theme_file = io.open(home .. "/.cache/theme", "r")
-if theme_file then
-  theme = theme_file:read("*l") or "dark"
-  theme_file:close()
-end
+local theme_file = io.open((os.getenv("HOME") or "") .. "/.cache/theme", "r")
+local theme = theme_file and theme_file:read("*l") or "dark"
+if theme_file then theme_file:close() end
 
 o.background = theme
 o.cursorline = false
@@ -93,7 +89,7 @@ api.nvim_create_autocmd("VimEnter", {
           local cur_lines = api.nvim_buf_line_count(term_buf)
           if cur_lines >= target_line then
             pcall(api.nvim_win_set_cursor, 0, { target_line, 0 })
-          elseif retries < 50 then
+          elseif retries < 250 then
             retries = retries + 1
             vim.defer_fn(try_set_cursor, 2)
           else

@@ -7,7 +7,7 @@
   "friendly-snippets": { "branch": "main", "commit": "6cd7280adead7f586db6fccbd15d2cac7e2188b9" },
   "fzf-lua": { "branch": "main", "commit": "28440c741e927592877514fba3db21eb188caec8" },
   "gitsigns.nvim": { "branch": "main", "commit": "31d6fb2d618bca1482b9f274751ead5f03461408" },
-  "grug-far.nvim": { "branch": "main", "commit": "0f6a5d0d7a70659b11bbcd6b3673ee0fe61b6024" },
+  "grug-far.nvim": { "branch": "main", "commit": "6e05398cf6cad05b3fb46569db96b1ccfcbbd402" },
   "lazy.nvim": { "branch": "main", "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97" },
   "lazydev.nvim": { "branch": "main", "commit": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d" },
   "mason-lspconfig.nvim": { "branch": "main", "commit": "7adc933dabcc7c86ae6b07aff7ee68eac398491f" },

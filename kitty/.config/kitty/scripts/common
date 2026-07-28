@@ -1,0 +1,281 @@
+#!/usr/bin/env zsh
+
+export KITTY_BIN="${KITTY_BIN:-/Applications/kitty.app/Contents/MacOS/kitten}"
+export SESSION_DIR="${SESSION_DIR:-$HOME/.cache/kitty-sessions}"
+
+typeset -U path
+path=(/opt/homebrew/bin /usr/local/bin /usr/bin /bin /usr/sbin /sbin $path)
+
+parse_fzf_header() {
+  local input_lines="${1:-}"
+  REPLY_HEADER_LINES=0
+  REPLY_CURRENT=""
+  [[ -n "${input_lines}" ]] || return 0
+
+  local first_line="${input_lines%%$'\n'*}"
+  if [[ "${first_line}" == $'\033'* ]]; then
+    REPLY_HEADER_LINES=1
+    REPLY_CURRENT="${first_line##*$'\t'}"
+  fi
+}
+
+parse_jq_session_lines() {
+  local jq_input="$1"
+  REPLY_CUR_SESS=""
+  REPLY_PREV_SESS=""
+  REPLY_LAUNCH_TAB_INFO=""
+  REPLY_ACTIVE_SESSIONS_DATA=""
+
+  local line
+  local newline=$'\n'
+  for line in ${(f)jq_input}; do
+    if [[ "${line}" == SESSION:* ]]; then
+      REPLY_CUR_SESS="${line#SESSION:}"
+    elif [[ "${line}" == PREV_SESSION:* ]]; then
+      REPLY_PREV_SESS="${line#PREV_SESSION:}"
+    elif [[ "${line}" == LAUNCH_TAB:* ]]; then
+      REPLY_LAUNCH_TAB_INFO="${line#LAUNCH_TAB:}"
+    elif [[ -n "${line}" ]]; then
+      REPLY_ACTIVE_SESSIONS_DATA+="${line}${newline}"
+    fi
+  done
+}
+
+print_fzf_lines() {
+  local cur_line="${1:-}"
+  shift
+  local -a rest_lines=("$@")
+
+  [[ -n "${cur_line}" ]] && print -r -- "${cur_line}"
+  if (( ${#rest_lines} )); then
+    print -l -r -- "${rest_lines[@]}"
+  fi
+  return 0
+}
+
+get_sessions_data() {
+  local json="${1:-}"
+  local launch_win="${2:-0}"
+  if [[ -z "${json}" ]]; then
+    json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
+  fi
+  [[ -n "${json}" ]] || return 0
+
+  local sessions_filter='
+    (
+      first(.[]?.tabs[]? | select(any(.windows[]?; .id == $w))) // null
+    ) as $launch_tab
+    | (
+        first($launch_tab.windows[]?.session_name | select(. != null and . != "")) // null
+      ) as $curr_sess
+    | ($launch_tab.id // "" | tostring) as $launch_tab_id
+    | (
+        [ $launch_tab?.windows[]? | select(.session_name != null and .session_name != "") ]
+        | length
+        | tostring
+      ) as $launch_tab_sess_wins
+    | [
+        .[]?.tabs[]?.windows[]?
+        | select(.session_name != null and .session_name != "")
+      ] as $all_sess_wins
+    | (
+        reduce ($all_sess_wins[] | select(.session_name != $curr_sess)) as $w (null;
+          if . == null or $w.last_focused_at > .last_focused_at then $w else . end
+        ) | .session_name // ""
+      ) as $prev_sess
+    | "SESSION:\($curr_sess // "")",
+      "PREV_SESSION:\($prev_sess)",
+      "LAUNCH_TAB:\($launch_tab_id)\t\($launch_tab_sess_wins)",
+      ($all_sess_wins[] | [(.session_name|tostring), (.env.PWD // .cwd // "")] | @tsv)
+  '
+
+  jq -r --argjson w "${launch_win}" "${sessions_filter}" 2>/dev/null <<< "${json}" || true
+}
+
+get_tabs_data() {
+  local json="${1:-}"
+  local launch_win="${2:-0}"
+  local is_all="${3:-0}"
+  if [[ -z "${json}" ]]; then
+    json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
+  fi
+  [[ -z "${json}" ]] && return 0
+
+  jq -r --argjson w "${launch_win}" --arg all "${is_all}" '
+    [ .[]?.tabs[]? ] as $all_tabs
+    | (
+      reduce ($all_tabs[] | select(.is_active != true)) as $t (null;
+        ([$t.windows[]?.last_focused_at] | max) as $focus
+        | if . == null or $focus > .max_focus then {id: $t.id, max_focus: $focus} else . end
+      ) | .id // "" | tostring
+    ) as $prev_tab_id
+    | (
+        first($all_tabs[] | select(any(.windows[]?; .id == $w))) // null
+      ) as $launch_tab
+    | (
+        first($launch_tab.windows[]?.session_name | select(. != null and . != "")) // null
+      ) as $sess
+    | "PREV_TAB_ID:\($prev_tab_id)", (
+        $all_tabs[]
+        | (
+            first(.windows[]?.session_name | select(. != null and . != "")) // null
+          ) as $tabsess
+        | select( ($all == "1") or ($sess == null) or ($tabsess == $sess) )
+        | (any(.windows[]?; .id == $w)) as $cur
+        | [ .windows[] | select(($w == 0) or (.id != $w)) ] as $wins
+        | [ (.id|tostring),
+            (if $cur then "1" else "0" end),
+            (if $cur then
+               (
+                 first($wins[] | select(.is_active == true) | .title)
+                 // $wins[0]?.title
+                 // .title
+               )
+             else .title end),
+            (
+              first($wins[] | select(.is_active == true) | (.env.PWD // .cwd))
+              // $wins[0]?.env.PWD
+              // $wins[0]?.cwd
+              // .windows[0].env.PWD
+              // .windows[0].cwd
+              // ""
+            )
+          ]
+        | @tsv
+      )
+  ' <<< "${json}" || true
+}
+
+reorder_lines_with_previous() {
+  local target_val="${1:-}"
+  shift
+  local -a input_lines=("$@")
+
+  REPLY_LINES=("${input_lines[@]}")
+  [[ -z "${target_val}" ]] && return 0
+
+  local tab=$'\t'
+  local pattern="*${tab}${(b)target_val}"
+  local -a matched_lines=( "${(M)input_lines[@]:#$~pattern}" )
+  local prev_line="${matched_lines[1]:-}"
+
+  if [[ -n "${prev_line}" ]]; then
+    local -a final_lines=("${input_lines[@]:#$~pattern}")
+    REPLY_LINES=( "${prev_line}" "${final_lines[@]}" )
+  fi
+}
+
+run_kitty_fzf() {
+  local input_lines="$1"
+  local prompt_text="$2"
+  local bind_action="${3:-}"
+  local custom_header="${4:-}"
+  shift $(( $# < 4 ? $# : 4 ))
+
+  parse_fzf_header "${input_lines}"
+
+  local -a fzf_args=(
+    --ansi
+    --header-lines="${REPLY_HEADER_LINES}"
+    -d $'\t'
+    --with-nth=1
+    --prompt="${prompt_text}"
+    --no-multi
+  )
+
+  [[ -n "${custom_header}" ]] && fzf_args+=( --header="${custom_header}" )
+  [[ -n "${bind_action}" ]] && fzf_args+=( --bind="${bind_action}" )
+
+  fzf_args+=( "$@" )
+
+  set +e
+  FZF_SELECTED="$(fzf "${fzf_args[@]}" <<< "${input_lines}")"
+  FZF_RC=$?
+  set -e
+}
+
+run_kitty_fzf_with_close() {
+  local script_path="$1"
+  local lines="$2"
+  local prompt_label="$3"
+  local close_key="${4:-ctrl-x}"
+  shift 4 2>/dev/null || shift $#
+
+  parse_fzf_header "${lines}"
+
+  local reload_cmd="'${script_path}' --close-and-list '{2}' '${REPLY_CURRENT}'"
+  local bind_cmd="${close_key}:reload(${reload_cmd})"
+
+  local header="${header_blue}:: <"
+  header+="${header_yellow}${close_key}${header_blue}>"
+  header+=" to ${header_orange}close${reset_color}"
+
+  run_kitty_fzf "${lines}" "${prompt_label}" "${bind_cmd}" "${header}" "$@"
+}
+
+trigger_cleanup() {
+  local json_data="${1:-}"
+  [[ -n "${json_data}" ]] || return 0
+  "${SCRIPT_DIR}/cleanup" >/dev/null 2>&1 <<< "${json_data}" &!
+}
+
+has_active_processes() {
+  local type="${1:-}"
+  local target="${2:-}"
+  local json="${3:-}"
+  [[ -n "${type}" && -n "${target}" && -n "${json}" ]] || return 1
+
+  local tab_filter='
+    any(
+      .[]?.tabs[]? | select((.id|tostring) == $target).windows[]?.foreground_processes[]?;
+      ((.cmdline[0] // "") | sub("^-"; "") | sub(".*/"; "")) as $c
+      | ($c | test("^(zsh|bash|sh|fish|dash|tcsh|ksh)$"))
+      | not
+    )
+  '
+  local session_filter='
+    any(
+      .[]?.tabs[]?.windows[]? | select(.session_name == $target).foreground_processes[]?;
+      ((.cmdline[0] // "") | sub("^-"; "") | sub(".*/"; "")) as $c
+      | ($c | test("^(zsh|bash|sh|fish|dash|tcsh|ksh)$"))
+      | not
+    )
+  '
+
+  if [[ "${type}" == "tab" ]]; then
+    jq --arg target "${target}" -e "${tab_filter}" <<< "${json}" >/dev/null 2>&1
+  else
+    jq --arg target "${target}" -e "${session_filter}" <<< "${json}" >/dev/null 2>&1
+  fi
+}
+
+if [[ -n "${FZF_DEFAULT_OPTS:-}" && -n "${active_color:-}" && -n "${reset_color:-}" ]]; then
+  return 0
+fi
+
+fzf_theme="dark"
+if [[ -f "$HOME/.cache/theme" ]]; then
+  fzf_theme="$(< "$HOME/.cache/theme")"
+  fzf_theme="${fzf_theme//[[:space:]]/}"
+fi
+
+FZF_COMMON_OPTS='--cycle --layout=reverse --border=rounded --margin=20%,20% --padding=0,1'
+FZF_COMMON_OPTS+=' --bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden'
+FZF_COMMON_OPTS+=' --color=fg:-1,bg:-1,hl:magenta,hl+:blue,info:blue,prompt:blue'
+FZF_COMMON_OPTS+=',pointer:magenta,marker:blue,spinner:blue,border:blue,label:blue'
+
+export reset_color=$'\033[0m'
+
+if [[ "${fzf_theme}" == "light" ]]; then
+  export FZF_DEFAULT_OPTS="--color=light ${FZF_COMMON_OPTS} --color=fg+:black,bg+:#ccd0da,gutter:#eff1f5"
+  export active_color=$'\033[38;2;136;57;239m'
+  export header_blue=$'\033[38;2;30;102;245m'
+  export header_yellow=$'\033[38;2;223;142;29m'
+  export header_orange=$'\033[38;2;254;100;11m'
+else
+  export FZF_DEFAULT_OPTS="--color=dark ${FZF_COMMON_OPTS} --color=fg+:white,bg+:#363a4f,gutter:#24273A"
+  export active_color=$'\033[38;2;198;160;246m'
+  export header_blue=$'\033[38;2;138;173;244m'
+  export header_yellow=$'\033[38;2;238;212;159m'
+  export header_orange=$'\033[38;2;245;169;127m'
+fi

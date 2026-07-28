@@ -13,8 +13,7 @@ _set_dark_theme() {
   export NVIM_THEME=dark
   export BAT_THEME="Catppuccin Macchiato"
   export COMPLETION_HIGHLIGHT_COLOR="ma=1;48;2;54;58;79;38;2;255;255;255"
-  export GIT_BRANCH_COLOR="#f5bde6"
-  export GIT_SEPARATOR_COLOR="#8bd5ca"
+  export PROMPT_INDICATOR="#8bd5ca"
 }
 
 _set_light_theme() {
@@ -24,8 +23,7 @@ _set_light_theme() {
   export NVIM_THEME=light
   export BAT_THEME="Catppuccin Latte"
   export COMPLETION_HIGHLIGHT_COLOR="ma=1;48;2;204;208;218;38;2;0;0;0"
-  export GIT_BRANCH_COLOR="#ea76cb"
-  export GIT_SEPARATOR_COLOR="#179299"
+  export PROMPT_INDICATOR="#179299"
 }
 
 if [[ -n "$FZF_THEME" ]]; then
@@ -387,7 +385,7 @@ _update_git_branch() {
 
   branch="${branch%$'\r'}"
   if [[ -n "$branch" ]]; then
-    __CURRENT_GIT_BRANCH="%F{magenta}%f %F{${GIT_BRANCH_COLOR}}${branch}%f "
+    __CURRENT_GIT_BRANCH="%F{magenta}%f %F{green}${branch}%f "
   else
     __CURRENT_GIT_BRANCH=""
   fi
@@ -397,7 +395,7 @@ autoload -Uz add-zsh-hook
 add-zsh-hook precmd _update_git_branch
 
 PROMPT_NL=$'\n'
-PROMPT='%(!.%F{red}root %f.)%F{blue}${PWD/#$HOME/~}%f ${__CURRENT_GIT_BRANCH}%(1j.%F{yellow}* %f.)${PROMPT_NL}%(?.%F{${GIT_SEPARATOR_COLOR}}.%F{red})❭%f '
+PROMPT='%(!.%F{red}root %f.)%F{blue}${PWD/#$HOME/~}%f ${__CURRENT_GIT_BRANCH}%(1j.%F{yellow}* %f.)${PROMPT_NL}%(?.%F{${PROMPT_INDICATOR}}.%F{red})❭%f '
 
 if [[ -n "$KITTY_INSTALLATION_DIR" ]]; then
   export KITTY_SHELL_INTEGRATION="enabled"
