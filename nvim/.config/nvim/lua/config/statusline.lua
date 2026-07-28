@@ -31,7 +31,7 @@ local PROGRESS = "%3p%%"
 local HL_ACTIVE = "%#StatusLine#"
 local HL_INACTIVE = "%#StatusLineNC#"
 local HL_BRANCH = "%#StlBranchIcon#"
-local BRANCH_ICON = TAB .. HL_BRANCH .. " " .. HL_ACTIVE
+local BRANCH_ICON = TAB .. HL_BRANCH .. "  " .. HL_ACTIVE
 
 local HL_ADD = "%#GitSignsAdd#"
 local HL_ERROR = "%#DiagnosticError#"
