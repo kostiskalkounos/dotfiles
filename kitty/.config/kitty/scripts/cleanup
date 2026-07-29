@@ -1,10 +1,6 @@
 #!/usr/bin/env zsh
 
-set -euo pipefail
-setopt nullglob extendedglob bareglobqual
-
-SCRIPT_DIR="${0:a:h}"
-source "${SCRIPT_DIR}/common"
+source "${0:a:h}/common"
 
 [[ -t 0 ]] && exit 0
 
@@ -27,10 +23,16 @@ for line in ${(f)jq_output}; do
   active_session_names[${line:t}]=1
 done
 
-local f base
+local f base pid
 typeset -a to_delete=()
-for f in "${SESSION_DIR}"/*(.ms+2); do
+for f in "${SESSION_DIR}"/*(.ms+2,=ms+2oN); do
   base="${f:t}"
+  if [[ -S "$f" && "$base" = kitty-[0-9]## ]]; then
+    pid="${base#kitty-}"
+    if kill -0 "$pid" 2>/dev/null; then
+      continue
+    fi
+  fi
   [[ -n "${active_session_names[$base]:-}" ]] && continue
   to_delete+=("${f}")
 done

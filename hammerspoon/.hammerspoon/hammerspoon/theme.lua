@@ -6,8 +6,8 @@ local cmdTemplate = [=[
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # 0. Update theme cache (kept synchronous so subsequent reads get the correct state instantly)
-mkdir -p $HOME/.cache
-echo "{{THEME_LOWER}}" > $HOME/.cache/theme
+mkdir -p $HOME/.cache/zsh
+echo "{{THEME_LOWER}}" > $HOME/.cache/zsh/theme
 
 # 1. Set macOS System Appearance asynchronously (avoids spawning a separate Hammerspoon task)
 osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to {{DARK_MODE}}' >/dev/null 2>&1 < /dev/null &!

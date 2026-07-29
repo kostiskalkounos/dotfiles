@@ -18,21 +18,21 @@ return {
     "stevearc/conform.nvim",
     event = "VeryLazy",
     config = function()
-      local prettier = { "prettier" }
+      local biome = { "biome" }
       local g = vim.g
       require("conform").setup({
         formatters_by_ft = {
           go = { "goimports", "gofumpt" },
           lua = { "stylua" },
           python = { "ruff_organize_imports", "ruff_format" },
-          css = prettier,
-          html = prettier,
-          yaml = prettier,
-          json = prettier,
-          jsonc = prettier,
-          javascript = prettier,
-          typescript = prettier,
-          typescriptreact = prettier,
+          css = biome,
+          html = biome,
+          yaml = biome,
+          json = biome,
+          jsonc = biome,
+          javascript = biome,
+          typescript = biome,
+          typescriptreact = biome,
         },
         format_on_save = function()
           if g.disable_autoformat then
@@ -55,10 +55,10 @@ return {
 
       local servers = {
         "bashls",
+        "biome",
         "clangd",
         "cssls",
         "dockerls",
-        "eslint",
         "gopls",
         "helm_ls",
         "html",
@@ -99,7 +99,6 @@ return {
         "goimports",
         "java-debug-adapter",
         "java-test",
-        "prettier",
         "ruff",
         "stylua",
         "vscode-spring-boot-tools",

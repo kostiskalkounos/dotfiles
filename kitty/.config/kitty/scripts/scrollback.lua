@@ -7,7 +7,7 @@ vim.g.maplocalleader = " "
 local set = vim.keymap.set
 local o = vim.o
 
-local theme_file = io.open((os.getenv("HOME") or "") .. "/.cache/theme", "r")
+local theme_file = io.open((os.getenv("HOME") or "") .. "/.cache/zsh/theme", "r")
 local theme = theme_file and theme_file:read("*l") or "dark"
 if theme_file then theme_file:close() end
 

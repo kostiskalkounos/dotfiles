@@ -1,7 +1,11 @@
 #!/usr/bin/env zsh
 
-export KITTY_BIN="${KITTY_BIN:-/Applications/kitty.app/Contents/MacOS/kitten}"
-export SESSION_DIR="${SESSION_DIR:-$HOME/.cache/kitty-sessions}"
+set -euo pipefail
+setopt nullglob extendedglob bareglobqual
+zmodload -F zsh/files b:rm b:mkdir
+
+export KITTY_BIN="/Applications/kitty.app/Contents/MacOS/kitten"
+export SESSION_DIR="$HOME/.cache/kitty"
 
 typeset -U path
 path=(/opt/homebrew/bin /usr/local/bin /usr/bin /bin /usr/sbin /sbin $path)
@@ -216,7 +220,7 @@ run_kitty_fzf_with_close() {
 trigger_cleanup() {
   local json_data="${1:-}"
   [[ -n "${json_data}" ]] || return 0
-  "${SCRIPT_DIR}/cleanup" >/dev/null 2>&1 <<< "${json_data}" &!
+  "${${(%):-%x}:a:h}/cleanup" >/dev/null 2>&1 <<< "${json_data}" &!
 }
 
 has_active_processes() {
@@ -233,6 +237,7 @@ has_active_processes() {
       | not
     )
   '
+
   local session_filter='
     any(
       .[]?.tabs[]?.windows[]? | select(.session_name == $target).foreground_processes[]?;
@@ -254,8 +259,8 @@ if [[ -n "${FZF_DEFAULT_OPTS:-}" && -n "${active_color:-}" && -n "${reset_color:
 fi
 
 fzf_theme="dark"
-if [[ -f "$HOME/.cache/theme" ]]; then
-  fzf_theme="$(< "$HOME/.cache/theme")"
+if [[ -f "$HOME/.cache/zsh/theme" ]]; then
+  fzf_theme="$(< "$HOME/.cache/zsh/theme")"
   fzf_theme="${fzf_theme//[[:space:]]/}"
 fi
 
