@@ -2,9 +2,7 @@
 
 source "${0:a:h}/common"
 
-launch_window_id="${KITTY_WINDOW_ID:-}"
-
-all_mode="${KT_ALL:-0}"
+typeset -i all_mode="${KT_ALL:-0}"
 if [[ "${1:-}" == "--all" ]]; then
   all_mode=1
   shift
@@ -12,20 +10,17 @@ fi
 
 build_lines() {
   local tabs_data="${1:-}"
-  local prev_tab_id="${2:-}"
   [[ -z "${tabs_data}" ]] && return 0
+
+  local -a lines=( ${(f)tabs_data} )
+  local prev_tab_id="${${lines[1]:-}#PREV_TAB_ID:}"
+  local -a tab_lines=( ${lines[@][2,-1]} )
 
   local tab_id is_current title cwd disp cur_line="" line
   local -a rest=() parts=()
   local -i idx=0
-  for line in "${(f)tabs_data}"; do
-    if [[ "${line}" == PREV_TAB_ID:* ]]; then
-      if [[ -z "${prev_tab_id}" ]]; then
-        prev_tab_id="${line#PREV_TAB_ID:}"
-      fi
-      continue
-    fi
-    parts=( "${(@ps:\t:)line}" )
+  for line in "${tab_lines[@]}"; do
+    parts=( "${(@ps:$tab:)line}" )
     tab_id="${parts[1]:-}"
     is_current="${parts[2]:-}"
     title="${parts[3]:-}"
@@ -33,9 +28,9 @@ build_lines() {
     idx+=1
     disp="${idx}: ${title}  (${(D)cwd})"
     if [[ "${is_current}" == "1" ]]; then
-      cur_line="${active_color}${disp}${reset_color}"$'\t'"${tab_id}"
+      cur_line="${active_color}${disp}${reset_color}${tab}${tab_id}"
     else
-      rest+=("${disp}"$'\t'"${tab_id}")
+      rest+=("${disp}${tab}${tab_id}")
     fi
   done
 
@@ -46,26 +41,27 @@ build_lines() {
 }
 
 if [[ "${1:-}" == "--close-and-list" ]]; then
-  target="${2:-}"
-  cur="${3:-}"
-  json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
+  typeset target="${2:-}"
+  typeset cur="${3:-}"
+  typeset json=""
   if [[ -n "${target}" && "${target}" != "${cur}" ]]; then
+    json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
     if ! has_active_processes "tab" "${target}" "${json}"; then
       "${KITTY_BIN}" @ close-tab --match "id:${target}" 2>/dev/null || true
       json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
       trigger_cleanup "${json}"
     fi
   fi
-  tabs_data="$(get_tabs_data "${json}" "${launch_window_id:-0}" "${all_mode:-0}")"
+  typeset tabs_data="$(get_tabs_data "${json}" "${launch_window_id:-0}" "${all_mode:-0}")"
   build_lines "${tabs_data}"
   exit 0
 fi
 
-main_json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
+typeset main_json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
 trigger_cleanup "${main_json}"
 
-main_tabs_data="$(get_tabs_data "${main_json}" "${launch_window_id:-0}" "${all_mode:-0}")"
-lines="$(build_lines "${main_tabs_data}")"
+typeset main_tabs_data="$(get_tabs_data "${main_json}" "${launch_window_id:-0}" "${all_mode:-0}")"
+typeset lines="$(build_lines "${main_tabs_data}")"
 if [[ -z "${lines}" ]]; then
   echo "No tabs found."
   exit 0
@@ -82,5 +78,5 @@ if [[ $FZF_RC -ne 0 || -z "${FZF_SELECTED}" ]]; then
   exit 0
 fi
 
-selected_tab="${FZF_SELECTED#*$'\t'}"
+typeset selected_tab="${FZF_SELECTED#*${tab}}"
 "${KITTY_BIN}" @ focus-tab --match "id:${selected_tab}" 2>/dev/null || true

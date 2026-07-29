@@ -7,8 +7,17 @@ zmodload -F zsh/files b:rm b:mkdir
 export KITTY_BIN="/Applications/kitty.app/Contents/MacOS/kitten"
 export SESSION_DIR="$HOME/.cache/kitty"
 
+typeset -g launch_window_id="${KITTY_WINDOW_ID:-}"
+typeset -gr tab=$'\t'
+
 typeset -U path
 path=(/opt/homebrew/bin /usr/local/bin /usr/bin /bin /usr/sbin /sbin $path)
+
+sanitize() {
+  local s="${1//[^A-Za-z0-9._-]/_}"
+  local pattern="_##"
+  REPLY="${s//$~pattern/_}"
+}
 
 parse_fzf_header() {
   local input_lines="${1:-}"
@@ -19,30 +28,23 @@ parse_fzf_header() {
   local first_line="${input_lines%%$'\n'*}"
   if [[ "${first_line}" == $'\033'* ]]; then
     REPLY_HEADER_LINES=1
-    REPLY_CURRENT="${first_line##*$'\t'}"
+    REPLY_CURRENT="${first_line##*${tab}}"
   fi
 }
 
 parse_jq_session_lines() {
-  local jq_input="$1"
-  REPLY_CUR_SESS=""
-  REPLY_PREV_SESS=""
-  REPLY_LAUNCH_TAB_INFO=""
-  REPLY_ACTIVE_SESSIONS_DATA=""
+  local jq_input="${1:-}"
+  local -a lines=( ${(f)jq_input} )
 
-  local line
-  local newline=$'\n'
-  for line in ${(f)jq_input}; do
-    if [[ "${line}" == SESSION:* ]]; then
-      REPLY_CUR_SESS="${line#SESSION:}"
-    elif [[ "${line}" == PREV_SESSION:* ]]; then
-      REPLY_PREV_SESS="${line#PREV_SESSION:}"
-    elif [[ "${line}" == LAUNCH_TAB:* ]]; then
-      REPLY_LAUNCH_TAB_INFO="${line#LAUNCH_TAB:}"
-    elif [[ -n "${line}" ]]; then
-      REPLY_ACTIVE_SESSIONS_DATA+="${line}${newline}"
-    fi
-  done
+  REPLY_CUR_SESS="${${lines[(r)SESSION:*]:-}#SESSION:}"
+  REPLY_PREV_SESS="${${lines[(r)PREV_SESSION:*]:-}#PREV_SESSION:}"
+  REPLY_LAUNCH_TAB_INFO="${${lines[(r)LAUNCH_TAB:*]:-}#LAUNCH_TAB:}"
+  local -a active=( ${lines:#(SESSION|PREV_SESSION|LAUNCH_TAB):*} )
+  if (( ${#active} )); then
+    REPLY_ACTIVE_SESSIONS_DATA="${(F)active}"$'\n'
+  else
+    REPLY_ACTIVE_SESSIONS_DATA=""
+  fi
 }
 
 print_fzf_lines() {
@@ -158,9 +160,8 @@ reorder_lines_with_previous() {
   REPLY_LINES=("${input_lines[@]}")
   [[ -z "${target_val}" ]] && return 0
 
-  local tab=$'\t'
   local pattern="*${tab}${(b)target_val}"
-  local -a matched_lines=( "${(M)input_lines[@]:#$~pattern}" )
+  local -a matched_lines=( ${(M)input_lines[@]:#$~pattern} )
   local prev_line="${matched_lines[1]:-}"
 
   if [[ -n "${prev_line}" ]]; then
@@ -181,7 +182,7 @@ run_kitty_fzf() {
   local -a fzf_args=(
     --ansi
     --header-lines="${REPLY_HEADER_LINES}"
-    -d $'\t'
+    -d "${tab}"
     --with-nth=1
     --prompt="${prompt_text}"
     --no-multi
@@ -203,7 +204,7 @@ run_kitty_fzf_with_close() {
   local lines="$2"
   local prompt_label="$3"
   local close_key="${4:-ctrl-x}"
-  shift 4 2>/dev/null || shift $#
+  shift $(( $# < 4 ? $# : 4 ))
 
   parse_fzf_header "${lines}"
 
@@ -260,8 +261,7 @@ fi
 
 fzf_theme="dark"
 if [[ -f "$HOME/.cache/zsh/theme" ]]; then
-  fzf_theme="$(< "$HOME/.cache/zsh/theme")"
-  fzf_theme="${fzf_theme//[[:space:]]/}"
+  fzf_theme="${$(< "$HOME/.cache/zsh/theme")//[[:space:]]}"
 fi
 
 FZF_COMMON_OPTS='--cycle --layout=reverse --border=rounded --margin=20%,20% --padding=0,1'

@@ -1,5 +1,6 @@
 umask 077
 typeset -U path fpath cdpath mailpath
+autoload -Uz add-zsh-hook
 
 bindkey -e
 
@@ -154,13 +155,26 @@ fpath=("$ZSH_CACHE_DIR/completions" $fpath)
 
 _zwc() {
   emulate -L zsh
+  zmodload zsh/files 2>/dev/null
   local src="$1" zwc="$2"
-  local tmpdir
-  tmpdir=$(mktemp -d "$ZSH_CACHE_DIR/${zwc:t}.XXXXXX") || return 1
-  if zcompile "$tmpdir/out.zwc" "$src" 2>/dev/null; then
-    mv -f "$tmpdir/out.zwc" "$zwc" 2>/dev/null
+  local lock="${zwc}.lock"
+
+  local -a expired_lock
+  expired_lock=( ${lock}(Nms+5) )
+  if (( $#expired_lock )); then
+    rm -rf "${expired_lock[@]}" 2>/dev/null
   fi
-  rm -rf "$tmpdir"
+
+  if [[ -d "$lock" ]]; then
+    return 0
+  fi
+
+  mkdir "$lock" 2>/dev/null || return 0
+
+  if zcompile "$lock/out.zwc" "$src" 2>/dev/null; then
+    mv -f "$lock/out.zwc" "$zwc" 2>/dev/null
+  fi
+  rm -rf "$lock"
 }
 
 _zcache() {
@@ -174,31 +188,33 @@ _zcache() {
 }
 
 () {
-  local _regen=0
-  if (( $+commands[kubectl] )); then
-    local _kubectl_path=$commands[kubectl]
-    if [[ ! -f "$ZSH_CACHE_DIR/completions/_kubectl" || "$_kubectl_path" -nt "$ZSH_CACHE_DIR/completions/_kubectl" ]]; then
-      _zcache "$ZSH_CACHE_DIR/completions/_kubectl" kubectl completion zsh && _regen=1
-    fi
-  fi
-
-  autoload -U compinit
+  autoload -Uz compinit
   local brew_completions="/opt/homebrew/share/zsh/site-functions"
   local custom_completions="$ZSH_CACHE_DIR/completions"
   local _compdump="$ZSH_CACHE_DIR/zcompdump"
+  local cached="$ZSH_CACHE_DIR/java_home"
+  local cached_path=""
 
-  if (( ! _regen )) && [[ -f "$_compdump" && \
+  if [[ -f "$_compdump" && \
         ! "$HOME/.zshrc" -nt "$_compdump" && \
+        ! "$HOME/.zprofile" -nt "$_compdump" && \
         ( ! -d "$brew_completions" || ! "$brew_completions" -nt "$_compdump" ) && \
         ( ! -d "$custom_completions" || ! "$custom_completions" -nt "$_compdump" ) ]]; then
     compinit -d "$_compdump" -C
   else
     compinit -d "$_compdump" -i
+    touch "$_compdump" 2>/dev/null
     { _zwc "$_compdump" "$_compdump.zwc" } &>/dev/null &!
   fi
 
-  local cached="$ZSH_CACHE_DIR/java_home"
-  local cached_path=""
+  compinit() { : }
+  _restore_compinit() {
+    unfunction compinit 2>/dev/null
+    autoload -Uz compinit
+    add-zsh-hook -d precmd _restore_compinit
+    unfunction _restore_compinit
+  }
+  add-zsh-hook precmd _restore_compinit
   if [[ -f "$cached" ]]; then
     cached_path=$(<"$cached")
   fi
@@ -235,10 +251,10 @@ _zcache() {
   fi
 }
 
-autoload -U down-line-or-beginning-search && zle -N down-line-or-beginning-search
-autoload -U edit-command-line && zle -N edit-command-line
-autoload -U up-line-or-beginning-search && zle -N up-line-or-beginning-search
-autoload zmv
+autoload -Uz down-line-or-beginning-search && zle -N down-line-or-beginning-search
+autoload -Uz edit-command-line && zle -N edit-command-line
+autoload -Uz up-line-or-beginning-search && zle -N up-line-or-beginning-search
+autoload -Uz zmv
 zle_highlight=('paste:none')
 
 bindkey ' ' magic-space
@@ -286,9 +302,9 @@ jt() {
 
 j() {
   unset JAVA_HOME
-  if [ -n "$1" ]; then
+  if [[ -n "$1" ]]; then
     local version="$1"
-    if [ "$version" = "8" ]; then
+    if [[ "$version" == "8" ]]; then
       version="1.8"
     fi
     local java_path
@@ -398,7 +414,6 @@ _update_git_branch() {
   fi
 }
 
-autoload -Uz add-zsh-hook
 add-zsh-hook precmd _update_git_branch
 
 PROMPT='%(!.%F{red}root %f.)%F{blue}%~%f ${__CURRENT_GIT_BRANCH}%(1j.%F{yellow}* %f.)
@@ -414,15 +429,24 @@ if [[ -n "$KITTY_INSTALLATION_DIR" ]]; then
   unfunction kitty-integration
 fi
 
+if [[ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]]; then
+  source "$HOME/google-cloud-sdk/path.zsh.inc"
+fi
+
 () {
-  local inc
-  for inc in "$HOME/google-cloud-sdk/path.zsh.inc" "$HOME/google-cloud-sdk/completion.zsh.inc"; do
-    [[ -f "$inc" ]] || continue
-    if [[ ! -f "$inc.zwc" || "$inc" -nt "$inc.zwc" ]]; then
-      _zwc "$inc" "$inc.zwc"
-    fi
-    source "$inc"
-  done
+  local _gcloud_inc="$HOME/google-cloud-sdk/completion.zsh.inc"
+
+  if [[ -f "$_gcloud_inc" ]]; then
+    _lazy_gcloud_completion() {
+      source "$HOME/google-cloud-sdk/completion.zsh.inc"
+      local cmd="${service:-$words[1]}"
+      local real_service="$_comps[$cmd]"
+      if [[ -n "$real_service" && "$real_service" != "_lazy_gcloud_completion" ]]; then
+        eval "$real_service"
+      fi
+    }
+    compdef _lazy_gcloud_completion gcloud bq gsutil
+  fi
 }
 
 if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then

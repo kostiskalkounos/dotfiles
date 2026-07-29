@@ -14,16 +14,13 @@ cleanup_filter='
   | select(.session_name != null and .session_name != "")
   | .session_name
 '
-jq_output="$(jq -r "${cleanup_filter}" 2>/dev/null <<< "${json}" || true)"
+jq_output="$(jq -r "${cleanup_filter}" 2>/dev/null <<< "${json}")" || exit 0
 
-typeset -A active_session_names
-local line
-for line in ${(f)jq_output}; do
-  [[ -z "${line}" ]] && continue
-  active_session_names[${line:t}]=1
-done
+typeset -a keys=( ${(u)${(f)jq_output}:t} )
+typeset -a vals=( ${keys[@]/*/1} )
+typeset -A active_session_names=( ${keys:^vals} )
 
-local f base pid
+typeset f base pid
 typeset -a to_delete=()
 for f in "${SESSION_DIR}"/*(.ms+2,=ms+2oN); do
   base="${f:t}"

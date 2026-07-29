@@ -2,8 +2,6 @@
 
 source "${0:a:h}/common"
 
-launch_window_id="${KITTY_WINDOW_ID:-}"
-
 build_active_lines() {
   local cur="${1:-}"
   local active_sess="${2:-}"
@@ -11,20 +9,19 @@ build_active_lines() {
 
   [[ -n "${active_sess}" ]] || return 0
 
-  local tab=$'\t'
   local -A visited
   local -a lines=()
-  local cur_line=""
-  local line
+  local cur_line="" line sname pwd_dir disp
+  local -a parts=()
   for line in "${(f)active_sess}"; do
-    local sname="${line%%${tab}*}"
-    local pwd_dir="${line#*${tab}}"
+    parts=( "${(@ps:$tab:)line}" )
+    sname="${parts[1]:-}"
+    pwd_dir="${parts[2]:-}"
     [[ -z "$sname" ]] && continue
     [[ -n "${visited[$sname]:-}" ]] && continue
     visited[$sname]=1
 
-    local sname_t="${sname:t}"
-    local disp="${sname_t}  (${(D)pwd_dir})"
+    disp="${sname:t}  (${(D)pwd_dir})"
     if [[ -n "${cur}" && "${sname}" == "${cur}" ]]; then
       cur_line="${active_color}${disp}${reset_color}${tab}${sname}"
     else
@@ -40,9 +37,9 @@ build_active_lines() {
 }
 
 if [[ "${1:-}" == "--close-and-list" ]]; then
-  target="${2:-}"
-  cur="${3:-}"
-  json=""
+  typeset target="${2:-}"
+  typeset cur="${3:-}"
+  typeset json=""
   if [[ -n "${target}" && "${target}" != "${cur}" ]]; then
     json="$("${KITTY_BIN}" @ ls 2>/dev/null || true)"
     if ! has_active_processes "session" "${target}" "${json}"; then
@@ -57,19 +54,19 @@ if [[ "${1:-}" == "--close-and-list" ]]; then
     fi
   fi
 
-  jq_out="$(get_sessions_data "${json}" "${launch_window_id:-0}")"
+  typeset jq_out="$(get_sessions_data "${json}" "${launch_window_id:-0}")"
   parse_jq_session_lines "${jq_out}"
   build_active_lines "${REPLY_CUR_SESS}" "${REPLY_ACTIVE_SESSIONS_DATA}" "${REPLY_PREV_SESS}"
   exit 0
 fi
 
-raw_ls_data=""
-active_sessions_data=""
-typeset -g -A active_session_names=()
-typeset -a paths zipped
+typeset raw_ls_data=""
+typeset active_sessions_data=""
+typeset -a zipped active_sessions
+typeset -U paths=()
 
-active_mode=false
-close_mode=false
+typeset active_mode=false
+typeset close_mode=false
 if [[ "${1:-}" == "--active" ]]; then
   active_mode=true
 elif [[ "${1:-}" == "--close" ]]; then
@@ -89,51 +86,36 @@ else
   exec {zoxide_fd}<&-
 
   paths=( ${(f)zoxide_out} )
-  paths=( "${paths[@][1,250]}" )
+  paths=( $paths[1,250] )
 fi
 
-launch_window_id="${KITTY_WINDOW_ID:-}"
-
-jq_output="$(get_sessions_data "${raw_ls_data}" "${launch_window_id:-0}")"
+typeset jq_output="$(get_sessions_data "${raw_ls_data}" "${launch_window_id:-0}")"
 parse_jq_session_lines "${jq_output}"
-cur_sess="${REPLY_CUR_SESS}"
-launch_tab_info="${REPLY_LAUNCH_TAB_INFO}"
+trigger_cleanup "${raw_ls_data}"
+typeset cur_sess="${REPLY_CUR_SESS}"
+typeset launch_tab_info="${REPLY_LAUNCH_TAB_INFO}"
 active_sessions_data="${REPLY_ACTIVE_SESSIONS_DATA}"
 
 if [[ -n "${active_sessions_data}" ]]; then
-  local tab=$'\t'
-  for line in "${(f)active_sessions_data}"; do
-    local sname="${line%%${tab}*}"
-    [[ -z "$sname" ]] && continue
-    local sname_t="${sname:t}"
-    local key="${sname_t}"
-    active_session_names[$key]=1
-  done
+  active_sessions=( ${(u)${${(f)active_sessions_data}%%${tab}*}:t} )
 fi
 
 session_exists() {
-  [[ -n "${active_session_names[$1]:-}" ]]
-}
-
-sanitize() {
-  local s="${1//[^A-Za-z0-9._-]/_}"
-  local pattern="_##"
-  REPLY="${s//$~pattern/_}"
+  (( ${active_sessions[(I)${(b)1}]} ))
 }
 
 close_launch_tab() {
   [[ -n "${launch_window_id}" ]] || return 0
   [[ -n "${launch_tab_info}" ]] || return 0
-  local tab=$'\t'
-  local tab_id="${launch_tab_info%%${tab}*}"
-  local session_windows="${launch_tab_info#*${tab}}"
+  local -a parts=( "${(@ps:$tab:)launch_tab_info}" )
+  local tab_id="${parts[1]:-}"
+  local session_windows="${parts[2]:-}"
   [[ "${session_windows}" == "0" ]] || return 0
   [[ -n "${tab_id}" ]] && "${KITTY_BIN}" @ close-tab --match "id:${tab_id}" >/dev/null 2>&1 || true
 }
 
 if [[ "${active_mode}" == "true" || "${close_mode}" == "true" ]]; then
-  trigger_cleanup "${raw_ls_data}"
-  lines="$(build_active_lines "${cur_sess}" "${active_sessions_data}" "${REPLY_PREV_SESS}")"
+  typeset lines="$(build_active_lines "${cur_sess}" "${active_sessions_data}" "${REPLY_PREV_SESS}")"
   if [[ -z "${lines}" ]]; then
     echo "No active sessions found."
     exit 0
@@ -146,8 +128,7 @@ if [[ "${active_mode}" == "true" || "${close_mode}" == "true" ]]; then
       exit 0
     fi
 
-    local tab=$'\t'
-    selected_session="${FZF_SELECTED#*${tab}}"
+    typeset selected_session="${FZF_SELECTED#*${tab}}"
     "${KITTY_BIN}" @ action goto_session "${selected_session}"
     close_launch_tab
     exit 0
@@ -159,28 +140,31 @@ if [[ "${active_mode}" == "true" || "${close_mode}" == "true" ]]; then
   fi
 fi
 
-trigger_cleanup "${raw_ls_data}"
-
 typeset cur_dir=""
 if [[ -n "${cur_sess}" ]]; then
-  typeset sf="${cur_sess}"
-  if [[ ! -r "${sf}" ]]; then
-    sf="${SESSION_DIR}/${cur_sess:t}"
+  if [[ -n "${active_sessions_data}" ]]; then
+    typeset pattern="${(b)cur_sess}${tab}*"
+    typeset -a matched=( ${(M)${(f)active_sessions_data}:#$~pattern} )
+    if (( ${#matched} )); then
+      cur_dir="${matched[1]#*${tab}}"
+    fi
   fi
-  if [[ -r "${sf}" ]]; then
-    typeset content="$(< "${sf}")"
-    cur_dir="${content%%$'\n'*}"
-    cur_dir="${cur_dir#cd }"
+  if [[ -z "${cur_dir}" ]]; then
+    typeset sf="${cur_sess}"
+    if [[ ! -r "${sf}" ]]; then
+      sf="${SESSION_DIR}/${cur_sess:t}"
+    fi
+    if [[ -r "${sf}" ]]; then
+      typeset content="$(< "${sf}")"
+      cur_dir="${content%%$'\n'*}"
+      cur_dir="${cur_dir#cd }"
+    fi
   fi
 fi
 
 typeset p="" disp="" cur_line=""
-typeset -A seen_paths=()
-local tab=$'\t'
 for p in "${paths[@]}"; do
   [[ -z "${p}" ]] && continue
-  [[ -n "${seen_paths[$p]:-}" ]] && continue
-  seen_paths[$p]=1
   disp="${(D)p}"
   if [[ -n "${cur_dir}" && "${p}" == "${cur_dir}" ]]; then
     cur_line="${active_color}${disp}${reset_color}${tab}${p}"
@@ -189,9 +173,8 @@ for p in "${paths[@]}"; do
   fi
 done
 
-typeset -i header_lines=0
 typeset -a picker=()
-[[ -n "${cur_line}" ]] && { picker+=("${cur_line}"); header_lines=1; }
+[[ -n "${cur_line}" ]] && picker+=("${cur_line}")
 picker+=("${zipped[@]}")
 
 if (( ${#picker} == 0 )); then
@@ -199,57 +182,57 @@ if (( ${#picker} == 0 )); then
   exit 0
 fi
 
-local picker_lines="${(F)picker}"
+typeset picker_lines="${(F)picker}"
 run_kitty_fzf "${picker_lines}" "Select Session > " "" "" --no-sort
 
-selected="${FZF_SELECTED}"
-fzf_rc=$FZF_RC
+typeset selected="${FZF_SELECTED}"
+typeset -i fzf_rc=$FZF_RC
 
 if [[ $fzf_rc -ne 0 || -z "${selected}" ]]; then
   exit 0
 fi
 
-local tab=$'\t'
-selected_path="${selected#*${tab}}"
+typeset selected_path="${selected#*${tab}}"
 
 if [[ ! -d "${selected_path}" ]]; then
   echo "Directory not found: ${selected_path}"
   exit 1
 fi
 
-real_target="${selected_path%/}"
+typeset real_target="${selected_path%/}"
 [[ -z "${real_target}" ]] && real_target="/"
 
-base_name="${real_target:t}"
+typeset base_name="${real_target:t}"
 
 sanitize "${base_name}"; safe_base="${REPLY}"
 
-existing_session=""
-typeset real_target_abs=""
+typeset existing_session=""
 if [[ -n "${active_sessions_data}" ]]; then
-  typeset session_name pwd_dir
-  local tab=$'\t'
-  for line in "${(f)active_sessions_data}"; do
-    session_name="${line%%${tab}*}"
-    pwd_dir="${line#*${tab}}"
-    [[ -z "$session_name" || -z "$pwd_dir" ]] && continue
+  typeset pattern="*${tab}${(b)real_target}"
+  typeset -a matched=( ${(M)${(f)active_sessions_data}:#$~pattern} )
 
-    if [[ "${pwd_dir}" == "${real_target}" ]]; then
-      existing_session="$session_name"
-      break
+  if (( ${#matched} )); then
+    existing_session="${matched[1]%%${tab}*}"
+  else
+    typeset real_target_abs="${real_target:A}"
+    pattern="*${tab}${(b)real_target_abs}"
+    matched=( ${(M)${(f)active_sessions_data}:#$~pattern} )
+
+    if (( ${#matched} )); then
+      existing_session="${matched[1]%%${tab}*}"
     else
-      if [[ -z "${real_target_abs}" ]]; then
-        real_target_abs="${real_target:A}"
-      fi
-      if [[ "${pwd_dir}" == "${real_target_abs}" ]]; then
-        existing_session="$session_name"
-        break
-      elif [[ "${pwd_dir:A}" == "${real_target_abs}" ]]; then
-        existing_session="$session_name"
-        break
-      fi
+      typeset line session_name pwd_dir
+      for line in "${(f)active_sessions_data}"; do
+        session_name="${line%%${tab}*}"
+        pwd_dir="${line#*${tab}}"
+        [[ -z "$session_name" || -z "$pwd_dir" ]] && continue
+        if [[ "${pwd_dir:A}" == "${real_target_abs}" ]]; then
+          existing_session="${session_name}"
+          break
+        fi
+      done
     fi
-  done
+  fi
 fi
 
 zoxide add "${real_target}" >/dev/null 2>&1 < /dev/null &!
@@ -260,12 +243,12 @@ if [[ -n "${existing_session}" ]]; then
   exit 0
 fi
 
-session_name="${safe_base}"
+typeset session_name="${safe_base}"
 if session_exists "${session_name}"; then
-  parent_name="${real_target:h:t}"
+  typeset parent_name="${real_target:h:t}"
   parent_name="${parent_name#.}"
   if [[ -n "${parent_name}" ]]; then
-    sanitize "${parent_name}"; safe_parent="${REPLY}"
+    sanitize "${parent_name}"; typeset safe_parent="${REPLY}"
     session_name="${safe_parent}-${safe_base}"
   fi
 
@@ -275,7 +258,7 @@ if session_exists "${session_name}"; then
 fi
 
 [[ -d "${SESSION_DIR}" ]] || mkdir -p "${SESSION_DIR}"
-session_file="${SESSION_DIR}/${session_name}"
+typeset session_file="${SESSION_DIR}/${session_name}"
 
 cat >"${session_file}" <<EOF
 cd ${real_target}
