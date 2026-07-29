@@ -1,7 +1,7 @@
 #!/bin/bash
 theme="${FZF_THEME}"
-if [[ -z "$theme" && -f "$HOME/.cache/theme" ]]; then
-    read -r theme < "$HOME/.cache/theme"
+if [[ -z "$theme" && -f "$HOME/.cache/zsh/theme" ]]; then
+    read -r theme < "$HOME/.cache/zsh/theme"
 fi
 if [[ -z "$theme" ]]; then
     theme="dark"

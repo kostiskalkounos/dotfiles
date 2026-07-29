@@ -20,6 +20,7 @@ o.laststatus = 3
 o.linebreak = true
 o.list = true
 o.makeprg = "make -j4 -w"
+o.modeline = false
 o.mouse = "a"
 o.number = true
 o.pumheight = 15

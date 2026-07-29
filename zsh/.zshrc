@@ -1,3 +1,4 @@
+umask 077
 typeset -U path fpath cdpath mailpath
 
 bindkey -e
@@ -26,18 +27,21 @@ _set_light_theme() {
   export PROMPT_INDICATOR="#179299"
 }
 
+KITTY_CACHE_DIR="$HOME/.cache/kitty"
+ZSH_CACHE_DIR="$HOME/.cache/zsh"
+
 if [[ -n "$FZF_THEME" ]]; then
   _theme="$FZF_THEME"
-elif [[ -f $HOME/.cache/theme ]]; then
-  _theme=$(<$HOME/.cache/theme)
+elif [[ -f $ZSH_CACHE_DIR/theme ]]; then
+  _theme=$(<$ZSH_CACHE_DIR/theme)
 else
   if plutil -extract "AppleInterfaceStyle" raw ~/Library/Preferences/.GlobalPreferences.plist &>/dev/null; then
     _theme="dark"
   else
     _theme="light"
   fi
-  mkdir -p "$HOME/.cache"
-  echo "$_theme" > "$HOME/.cache/theme"
+  mkdir -p "$ZSH_CACHE_DIR"
+  echo "$_theme" > "$ZSH_CACHE_DIR/theme"
 fi
 
 if [[ "$_theme" == "dark" ]]; then
@@ -47,14 +51,11 @@ else
 fi
 unset _theme
 
-[[ -f ~/.artifactory ]] && source ~/.artifactory
-
 export MANPAGER='nvim +Man!'
 export NVIM_LOG_FILE=/dev/null
 path+=("$HOME/go/bin")
 export XDG_CONFIG_HOME="$HOME/.config"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
-ZSH_CACHE_DIR="$HOME/.cache/zsh"
 
 export HOMEBREW_BUNDLE_NO_DESCRIBE=1
 export HOMEBREW_NO_ANALYTICS=1
@@ -110,9 +111,10 @@ alias dn='docker network rm $(docker network ls -q)'
 alias dp='docker system prune --volumes -af'
 alias dv='docker volume rm $(docker volume ls -q)'
 
-alias la='eza -la --group-directories-first --icons=always'
 alias ld='lazydocker'
 alias lg='lazygit'
+
+alias la='eza -la --group-directories-first --icons=always'
 alias ll='eza -l --group-directories-first --icons=always'
 alias ls='eza --group-directories-first --icons=always'
 
@@ -129,6 +131,7 @@ alias sudo='sudo '
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=100000
 SAVEHIST=$HISTSIZE
+export HISTORY_IGNORE="(*password*|*passwd*|*secret*|*token*|*api_key*|*apikey*|*auth*|*bearer*)"
 
 setopt AUTO_CD
 setopt AUTO_PUSHD
@@ -153,18 +156,19 @@ fpath=("$ZSH_CACHE_DIR/completions" $fpath)
 _zwc() {
   emulate -L zsh
   local src="$1" zwc="$2"
-  local tmp="$zwc.$$.tmp.zwc"
-  if zcompile "$tmp" "$src" 2>/dev/null; then
-    mv -f "$tmp" "$zwc" 2>/dev/null || rm -f "$tmp"
-  else
-    rm -f "$tmp"
+  local tmpdir
+  tmpdir=$(mktemp -d "$ZSH_CACHE_DIR/${zwc:t}.XXXXXX") || return 1
+  if zcompile "$tmpdir/out.zwc" "$src" 2>/dev/null; then
+    mv -f "$tmpdir/out.zwc" "$zwc" 2>/dev/null
   fi
+  rm -rf "$tmpdir"
 }
 
 _zcache() {
   emulate -L zsh
   local dest="$1"; shift
-  local tmp="$dest.$$.tmp"
+  local tmp
+  tmp=$(mktemp "$ZSH_CACHE_DIR/${dest:t}.XXXXXX") || return 1
   "$@" > "$tmp" 2>/dev/null || { rm -f "$tmp"; return 1 }
   mv -f "$tmp" "$dest" 2>/dev/null || { rm -f "$tmp"; return 1 }
   _zwc "$dest" "$dest.zwc"
@@ -182,18 +186,19 @@ _zcache() {
   autoload -U compinit
   local brew_completions="/opt/homebrew/share/zsh/site-functions"
   local custom_completions="$ZSH_CACHE_DIR/completions"
+  local _compdump="$ZSH_CACHE_DIR/zcompdump"
 
-  if (( ! _regen )) && [[ -f "${ZDOTDIR:-$HOME}/.zcompdump" && \
-        ! "${ZDOTDIR:-$HOME}/.zshrc" -nt "${ZDOTDIR:-$HOME}/.zcompdump" && \
-        ( ! -d "$brew_completions" || ! "$brew_completions" -nt "${ZDOTDIR:-$HOME}/.zcompdump" ) && \
-        ( ! -d "$custom_completions" || ! "$custom_completions" -nt "${ZDOTDIR:-$HOME}/.zcompdump" ) ]]; then
-    compinit -C
+  if (( ! _regen )) && [[ -f "$_compdump" && \
+        ! "$HOME/.zshrc" -nt "$_compdump" && \
+        ( ! -d "$brew_completions" || ! "$brew_completions" -nt "$_compdump" ) && \
+        ( ! -d "$custom_completions" || ! "$custom_completions" -nt "$_compdump" ) ]]; then
+    compinit -d "$_compdump" -C
   else
-    compinit -i
-    { _zwc "${ZDOTDIR:-$HOME}/.zcompdump" "${ZDOTDIR:-$HOME}/.zcompdump.zwc" } &>/dev/null &!
+    compinit -d "$_compdump" -i
+    { _zwc "$_compdump" "$_compdump.zwc" } &>/dev/null &!
   fi
 
-  local cached="$HOME/.cache/java_home"
+  local cached="$ZSH_CACHE_DIR/java_home"
   local cached_path=""
   if [[ -f "$cached" ]]; then
     cached_path=$(<"$cached")
@@ -212,18 +217,18 @@ _zcache() {
 
   if (( $+commands[zoxide] )); then
     local _zoxide_path=$commands[zoxide]
-    if [[ ! -f "$HOME/.cache/zoxide_init.zsh" || "$_zoxide_path" -nt "$HOME/.cache/zoxide_init.zsh" ]]; then
-      _zcache "$HOME/.cache/zoxide_init.zsh" zoxide init zsh
+    if [[ ! -f "$ZSH_CACHE_DIR/zoxide_init.zsh" || "$_zoxide_path" -nt "$ZSH_CACHE_DIR/zoxide_init.zsh" ]]; then
+      _zcache "$ZSH_CACHE_DIR/zoxide_init.zsh" zoxide init zsh
     fi
-    [[ -r "$HOME/.cache/zoxide_init.zsh" ]] && source "$HOME/.cache/zoxide_init.zsh"
+    [[ -r "$ZSH_CACHE_DIR/zoxide_init.zsh" ]] && source "$ZSH_CACHE_DIR/zoxide_init.zsh"
   fi
 
   if (( $+commands[fzf] )); then
     local _fzf_path=$commands[fzf]
-    if [[ ! -f "$HOME/.cache/fzf_init.zsh" || "$_fzf_path" -nt "$HOME/.cache/fzf_init.zsh" ]]; then
-      _zcache "$HOME/.cache/fzf_init.zsh" fzf --zsh
+    if [[ ! -f "$ZSH_CACHE_DIR/fzf_init.zsh" || "$_fzf_path" -nt "$ZSH_CACHE_DIR/fzf_init.zsh" ]]; then
+      _zcache "$ZSH_CACHE_DIR/fzf_init.zsh" fzf --zsh
     fi
-    [[ -r "$HOME/.cache/fzf_init.zsh" ]] && source "$HOME/.cache/fzf_init.zsh"
+    [[ -r "$ZSH_CACHE_DIR/fzf_init.zsh" ]] && source "$ZSH_CACHE_DIR/fzf_init.zsh"
   fi
 
   if (( $+commands[kubectl] )); then
@@ -276,7 +281,7 @@ TRAPUSR2() {
 
 jt() {
   unset -f jt
-  source $HOME/Dotfiles/scripts/jt
+  source "$HOME/Dotfiles/scripts/jt"
   jt "$@"
 }
 
@@ -334,6 +339,7 @@ _update_git_branch() {
 
   if [[ -z "$gitdir" ]]; then
     __CURRENT_GIT_BRANCH=""
+    psvar[1]=""
     return
   fi
 
@@ -385,8 +391,10 @@ _update_git_branch() {
 
   branch="${branch%$'\r'}"
   if [[ -n "$branch" ]]; then
-    __CURRENT_GIT_BRANCH="%F{magenta}%f %F{green}${branch}%f "
+    psvar[1]="$branch"
+    __CURRENT_GIT_BRANCH="%F{magenta}%f %F{green}%1v%f "
   else
+    psvar[1]=""
     __CURRENT_GIT_BRANCH=""
   fi
 }
@@ -394,7 +402,7 @@ _update_git_branch() {
 autoload -Uz add-zsh-hook
 add-zsh-hook precmd _update_git_branch
 
-PROMPT='%(!.%F{red}root %f.)%F{blue}${PWD/#$HOME/~}%f ${__CURRENT_GIT_BRANCH}%(1j.%F{yellow}* %f.)
+PROMPT='%(!.%F{red}root %f.)%F{blue}%~%f ${__CURRENT_GIT_BRANCH}%(1j.%F{yellow}* %f.)
 %(?.%F{${PROMPT_INDICATOR}}.%F{red})❭%f '
 
 if [[ -n "$KITTY_INSTALLATION_DIR" ]]; then
@@ -416,9 +424,9 @@ fi
 }
 
 if [[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-  source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  source "/opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 elif [[ -f /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-  source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+  source "/usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
 typeset -A ZSH_HIGHLIGHT_STYLES
@@ -435,7 +443,7 @@ ZSH_HIGHLIGHT_STYLES[double-quoted-argument-unclosed]='fg=red'
 
 () {
   local f zwc
-  for f in "${ZDOTDIR:-$HOME}/.zshrc" "${ZDOTDIR:-$HOME}/.zprofile"; do
+  for f in "$HOME/.zshrc" "$HOME/.zprofile"; do
     [[ -f "$f" ]] || continue
     zwc="$f.zwc"
     if [[ ! -f "$zwc" || "$f" -nt "$zwc" ]]; then
