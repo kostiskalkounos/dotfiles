@@ -93,7 +93,6 @@ typeset jq_output="$(get_sessions_data "${raw_ls_data}" "${launch_window_id:-0}"
 parse_jq_session_lines "${jq_output}"
 trigger_cleanup "${raw_ls_data}"
 typeset cur_sess="${REPLY_CUR_SESS}"
-typeset launch_tab_info="${REPLY_LAUNCH_TAB_INFO}"
 active_sessions_data="${REPLY_ACTIVE_SESSIONS_DATA}"
 
 if [[ -n "${active_sessions_data}" ]]; then

@@ -38,8 +38,7 @@ parse_jq_session_lines() {
 
   REPLY_CUR_SESS="${${lines[(r)SESSION:*]:-}#SESSION:}"
   REPLY_PREV_SESS="${${lines[(r)PREV_SESSION:*]:-}#PREV_SESSION:}"
-  REPLY_LAUNCH_TAB_INFO="${${lines[(r)LAUNCH_TAB:*]:-}#LAUNCH_TAB:}"
-  local -a active=( ${lines:#(SESSION|PREV_SESSION|LAUNCH_TAB):*} )
+  local -a active=( ${lines:#(SESSION|PREV_SESSION):*} )
   if (( ${#active} )); then
     REPLY_ACTIVE_SESSIONS_DATA="${(F)active}"$'\n'
   else
@@ -74,12 +73,6 @@ get_sessions_data() {
     | (
         first($launch_tab.windows[]?.session_name | select(. != null and . != "")) // null
       ) as $curr_sess
-    | ($launch_tab.id // "" | tostring) as $launch_tab_id
-    | (
-        [ $launch_tab?.windows[]? | select(.session_name != null and .session_name != "") ]
-        | length
-        | tostring
-      ) as $launch_tab_sess_wins
     | [
         .[]?.tabs[]?.windows[]?
         | select(.session_name != null and .session_name != "")
@@ -91,7 +84,6 @@ get_sessions_data() {
       ) as $prev_sess
     | "SESSION:\($curr_sess // "")",
       "PREV_SESSION:\($prev_sess)",
-      "LAUNCH_TAB:\($launch_tab_id)\t\($launch_tab_sess_wins)",
       ($all_sess_wins[] | [(.session_name|tostring), (.env.PWD // .cwd // "")] | @tsv)
   '
 
@@ -129,15 +121,25 @@ get_tabs_data() {
         | select( ($all == "1") or ($sess == null) or ($tabsess == $sess) )
         | (any(.windows[]?; .id == $w)) as $cur
         | [ .windows[] | select(($w == 0) or (.id != $w)) ] as $wins
+        | (first($wins[] | select(.is_active == true)) // $wins[0] // .windows[0]) as $aw
+        | (
+            ($aw.foreground_processes // [])
+            | any(
+                ((.cmdline[0] // "") | sub("^-"; "") | sub(".*/"; "")) as $c
+                | ($c | test("^(zsh|bash|sh|fish|dash|tcsh|ksh)$") | not)
+              )
+          ) as $is_active
         | [ (.id|tostring),
             (if $cur then "1" else "0" end),
-            (if $cur then
-               (
-                 first($wins[] | select(.is_active == true) | .title)
-                 // $wins[0]?.title
-                 // .title
-               )
-             else .title end),
+            (
+              if $is_active then
+                ($aw.title // .title)
+              else
+                ($aw.session_name | select(. != null and . != ""))
+                // (($aw.env.PWD // $aw.cwd // "") | split("/") | last | select(. != ""))
+                // "/"
+              end
+            ),
             (
               first($wins[] | select(.is_active == true) | (.env.PWD // .cwd))
               // $wins[0]?.env.PWD
