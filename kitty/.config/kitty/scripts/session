@@ -93,7 +93,6 @@ typeset jq_output="$(get_sessions_data "${raw_ls_data}" "${launch_window_id:-0}"
 parse_jq_session_lines "${jq_output}"
 trigger_cleanup "${raw_ls_data}"
 typeset cur_sess="${REPLY_CUR_SESS}"
-typeset launch_tab_info="${REPLY_LAUNCH_TAB_INFO}"
 active_sessions_data="${REPLY_ACTIVE_SESSIONS_DATA}"
 
 if [[ -n "${active_sessions_data}" ]]; then
@@ -102,16 +101,6 @@ fi
 
 session_exists() {
   (( ${active_sessions[(I)${(b)1}]} ))
-}
-
-close_launch_tab() {
-  [[ -n "${launch_window_id}" ]] || return 0
-  [[ -n "${launch_tab_info}" ]] || return 0
-  local -a parts=( "${(@ps:$tab:)launch_tab_info}" )
-  local tab_id="${parts[1]:-}"
-  local session_windows="${parts[2]:-}"
-  [[ "${session_windows}" == "0" ]] || return 0
-  [[ -n "${tab_id}" ]] && "${KITTY_BIN}" @ close-tab --match "id:${tab_id}" >/dev/null 2>&1 || true
 }
 
 if [[ "${active_mode}" == "true" || "${close_mode}" == "true" ]]; then
@@ -130,7 +119,6 @@ if [[ "${active_mode}" == "true" || "${close_mode}" == "true" ]]; then
 
     typeset selected_session="${FZF_SELECTED#*${tab}}"
     "${KITTY_BIN}" @ action goto_session "${selected_session}"
-    close_launch_tab
     exit 0
   fi
 
@@ -239,7 +227,6 @@ zoxide add "${real_target}" >/dev/null 2>&1 < /dev/null &!
 
 if [[ -n "${existing_session}" ]]; then
   "${KITTY_BIN}" @ action goto_session "${existing_session}"
-  close_launch_tab
   exit 0
 fi
 
@@ -266,4 +253,3 @@ launch
 EOF
 
 "${KITTY_BIN}" @ action goto_session "${session_file}"
-close_launch_tab
