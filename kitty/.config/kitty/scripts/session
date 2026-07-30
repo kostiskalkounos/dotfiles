@@ -104,16 +104,6 @@ session_exists() {
   (( ${active_sessions[(I)${(b)1}]} ))
 }
 
-close_launch_tab() {
-  [[ -n "${launch_window_id}" ]] || return 0
-  [[ -n "${launch_tab_info}" ]] || return 0
-  local -a parts=( "${(@ps:$tab:)launch_tab_info}" )
-  local tab_id="${parts[1]:-}"
-  local session_windows="${parts[2]:-}"
-  [[ "${session_windows}" == "0" ]] || return 0
-  [[ -n "${tab_id}" ]] && "${KITTY_BIN}" @ close-tab --match "id:${tab_id}" >/dev/null 2>&1 || true
-}
-
 if [[ "${active_mode}" == "true" || "${close_mode}" == "true" ]]; then
   typeset lines="$(build_active_lines "${cur_sess}" "${active_sessions_data}" "${REPLY_PREV_SESS}")"
   if [[ -z "${lines}" ]]; then
@@ -130,7 +120,6 @@ if [[ "${active_mode}" == "true" || "${close_mode}" == "true" ]]; then
 
     typeset selected_session="${FZF_SELECTED#*${tab}}"
     "${KITTY_BIN}" @ action goto_session "${selected_session}"
-    close_launch_tab
     exit 0
   fi
 
@@ -239,7 +228,6 @@ zoxide add "${real_target}" >/dev/null 2>&1 < /dev/null &!
 
 if [[ -n "${existing_session}" ]]; then
   "${KITTY_BIN}" @ action goto_session "${existing_session}"
-  close_launch_tab
   exit 0
 fi
 
@@ -266,4 +254,3 @@ launch
 EOF
 
 "${KITTY_BIN}" @ action goto_session "${session_file}"
-close_launch_tab
