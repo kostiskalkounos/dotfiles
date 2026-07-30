@@ -2,7 +2,7 @@ local application = require("hs.application")
 
 Hyper:bind({}, "a", function() application.launchOrFocus("kitty") end)
 Hyper:bind({}, "c", function() application.launchOrFocus("Calendar") end)
-Hyper:bind({}, "d", function() application.launchOrFocus("Brave Browser") end)
+Hyper:bind({}, "d", function() application.launchOrFocus("Helium") end)
 Hyper:bind({}, "e", function() application.launchOrFocus("Mail") end)
 Hyper:bind({}, "f", function() application.launchOrFocus("Finder") end)
 Hyper:bind({}, "g", function() application.launchOrFocus("System Settings") end)
