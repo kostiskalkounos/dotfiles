@@ -12,5 +12,5 @@ fpath=("/opt/homebrew/share/zsh/site-functions" $fpath)
 path=("/opt/homebrew/bin" "/opt/homebrew/sbin" $path)
 export PATH
 
-[ -z "${MANPATH-}" ] || export MANPATH=":${MANPATH#:}";
+[[ -z "${MANPATH-}" ]] || export MANPATH=":${MANPATH#:}";
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
