@@ -38,7 +38,7 @@ build_lines() {
     idx+=1
     local title_part="${idx}: ${title}"
     local width=$(( ${#title_part} > COLUMN_WIDTH_FLOOR ? ${#title_part} : COLUMN_WIDTH_FLOOR ))
-    disp="${FZF_PADDING}${(r:width:)title_part}${tab}${(D)final_cwd}"
+    disp="${(r:width:)title_part}${tab}${(D)final_cwd}"
     if [[ "${is_current}" == "1" ]]; then
       cur_line="${ACTIVE_COLOR}${disp}${RESET_COLOR}${tab}${tab_id}"
     else

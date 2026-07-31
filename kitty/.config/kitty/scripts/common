@@ -9,7 +9,6 @@ export SESSION_DIR="$HOME/.cache/kitty"
 
 typeset -gi COLUMN_WIDTH_FLOOR=40
 typeset -gi FZF_TABSTOP=4
-typeset -gr FZF_PADDING="${(l:FZF_TABSTOP:: :):-}"
 
 typeset -g launch_window_id="${KITTY_WINDOW_ID:-}"
 typeset -gr tab=$'\t'
@@ -170,24 +169,11 @@ reorder_lines_with_previous() {
   fi
 }
 
-build_fzf_header() {
-  local -a parts=()
-  local key action
-  while (( $# >= 2 )); do
-    key="$1"
-    action="$2"
-    shift 2
-    parts+=("${HEADER_BLUE}:: <${HEADER_YELLOW}${key}${HEADER_BLUE}> to ${HEADER_ORANGE}${action}${RESET_COLOR}")
-  done
-  REPLY_HEADER="${(j:   :)parts}"
-}
-
 run_kitty_fzf() {
   local input_lines="$1"
   local prompt_text="$2"
   local bind_action="${3:-}"
-  local custom_header="${4:-}"
-  shift $(( $# < 4 ? $# : 4 ))
+  shift $(( $# < 3 ? $# : 3 ))
 
   parse_fzf_header "${input_lines}"
 
@@ -201,7 +187,6 @@ run_kitty_fzf() {
     --tabstop="${FZF_TABSTOP}"
   )
 
-  [[ -n "${custom_header}" ]] && fzf_args+=( --header="${custom_header}" )
   [[ -n "${bind_action}" ]] && fzf_args+=( --bind="${bind_action}" )
 
   fzf_args+=( "$@" )
@@ -224,8 +209,7 @@ run_kitty_fzf_with_close() {
   local reload_cmd="${(qq)script_path} --close-and-list {-1} ${(qq)REPLY_CURRENT}"
   local bind_cmd="${close_key}:reload(${reload_cmd})"
 
-  build_fzf_header "${close_key}" "close"
-  run_kitty_fzf "${lines}" "${prompt_label}" "${bind_cmd}" "${REPLY_HEADER}" "$@"
+  run_kitty_fzf "${lines}" "${prompt_label}" "${bind_cmd}" "$@"
 }
 
 trigger_cleanup() {
@@ -284,13 +268,7 @@ export RESET_COLOR=$'\033[0m'
 if [[ "${fzf_theme}" == "light" ]]; then
   export FZF_DEFAULT_OPTS="--color=light ${FZF_COMMON_OPTS} --color=fg+:black,bg+:#ccd0da,gutter:#eff1f5"
   export ACTIVE_COLOR=$'\033[38;2;136;57;239m'
-  export HEADER_BLUE=$'\033[38;2;30;102;245m'
-  export HEADER_ORANGE=$'\033[38;2;254;100;11m'
-  export HEADER_YELLOW=$'\033[38;2;223;142;29m'
 else
   export FZF_DEFAULT_OPTS="--color=dark ${FZF_COMMON_OPTS} --color=fg+:white,bg+:#363a4f,gutter:#24273A"
   export ACTIVE_COLOR=$'\033[38;2;198;160;246m'
-  export HEADER_BLUE=$'\033[38;2;138;173;244m'
-  export HEADER_ORANGE=$'\033[38;2;245;169;127m'
-  export HEADER_YELLOW=$'\033[38;2;238;212;159m'
 fi
