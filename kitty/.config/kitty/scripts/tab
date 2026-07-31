@@ -16,7 +16,7 @@ build_lines() {
   local prev_tab_id="${${lines[1]:-}#PREV_TAB_ID:}"
   local -a tab_lines=( ${lines[@][2,-1]} )
 
-  local tab_id is_current title cwd disp cur_line="" line
+  local tab_id is_current title disp cur_line="" line
   local -a rest=() parts=()
   local -i idx=0
   for line in "${tab_lines[@]}"; do
@@ -24,9 +24,19 @@ build_lines() {
     tab_id="${parts[1]:-}"
     is_current="${parts[2]:-}"
     title="${parts[3]:-}"
-    cwd="${parts[4]:-}"
+    local proc_cwd="${parts[4]:-}"
+    local win_cwd="${parts[5]:-}"
+    local final_cwd="${proc_cwd:-$win_cwd}"
+
+    if [[ -n "${win_cwd}" && -n "${proc_cwd}" ]]; then
+      local win_p="${win_cwd:A}" proc_p="${proc_cwd:A}"
+      if [[ "${proc_p}/" == "${win_p%/}/"* ]]; then
+        final_cwd="${win_cwd%/}${proc_p#${win_p%/}}"
+      fi
+    fi
+
     idx+=1
-    disp="${idx}: ${title}  (${(D)cwd})"
+    disp="${idx}: ${title}${tab}${(D)final_cwd}"
     if [[ "${is_current}" == "1" ]]; then
       cur_line="${active_color}${disp}${reset_color}${tab}${tab_id}"
     else
@@ -78,5 +88,5 @@ if [[ $FZF_RC -ne 0 || -z "${FZF_SELECTED}" ]]; then
   exit 0
 fi
 
-typeset selected_tab="${FZF_SELECTED#*${tab}}"
+typeset selected_tab="${FZF_SELECTED##*${tab}}"
 "${KITTY_BIN}" @ focus-tab --match "id:${selected_tab}" 2>/dev/null || true

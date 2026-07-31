@@ -78,9 +78,9 @@ get_sessions_data() {
         | select(.session_name != null and .session_name != "")
       ] as $all_sess_wins
     | (
-        reduce ($all_sess_wins[] | select(.session_name != $curr_sess)) as $w (null;
-          if . == null or $w.last_focused_at > .last_focused_at then $w else . end
-        ) | .session_name // ""
+        [ $all_sess_wins[] | select(.session_name != $curr_sess) ]
+        | max_by(.last_focused_at)
+        | .session_name // ""
       ) as $prev_sess
     | "SESSION:\($curr_sess // "")",
       "PREV_SESSION:\($prev_sess)",
@@ -102,10 +102,9 @@ get_tabs_data() {
   jq -r --argjson w "${launch_win}" --arg all "${is_all}" '
     [ .[]?.tabs[]? ] as $all_tabs
     | (
-      reduce ($all_tabs[] | select(.is_active != true)) as $t (null;
-        ([$t.windows[]?.last_focused_at] | max) as $focus
-        | if . == null or $focus > .max_focus then {id: $t.id, max_focus: $focus} else . end
-      ) | .id // "" | tostring
+      [ $all_tabs[] | select(.is_active != true) ]
+      | max_by([.windows[]?.last_focused_at] | max)
+      | .id // "" | tostring
     ) as $prev_tab_id
     | (
         first($all_tabs[] | select(any(.windows[]?; .id == $w))) // null
@@ -122,6 +121,7 @@ get_tabs_data() {
         | (any(.windows[]?; .id == $w)) as $cur
         | [ .windows[] | select(($w == 0) or (.id != $w)) ] as $wins
         | (first($wins[] | select(.is_active == true)) // $wins[0] // .windows[0]) as $aw
+        | ($aw.foreground_processes[0]?.cwd // $aw.foreground_processes[0]?.env.PWD // $aw.env.PWD // $aw.cwd // "") as $aw_cwd
         | (
             ($aw.foreground_processes // [])
             | any(
@@ -133,21 +133,15 @@ get_tabs_data() {
             (if $cur then "1" else "0" end),
             (
               if $is_active then
-                ($aw.title // .title)
+                (($aw.title // .title) | rtrimstr(" ") | rtrimstr(if ($tabsess // "") != "" then "(" + $tabsess + ")" else "" end) | rtrimstr(" "))
               else
                 ($aw.session_name | select(. != null and . != ""))
-                // (($aw.env.PWD // $aw.cwd // "") | split("/") | last | select(. != ""))
+                // ($aw_cwd | split("/") | last | select(. != ""))
                 // "/"
               end
             ),
-            (
-              first($wins[] | select(.is_active == true) | (.env.PWD // .cwd))
-              // $wins[0]?.env.PWD
-              // $wins[0]?.cwd
-              // .windows[0].env.PWD
-              // .windows[0].cwd
-              // ""
-            )
+            ($aw.foreground_processes[0]?.cwd // ""),
+            ($aw.env.PWD // $aw.cwd // "")
           ]
         | @tsv
       )
@@ -185,7 +179,7 @@ run_kitty_fzf() {
     --ansi
     --header-lines="${REPLY_HEADER_LINES}"
     -d "${tab}"
-    --with-nth=1
+    --with-nth=1..-2
     --prompt="${prompt_text}"
     --no-multi
   )
@@ -210,7 +204,7 @@ run_kitty_fzf_with_close() {
 
   parse_fzf_header "${lines}"
 
-  local reload_cmd="'${script_path}' --close-and-list '{2}' '${REPLY_CURRENT}'"
+  local reload_cmd="'${script_path}' --close-and-list {-1} ${(qq)REPLY_CURRENT}"
   local bind_cmd="${close_key}:reload(${reload_cmd})"
 
   local header="${header_blue}:: <"
