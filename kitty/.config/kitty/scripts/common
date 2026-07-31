@@ -7,7 +7,17 @@ zmodload -F zsh/files b:rm b:mkdir
 export KITTY_BIN="/Applications/kitty.app/Contents/MacOS/kitten"
 export SESSION_DIR="$HOME/.cache/kitty"
 
+typeset -a -g REPLY_LINES=()
+typeset -g FZF_RC=""
+typeset -g FZF_SELECTED=""
+typeset -g REPLY=""
+typeset -g REPLY_ACTIVE_SESSIONS_DATA=""
+typeset -g REPLY_CURRENT=""
+typeset -g REPLY_CUR_SESS=""
+typeset -g REPLY_DISP=""
+typeset -g REPLY_PREV_SESS=""
 typeset -gi COLUMN_WIDTH_FLOOR=30
+typeset -gi REPLY_HEADER_LINES=0
 
 typeset -U path
 path=(/opt/homebrew/bin /usr/local/bin /usr/bin /bin /usr/sbin /sbin "${path[@]}")
@@ -16,7 +26,7 @@ typeset -g launch_window_id="${KITTY_WINDOW_ID:-}"
 typeset -gr tab=$'\t'
 
 sanitize() {
-  local s="${1//[^A-Za-z0-9._-]/_}"
+  local s="${${1:-}//[^A-Za-z0-9._-]/_}"
   local pattern="_##"
   REPLY="${s//$~pattern/_}"
 }
@@ -259,12 +269,12 @@ if [[ -n "${FZF_DEFAULT_OPTS:-}" && -n "${ACTIVE_COLOR:-}" && -n "${RESET_COLOR:
   return 0
 fi
 
-typeset fzf_theme="dark"
-if [[ -f "$HOME/.cache/zsh/theme" ]]; then
+typeset -g fzf_theme="dark"
+if [[ -r "$HOME/.cache/zsh/theme" ]]; then
   fzf_theme="${$(< "$HOME/.cache/zsh/theme")//[[:space:]]}"
 fi
 
-FZF_COMMON_OPTS='--cycle --layout=reverse --border=rounded --margin=20%,20% --padding=0,1'
+typeset -g FZF_COMMON_OPTS='--cycle --layout=reverse --border=rounded --margin=20%,20% --padding=0,1'
 FZF_COMMON_OPTS+=' --bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden'
 FZF_COMMON_OPTS+=' --color=fg:-1,bg:-1,hl:magenta,hl+:blue,info:blue,prompt:blue'
 FZF_COMMON_OPTS+=',pointer:magenta,marker:blue,spinner:blue,border:blue,label:blue'

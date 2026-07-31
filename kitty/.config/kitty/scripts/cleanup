@@ -20,8 +20,8 @@ typeset -a keys=( ${(u)${${(f)jq_output}:#}:t} )
 typeset -a vals=( ${keys[@]/*/1} )
 typeset -A active_session_names=( ${keys:^vals} )
 
-typeset f base pid
 typeset -a to_delete=()
+typeset f="" base="" pid=""
 for f in "${SESSION_DIR}"/*(.ms+2,=ms+2oN); do
   base="${f:t}"
   if [[ -S "$f" && "$base" = kitty-[0-9]## ]]; then

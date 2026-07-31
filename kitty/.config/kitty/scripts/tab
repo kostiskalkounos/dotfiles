@@ -17,18 +17,20 @@ build_lines() {
   local -a tab_lines=( ${lines[@][2,-1]} )
 
   local tab_id is_current title disp cur_line="" line
+  local proc_cwd win_cwd final_cwd win_p proc_p
   local -a rest=() parts=()
   for line in "${tab_lines[@]}"; do
     parts=( "${(@ps:$tab:)line}" )
     tab_id="${parts[1]:-}"
     is_current="${parts[2]:-}"
     title="${parts[3]:-}"
-    local proc_cwd="${parts[4]:-}"
-    local win_cwd="${parts[5]:-}"
-    local final_cwd="${proc_cwd:-$win_cwd}"
+    proc_cwd="${parts[4]:-}"
+    win_cwd="${parts[5]:-}"
+    final_cwd="${proc_cwd:-$win_cwd}"
 
     if [[ -n "${win_cwd}" && -n "${proc_cwd}" ]]; then
-      local win_p="${win_cwd:A}" proc_p="${proc_cwd:A}"
+      win_p="${win_cwd:A}"
+      proc_p="${proc_cwd:A}"
       if [[ "${proc_p}/" == "${win_p%/}/"* ]]; then
         final_cwd="${win_cwd%/}${proc_p#${win_p%/}}"
       fi
