@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 set -euo pipefail
-setopt nullglob extendedglob bareglobqual
+setopt nullglob extendedglob bareglobqual globdots
 zmodload -F zsh/files b:rm b:mkdir
 
 export KITTY_BIN="/Applications/kitty.app/Contents/MacOS/kitten"
@@ -9,11 +9,11 @@ export SESSION_DIR="$HOME/.cache/kitty"
 
 typeset -gi COLUMN_WIDTH_FLOOR=30
 
-typeset -g launch_window_id="${KITTY_WINDOW_ID:-}"
-typeset -gr tab=$'\t'
-
 typeset -U path
 path=(/opt/homebrew/bin /usr/local/bin /usr/bin /bin /usr/sbin /sbin "${path[@]}")
+
+typeset -g launch_window_id="${KITTY_WINDOW_ID:-}"
+typeset -gr tab=$'\t'
 
 sanitize() {
   local s="${1//[^A-Za-z0-9._-]/_}"
@@ -259,7 +259,7 @@ if [[ -n "${FZF_DEFAULT_OPTS:-}" && -n "${ACTIVE_COLOR:-}" && -n "${RESET_COLOR:
   return 0
 fi
 
-fzf_theme="dark"
+typeset fzf_theme="dark"
 if [[ -f "$HOME/.cache/zsh/theme" ]]; then
   fzf_theme="${$(< "$HOME/.cache/zsh/theme")//[[:space:]]}"
 fi
