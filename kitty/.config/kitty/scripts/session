@@ -173,7 +173,9 @@ if (( ${#picker} == 0 )); then
 fi
 
 typeset picker_lines="${(F)picker}"
-run_kitty_fzf "${picker_lines}" "Select Session > " "" "" --no-sort
+
+build_fzf_header "enter" "launch"
+run_kitty_fzf "${picker_lines}" "Select Session > " "" "${REPLY_HEADER}" --no-sort
 
 typeset selected="${FZF_SELECTED}"
 typeset -i fzf_rc=$FZF_RC
