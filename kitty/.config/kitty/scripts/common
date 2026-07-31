@@ -170,6 +170,18 @@ reorder_lines_with_previous() {
   fi
 }
 
+build_fzf_header() {
+  local -a parts=()
+  local key action
+  while (( $# >= 2 )); do
+    key="$1"
+    action="$2"
+    shift 2
+    parts+=("${HEADER_BLUE}:: <${HEADER_YELLOW}${key}${HEADER_BLUE}> to ${HEADER_ORANGE}${action}${RESET_COLOR}")
+  done
+  REPLY_HEADER="${(j:   :)parts}"
+}
+
 run_kitty_fzf() {
   local input_lines="$1"
   local prompt_text="$2"
@@ -212,11 +224,8 @@ run_kitty_fzf_with_close() {
   local reload_cmd="${(qq)script_path} --close-and-list {-1} ${(qq)REPLY_CURRENT}"
   local bind_cmd="${close_key}:reload(${reload_cmd})"
 
-  local header="${HEADER_BLUE}:: <"
-  header+="${HEADER_YELLOW}${close_key}${HEADER_BLUE}>"
-  header+=" to ${HEADER_ORANGE}close${RESET_COLOR}"
-
-  run_kitty_fzf "${lines}" "${prompt_label}" "${bind_cmd}" "${header}" "$@"
+  build_fzf_header "${close_key}" "close"
+  run_kitty_fzf "${lines}" "${prompt_label}" "${bind_cmd}" "${REPLY_HEADER}" "$@"
 }
 
 trigger_cleanup() {
