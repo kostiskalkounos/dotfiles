@@ -18,7 +18,6 @@ build_lines() {
 
   local tab_id is_current title disp cur_line="" line
   local -a rest=() parts=()
-  local -i idx=0
   for line in "${tab_lines[@]}"; do
     parts=( "${(@ps:$tab:)line}" )
     tab_id="${parts[1]:-}"
@@ -35,9 +34,7 @@ build_lines() {
       fi
     fi
 
-    idx+=1
-    local title_part="${idx}: ${title}"
-    format_display_line "${title_part}" "${(D)final_cwd}"
+    format_display_line "${title}" "${(D)final_cwd}"
     disp="${REPLY_DISP}"
     if [[ "${is_current}" == "1" ]]; then
       cur_line="${ACTIVE_COLOR}${disp}${RESET_COLOR}${tab}${tab_id}"

@@ -4,17 +4,17 @@ source "${0:a:h}/common"
 
 [[ -t 0 ]] && exit 0
 
-json="$(</dev/stdin)"
+typeset json="$(</dev/stdin)"
 [[ -n "${json}" ]] || exit 0
 
 [[ -d "${SESSION_DIR}" ]] || exit 0
 
-cleanup_filter='
+typeset cleanup_filter='
   .[]?.tabs[]?.windows[]?
   | select(.session_name != null and .session_name != "")
   | .session_name
 '
-jq_output="$(jq -r "${cleanup_filter}" 2>/dev/null <<< "${json}")" || exit 0
+typeset jq_output="$(jq -r "${cleanup_filter}" 2>/dev/null <<< "${json}")" || exit 0
 
 typeset -a keys=( ${(u)${${(f)jq_output}:#}:t} )
 typeset -a vals=( ${keys[@]/*/1} )
