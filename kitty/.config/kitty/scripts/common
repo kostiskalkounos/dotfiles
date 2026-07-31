@@ -7,8 +7,7 @@ zmodload -F zsh/files b:rm b:mkdir
 export KITTY_BIN="/Applications/kitty.app/Contents/MacOS/kitten"
 export SESSION_DIR="$HOME/.cache/kitty"
 
-typeset -gi COLUMN_WIDTH_FLOOR=40
-typeset -gi FZF_TABSTOP=4
+typeset -gi COLUMN_WIDTH_FLOOR=30
 
 typeset -g launch_window_id="${KITTY_WINDOW_ID:-}"
 typeset -gr tab=$'\t'
@@ -20,6 +19,14 @@ sanitize() {
   local s="${1//[^A-Za-z0-9._-]/_}"
   local pattern="_##"
   REPLY="${s//$~pattern/_}"
+}
+
+format_display_line() {
+  local name="${1:-}"
+  local path_val="${2:-}"
+  local disp="${(r:COLUMN_WIDTH_FLOOR:)name}"
+  (( ${#name} > COLUMN_WIDTH_FLOOR )) && disp="${name}"
+  REPLY_DISP="${disp}${tab}${path_val}"
 }
 
 parse_fzf_header() {
@@ -184,7 +191,6 @@ run_kitty_fzf() {
     --with-nth=1..-2
     --prompt="${prompt_text}"
     --no-multi
-    --tabstop="${FZF_TABSTOP}"
   )
 
   [[ -n "${bind_action}" ]] && fzf_args+=( --bind="${bind_action}" )
