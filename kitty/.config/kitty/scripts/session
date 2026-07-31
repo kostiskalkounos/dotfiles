@@ -22,8 +22,8 @@ build_active_lines() {
     visited[$sname]=1
 
     local sname_part="${sname:t}"
-    local width=$(( ${#sname_part} > COLUMN_WIDTH_FLOOR ? ${#sname_part} : COLUMN_WIDTH_FLOOR ))
-    disp="${(r:width:)sname_part}${tab}${(D)pwd_dir}"
+    format_display_line "${sname_part}" "${(D)pwd_dir}"
+    disp="${REPLY_DISP}"
     if [[ -n "${cur}" && "${sname}" == "${cur}" ]]; then
       cur_line="${ACTIVE_COLOR}${disp}${RESET_COLOR}${tab}${sname}"
     else
