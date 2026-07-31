@@ -45,7 +45,7 @@ osascript -e 'tell app "System Events" to tell appearance preferences to set dar
 
 # 4. Hot-reload Tmux config
 pgrep tmux >/dev/null && {
-  tmux source-file $HOME/.tmux/{{THEME_LOWER}}.conf
+  [ -f "$HOME/.tmux/{{THEME_LOWER}}.conf" ] && tmux source-file "$HOME/.tmux/{{THEME_LOWER}}.conf"
   tmux list-clients -F '#{client_name}' 2>/dev/null | xargs -I {} tmux refresh-client -t '{}'
 } >/dev/null 2>&1 < /dev/null &!
 
@@ -78,9 +78,8 @@ pgrep tmux >/dev/null && {
 } >/dev/null 2>&1 < /dev/null &!
 ]=]
 
-local isDark = hs.host.interfaceStyle() == "Dark"
-
 Hyper:bind({}, "/", function()
+  local isDark = hs.host.interfaceStyle() == "Dark"
   isDark = not isDark
 
   local theme = isDark and "Dark" or "Light"
@@ -115,12 +114,7 @@ Hyper:bind({}, "/", function()
   local cmd = cmdTemplate:gsub("{{([%w_]+)}}", replacements)
 
   local zshTask
-  zshTask = hs.task.new("/bin/zsh", function(exitCode, stdErr)
-    if exitCode ~= 0 then
-      hs.log
-        .new("theme", "error")
-        :e("Zsh theme task failed with exit code " .. tostring(exitCode) .. ": " .. tostring(stdErr))
-    end
+  zshTask = hs.task.new("/bin/zsh", function()
     activeTasks[zshTask] = nil
   end, { "-c", cmd })
 
