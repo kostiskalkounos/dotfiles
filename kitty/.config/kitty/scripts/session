@@ -11,7 +11,7 @@ build_active_lines() {
 
   local -A visited
   local -a lines=()
-  local cur_line="" line sname pwd_dir disp
+  local cur_line="" line sname pwd_dir disp sname_part
   local -a parts=()
   for line in "${(f)active_sess}"; do
     parts=( "${(@ps:$tab:)line}" )
@@ -21,7 +21,7 @@ build_active_lines() {
     [[ -n "${visited[$sname]:-}" ]] && continue
     visited[$sname]=1
 
-    local sname_part="${sname:t}"
+    sname_part="${sname:t}"
     format_display_line "${sname_part}" "${(D)pwd_dir}"
     disp="${REPLY_DISP}"
     if [[ -n "${cur}" && "${sname}" == "${cur}" ]]; then
@@ -62,10 +62,13 @@ if [[ "${1:-}" == "--close-and-list" ]]; then
   exit 0
 fi
 
-typeset raw_ls_data=""
-typeset active_sessions_data=""
-typeset -a zipped active_sessions
 typeset -U paths=()
+typeset -a zipped=() active_sessions=()
+typeset -i kitty_fd=0 zoxide_fd=0
+typeset active_sessions_data=""
+typeset raw_ls_data=""
+typeset safe_base=""
+typeset zoxide_out=""
 
 typeset active_mode=false
 typeset close_mode=false
@@ -212,13 +215,13 @@ if [[ -n "${active_sessions_data}" ]]; then
     if (( ${#matched} )); then
       existing_session="${matched[1]%%${tab}*}"
     else
-      typeset line session_name pwd_dir
+      typeset line active_sname pwd_dir
       for line in "${(f)active_sessions_data}"; do
-        session_name="${line%%${tab}*}"
+        active_sname="${line%%${tab}*}"
         pwd_dir="${line#*${tab}}"
-        [[ -z "$session_name" || -z "$pwd_dir" ]] && continue
+        [[ -z "$active_sname" || -z "$pwd_dir" ]] && continue
         if [[ "${pwd_dir:A}" == "${real_target_abs}" ]]; then
-          existing_session="${session_name}"
+          existing_session="${active_sname}"
           break
         fi
       done
@@ -233,7 +236,7 @@ if [[ -n "${existing_session}" ]]; then
   exit 0
 fi
 
-typeset session_name="${safe_base}"
+typeset session_name="${safe_base:-root}"
 if session_exists "${session_name}"; then
   typeset parent_name="${real_target:h:t}"
   parent_name="${parent_name#.}"
