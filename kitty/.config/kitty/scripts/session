@@ -21,7 +21,7 @@ build_active_lines() {
     [[ -n "${visited[$sname]:-}" ]] && continue
     visited[$sname]=1
 
-    disp="${sname:t}  (${(D)pwd_dir})"
+    disp="${sname:t}${tab}${(D)pwd_dir}"
     if [[ -n "${cur}" && "${sname}" == "${cur}" ]]; then
       cur_line="${active_color}${disp}${reset_color}${tab}${sname}"
     else
@@ -117,7 +117,7 @@ if [[ "${active_mode}" == "true" || "${close_mode}" == "true" ]]; then
       exit 0
     fi
 
-    typeset selected_session="${FZF_SELECTED#*${tab}}"
+    typeset selected_session="${FZF_SELECTED##*${tab}}"
     "${KITTY_BIN}" @ action goto_session "${selected_session}"
     exit 0
   fi
@@ -180,7 +180,7 @@ if [[ $fzf_rc -ne 0 || -z "${selected}" ]]; then
   exit 0
 fi
 
-typeset selected_path="${selected#*${tab}}"
+typeset selected_path="${selected##*${tab}}"
 
 if [[ ! -d "${selected_path}" ]]; then
   echo "Directory not found: ${selected_path}"

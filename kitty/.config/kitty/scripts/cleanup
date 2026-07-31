@@ -16,7 +16,7 @@ cleanup_filter='
 '
 jq_output="$(jq -r "${cleanup_filter}" 2>/dev/null <<< "${json}")" || exit 0
 
-typeset -a keys=( ${(u)${(f)jq_output}:t} )
+typeset -a keys=( ${(u)${${(f)jq_output}:#}:t} )
 typeset -a vals=( ${keys[@]/*/1} )
 typeset -A active_session_names=( ${keys:^vals} )
 
