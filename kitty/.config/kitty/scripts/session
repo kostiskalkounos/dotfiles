@@ -23,7 +23,7 @@ build_active_lines() {
 
     local sname_part="${sname:t}"
     local width=$(( ${#sname_part} > COLUMN_WIDTH_FLOOR ? ${#sname_part} : COLUMN_WIDTH_FLOOR ))
-    disp="${FZF_PADDING}${(r:width:)sname_part}${tab}${(D)pwd_dir}"
+    disp="${(r:width:)sname_part}${tab}${(D)pwd_dir}"
     if [[ -n "${cur}" && "${sname}" == "${cur}" ]]; then
       cur_line="${ACTIVE_COLOR}${disp}${RESET_COLOR}${tab}${sname}"
     else
@@ -155,7 +155,7 @@ fi
 typeset p="" disp="" cur_line=""
 for p in "${paths[@]}"; do
   [[ -z "${p}" ]] && continue
-  disp="${FZF_PADDING}${(D)p}"
+  disp="${(D)p}"
   if [[ -n "${cur_dir}" && "${p}" == "${cur_dir}" ]]; then
     cur_line="${ACTIVE_COLOR}${disp}${RESET_COLOR}${tab}${p}"
   else
@@ -174,8 +174,7 @@ fi
 
 typeset picker_lines="${(F)picker}"
 
-build_fzf_header "enter" "launch"
-run_kitty_fzf "${picker_lines}" "Select Session > " "" "${REPLY_HEADER}" --no-sort
+run_kitty_fzf "${picker_lines}" "Select Session > " "" --no-sort
 
 typeset selected="${FZF_SELECTED}"
 typeset -i fzf_rc=$FZF_RC
