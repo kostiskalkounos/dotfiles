@@ -15,7 +15,6 @@ _set_dark_theme() {
   export NVIM_THEME=dark
   export BAT_THEME="Catppuccin Macchiato"
   export COMPLETION_HIGHLIGHT_COLOR="ma=1;48;2;54;58;79;38;2;255;255;255"
-  export PROMPT_INDICATOR="#8bd5ca"
 }
 
 _set_light_theme() {
@@ -25,7 +24,6 @@ _set_light_theme() {
   export NVIM_THEME=light
   export BAT_THEME="Catppuccin Latte"
   export COMPLETION_HIGHLIGHT_COLOR="ma=1;48;2;204;208;218;38;2;0;0;0"
-  export PROMPT_INDICATOR="#179299"
 }
 
 ZSH_CACHE_DIR="$HOME/.cache/zsh"
@@ -417,7 +415,7 @@ _update_git_branch() {
 add-zsh-hook precmd _update_git_branch
 
 PROMPT='%(!.%F{red}root %f.)%F{blue}%~%f ${__CURRENT_GIT_BRANCH}%(1j.%F{yellow}* %f.)
-%(?.%F{${PROMPT_INDICATOR}}.%F{red})❭%f '
+%(?.%F{green}.%F{red})❭%f '
 
 KITTY_CACHE_DIR="$HOME/.cache/kitty"
 [[ -d "$KITTY_CACHE_DIR" ]] || mkdir -p "$KITTY_CACHE_DIR"
