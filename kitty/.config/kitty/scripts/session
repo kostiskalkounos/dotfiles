@@ -21,9 +21,11 @@ build_active_lines() {
     [[ -n "${visited[$sname]:-}" ]] && continue
     visited[$sname]=1
 
-    disp="${sname:t}${tab}${(D)pwd_dir}"
+    local sname_part="${sname:t}"
+    local width=$(( ${#sname_part} > COLUMN_WIDTH_FLOOR ? ${#sname_part} : COLUMN_WIDTH_FLOOR ))
+    disp="${FZF_PADDING}${(r:width:)sname_part}${tab}${(D)pwd_dir}"
     if [[ -n "${cur}" && "${sname}" == "${cur}" ]]; then
-      cur_line="${active_color}${disp}${reset_color}${tab}${sname}"
+      cur_line="${ACTIVE_COLOR}${disp}${RESET_COLOR}${tab}${sname}"
     else
       lines+=("${disp}${tab}${sname}")
     fi
@@ -153,9 +155,9 @@ fi
 typeset p="" disp="" cur_line=""
 for p in "${paths[@]}"; do
   [[ -z "${p}" ]] && continue
-  disp="${(D)p}"
+  disp="${FZF_PADDING}${(D)p}"
   if [[ -n "${cur_dir}" && "${p}" == "${cur_dir}" ]]; then
-    cur_line="${active_color}${disp}${reset_color}${tab}${p}"
+    cur_line="${ACTIVE_COLOR}${disp}${RESET_COLOR}${tab}${p}"
   else
     zipped+=("${disp}${tab}${p}")
   fi

@@ -7,6 +7,10 @@ zmodload -F zsh/files b:rm b:mkdir
 export KITTY_BIN="/Applications/kitty.app/Contents/MacOS/kitten"
 export SESSION_DIR="$HOME/.cache/kitty"
 
+typeset -gi COLUMN_WIDTH_FLOOR=40
+typeset -gi FZF_TABSTOP=4
+typeset -gr FZF_PADDING="${(l:FZF_TABSTOP:: :):-}"
+
 typeset -g launch_window_id="${KITTY_WINDOW_ID:-}"
 typeset -gr tab=$'\t'
 
@@ -182,6 +186,7 @@ run_kitty_fzf() {
     --with-nth=1..-2
     --prompt="${prompt_text}"
     --no-multi
+    --tabstop="${FZF_TABSTOP}"
   )
 
   [[ -n "${custom_header}" ]] && fzf_args+=( --header="${custom_header}" )
@@ -207,9 +212,9 @@ run_kitty_fzf_with_close() {
   local reload_cmd="${(qq)script_path} --close-and-list {-1} ${(qq)REPLY_CURRENT}"
   local bind_cmd="${close_key}:reload(${reload_cmd})"
 
-  local header="${header_blue}:: <"
-  header+="${header_yellow}${close_key}${header_blue}>"
-  header+=" to ${header_orange}close${reset_color}"
+  local header="${HEADER_BLUE}:: <"
+  header+="${HEADER_YELLOW}${close_key}${HEADER_BLUE}>"
+  header+=" to ${HEADER_ORANGE}close${RESET_COLOR}"
 
   run_kitty_fzf "${lines}" "${prompt_label}" "${bind_cmd}" "${header}" "$@"
 }
@@ -251,7 +256,7 @@ has_active_processes() {
   fi
 }
 
-if [[ -n "${FZF_DEFAULT_OPTS:-}" && -n "${active_color:-}" && -n "${reset_color:-}" ]]; then
+if [[ -n "${FZF_DEFAULT_OPTS:-}" && -n "${ACTIVE_COLOR:-}" && -n "${RESET_COLOR:-}" ]]; then
   return 0
 fi
 
@@ -265,18 +270,18 @@ FZF_COMMON_OPTS+=' --bind=alt-k:up,alt-j:down,alt-p:up,alt-n:down --info=hidden'
 FZF_COMMON_OPTS+=' --color=fg:-1,bg:-1,hl:magenta,hl+:blue,info:blue,prompt:blue'
 FZF_COMMON_OPTS+=',pointer:magenta,marker:blue,spinner:blue,border:blue,label:blue'
 
-export reset_color=$'\033[0m'
+export RESET_COLOR=$'\033[0m'
 
 if [[ "${fzf_theme}" == "light" ]]; then
   export FZF_DEFAULT_OPTS="--color=light ${FZF_COMMON_OPTS} --color=fg+:black,bg+:#ccd0da,gutter:#eff1f5"
-  export active_color=$'\033[38;2;136;57;239m'
-  export header_blue=$'\033[38;2;30;102;245m'
-  export header_yellow=$'\033[38;2;223;142;29m'
-  export header_orange=$'\033[38;2;254;100;11m'
+  export ACTIVE_COLOR=$'\033[38;2;136;57;239m'
+  export HEADER_BLUE=$'\033[38;2;30;102;245m'
+  export HEADER_ORANGE=$'\033[38;2;254;100;11m'
+  export HEADER_YELLOW=$'\033[38;2;223;142;29m'
 else
   export FZF_DEFAULT_OPTS="--color=dark ${FZF_COMMON_OPTS} --color=fg+:white,bg+:#363a4f,gutter:#24273A"
-  export active_color=$'\033[38;2;198;160;246m'
-  export header_blue=$'\033[38;2;138;173;244m'
-  export header_yellow=$'\033[38;2;238;212;159m'
-  export header_orange=$'\033[38;2;245;169;127m'
+  export ACTIVE_COLOR=$'\033[38;2;198;160;246m'
+  export HEADER_BLUE=$'\033[38;2;138;173;244m'
+  export HEADER_ORANGE=$'\033[38;2;245;169;127m'
+  export HEADER_YELLOW=$'\033[38;2;238;212;159m'
 fi
