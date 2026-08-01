@@ -91,12 +91,19 @@ local global_statusline, local_statusline
 
 local bg_active_cache = nil
 local generated_icon_hls = {}
+local is_global_stl = o.laststatus == 3
 local is_insert_mode = false
 local mini_icons_module = nil
-local is_global_stl = o.laststatus == 3
+local redraw_pending = false
 
 local function redrawstatus()
-  nvim_command("redrawstatus")
+  if not redraw_pending then
+    redraw_pending = true
+    vim.schedule(function()
+      nvim_command("redrawstatus")
+      redraw_pending = false
+    end)
+  end
 end
 
 local function is_float(winid)
@@ -106,7 +113,11 @@ end
 local function refresh_hl_cache()
   local sl = nvim_get_hl(0, { name = "StatusLine", link = false })
   bg_active_cache = sl.bg
-  generated_icon_hls = {}
+  for hl_group, _ in pairs(generated_icon_hls) do
+    local active_hl_name = "StlIconActive_" .. hl_group
+    local icon_colors = nvim_get_hl(0, { name = hl_group, link = false })
+    nvim_set_hl(0, active_hl_name, { fg = icon_colors.fg, bg = bg_active_cache })
+  end
 end
 
 local function update_icon_cache(bufnr, c, defer_rebuild, force)
@@ -340,6 +351,7 @@ nvim_create_autocmd("FileType", {
       rebuild_active_string(c)
       rebuild_inactive_string(c)
     end
+    redrawstatus()
   end,
 })
 
@@ -356,6 +368,7 @@ nvim_create_autocmd("BufFilePost", {
       rebuild_active_string(c)
       rebuild_inactive_string(c)
     end
+    redrawstatus()
   end,
 })
 
@@ -370,11 +383,10 @@ nvim_create_autocmd({ "BufDelete", "BufWipeout" }, {
 nvim_create_autocmd("ColorScheme", {
   group = augroup,
   callback = function()
-    refresh_hl_cache()
-    for bufnr, c in pairs(cache) do
-      update_icon_cache(bufnr, c, false, true)
-    end
-    redrawstatus()
+    vim.schedule(function()
+      refresh_hl_cache()
+      redrawstatus()
+    end)
   end,
 })
 

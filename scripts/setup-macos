@@ -144,6 +144,9 @@ defaults write -g CGDisableCursorLocationMagnification -bool true
 defaults write com.apple.universalaccess closeViewScrollWheelToggle -bool true
 defaults write com.apple.universalaccess closeViewScrollWheelModifiersInt -int 524288
 
+# Hide Hammerspoon menu bar icon to keep the menu bar clean
+defaults write org.hammerspoon.Hammerspoon MJShowMenuIconKey -bool false
+
 # Prevent macOS from throttling/sleeping Hammerspoon background execution
 defaults write org.hammerspoon.Hammerspoon NSAppSleepDisabled -bool YES
 
@@ -250,6 +253,11 @@ defaults write com.apple.Safari "WebKitPreferences.developerExtrasEnabled" -bool
 
 # Safari: Show full website address in the Smart Search field
 defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
+
+# Set default search engine to DuckDuckGo (global and Safari-specific)
+defaults write -g NSPreferredWebServices -dict-add NSWebServicesProviderWebSearch '{ NSDefaultDisplayName = DuckDuckGo; NSProviderIdentifier = "com.duckduckgo"; }'
+defaults write com.apple.Safari SearchProviderShortName -string "DuckDuckGo"
+defaults write com.apple.Safari PrivateSearchProviderShortName -string "DuckDuckGo"
 
 # Screen Capture: Save screenshots to Downloads folder
 defaults write com.apple.screencapture location -string "${HOME}/Downloads"
