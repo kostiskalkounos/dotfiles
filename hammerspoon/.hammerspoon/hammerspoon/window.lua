@@ -11,7 +11,10 @@ local whitelist = {
 
 local function withFocused(fn)
   local win = window.focusedWindow()
-  if win then return fn(win) end
+
+  if win then
+    return fn(win)
+  end
 end
 
 local function focusScreen(iScreen)
@@ -22,13 +25,20 @@ local function focusScreen(iScreen)
       break
     end
   end
-  windowToFocus:focus()
+
+  if windowToFocus then
+    windowToFocus:focus()
+  end
 end
 
 local function moveWindowToDisplay(d)
   withFocused(function(win)
     local displays = screen.allScreens()
-    if not displays[d] then return end
+
+    if not displays[d] then
+      return
+    end
+
     win:moveToScreen(displays[d], false, true)
   end)
 end
@@ -65,7 +75,10 @@ end
 
 local function moveWindowToFraction(x1, y1, x2, y2, win)
   win = win or window.focusedWindow()
-  if not win then return end
+
+  if not win then
+    return
+  end
 
   local outerMargin = 3
   local innerMargin = outerMargin / 2
@@ -90,10 +103,8 @@ local function centerWindow()
   withFocused(function(win)
     local winFrame = win:frame()
     local screenFrame = win:screen():frame()
-
     local newX = screenFrame.x + (screenFrame.w - winFrame.w) / 2
     local newY = screenFrame.y + (screenFrame.h - winFrame.h) / 2
-
     win:setFrame(geometry.rect(newX, newY, winFrame.w, winFrame.h))
   end)
 end
@@ -104,7 +115,7 @@ local function maximizeWindows(x1, y1, x2, y2)
   for _, win in ipairs(allWindows) do
     local app = win:application()
 
-    if win:isStandard() and app and whitelist[app:name()] then
+    if win:isStandard() and app and whitelist[app:title()] then
       if x1 and y1 and x2 and y2 then
         moveWindowToFraction(x1, y1, x2, y2, win)
       else
@@ -123,7 +134,7 @@ local function focusWindowInDirection(direction)
     for _, w in ipairs(allWindows) do
       if w:screen() == focusedScreen then
         local app = w:application()
-        if app and whitelist[app:name()] then
+        if app and whitelist[app:title()] then
           table.insert(candidateWindows, w)
         end
       end
@@ -153,14 +164,17 @@ Hyper:bind({}, "]", function()
   end)
 end)
 
-Hyper:bind({ "alt" }, "1", function() moveWindowToDisplay(1) end)
-Hyper:bind({ "alt" }, "2", function() moveWindowToDisplay(2) end)
-Hyper:bind({ "alt" }, "3", function() moveWindowToDisplay(3) end)
+for i = 1, 3 do
+  Hyper:bind({ "alt" }, tostring(i), function()
+    moveWindowToDisplay(i)
+  end)
+end
 
 Hyper:bind({ "alt" }, "[", function()
   withFocused(function(win)
     local screenBefore = win:screen()
     win:moveOneScreenWest(false, true)
+
     if win:screen() == screenBefore then
       win:moveOneScreenEast(false, true)
     end
@@ -171,60 +185,110 @@ Hyper:bind({ "alt" }, "]", function()
   withFocused(function(win)
     local screenBefore = win:screen()
     win:moveOneScreenEast(false, true)
+
     if win:screen() == screenBefore then
       win:moveOneScreenWest(false, true)
     end
   end)
 end)
 
-Hyper:bind({}, ";", function() moveWindowToFraction(0, 0, 1, 1) end)
+Hyper:bind({}, ";", function()
+  moveWindowToFraction(0, 0, 1, 1)
+end)
 Hyper:bind({}, "'", function()
   withFocused(function(win)
     win:moveToUnit("[0,0,100,100]")
   end)
 end)
 
-Hyper:bind({}, "h", function() focusWindowInDirection("west") end)
-Hyper:bind({}, "j", function() focusWindowInDirection("south") end)
-Hyper:bind({}, "k", function() focusWindowInDirection("north") end)
-Hyper:bind({}, "l", function() focusWindowInDirection("east") end)
+Hyper:bind({}, "h", function()
+  focusWindowInDirection("west")
+end)
+Hyper:bind({}, "j", function()
+  focusWindowInDirection("south")
+end)
+Hyper:bind({}, "k", function()
+  focusWindowInDirection("north")
+end)
+Hyper:bind({}, "l", function()
+  focusWindowInDirection("east")
+end)
 
-Hyper:bind({ "cmd" }, "p", function() centerWindow() end)
-Hyper:bind({}, "p", function() moveWindowToFixedSize(1300, 810) end)
+Hyper:bind({ "cmd" }, "p", function()
+  centerWindow()
+end)
+Hyper:bind({}, "p", function()
+  moveWindowToFixedSize(1300, 810)
+end)
 
-Hyper:bind({ "alt" }, "p", function() moveWindowToFraction(0.33, 0, 0.67, 1) end)
-Hyper:bind({ "ctrl" }, "p", function() moveWindowToFraction(0, 0.33, 1, 0.67) end)
+Hyper:bind({ "alt" }, "p", function()
+  moveWindowToFraction(0.33, 0, 0.67, 1)
+end)
+Hyper:bind({ "ctrl" }, "p", function()
+  moveWindowToFraction(0, 0.33, 1, 0.67)
+end)
 
+Hyper:bind({ "cmd" }, "'", function()
+  maximizeWindows()
+end)
+Hyper:bind({ "cmd" }, ";", function()
+  maximizeWindows(0, 0, 1, 1)
+end)
 
-Hyper:bind({ "cmd" }, "'", function() maximizeWindows() end)
-Hyper:bind({ "cmd" }, ";", function() maximizeWindows(0, 0, 1, 1) end)
+local fractionalLayouts = {
+  -- Half Screen (cmd + hjkl)
+  { modifiers = { "cmd" }, key = "h", rect = { 0, 0, 0.5, 1 } },
+  { modifiers = { "cmd" }, key = "j", rect = { 0, 0.5, 1, 1 } },
+  { modifiers = { "cmd" }, key = "k", rect = { 0, 0, 1, 0.5 } },
+  { modifiers = { "cmd" }, key = "l", rect = { 0.5, 0, 1, 1 } },
 
-Hyper:bind({ "cmd" }, "h", function() moveWindowToFraction(0, 0, 0.5, 1) end)
-Hyper:bind({ "cmd" }, "j", function() moveWindowToFraction(0, 0.5, 1, 1) end)
-Hyper:bind({ "cmd" }, "k", function() moveWindowToFraction(0, 0, 1, 0.5) end)
-Hyper:bind({ "cmd" }, "l", function() moveWindowToFraction(0.5, 0, 1, 1) end)
+  -- Two-Thirds Screen (cmd + yuio)
+  { modifiers = { "cmd" }, key = "y", rect = { 0, 0, 0.67, 1 } },
+  { modifiers = { "cmd" }, key = "u", rect = { 0, 0.33, 1, 1 } },
+  { modifiers = { "cmd" }, key = "i", rect = { 0, 0, 1, 0.67 } },
+  { modifiers = { "cmd" }, key = "o", rect = { 0.33, 0, 1, 1 } },
 
-Hyper:bind({ "cmd" }, "y", function() moveWindowToFraction(0, 0, 0.67, 1) end)
-Hyper:bind({ "cmd" }, "u", function() moveWindowToFraction(0, 0.33, 1, 1) end)
-Hyper:bind({ "cmd" }, "i", function() moveWindowToFraction(0, 0, 1, 0.67) end)
-Hyper:bind({ "cmd" }, "o", function() moveWindowToFraction(0.33, 0, 1, 1) end)
+  -- One-Third Screen (alt + yuio)
+  { modifiers = { "alt" }, key = "y", rect = { 0, 0, 0.33, 1 } },
+  { modifiers = { "alt" }, key = "u", rect = { 0, 0.67, 1, 1 } },
+  { modifiers = { "alt" }, key = "i", rect = { 0, 0, 1, 0.33 } },
+  { modifiers = { "alt" }, key = "o", rect = { 0.67, 0, 1, 1 } },
 
-Hyper:bind({}, "Left", function() moveWindowToFraction(0, 0, 0.5, 0.5) end)
-Hyper:bind({}, "Down", function() moveWindowToFraction(0, 0.5, 0.5, 1) end)
-Hyper:bind({}, "Up", function() moveWindowToFraction(0.5, 0, 1, 0.5) end)
-Hyper:bind({}, "Right", function() moveWindowToFraction(0.5, 0.5, 1, 1) end)
+  -- Quadrants (arrow keys)
+  { modifiers = {}, key = "Left", rect = { 0, 0, 0.5, 0.5 } },
+  { modifiers = {}, key = "Down", rect = { 0, 0.5, 0.5, 1 } },
+  { modifiers = {}, key = "Up", rect = { 0.5, 0, 1, 0.5 } },
+  { modifiers = {}, key = "Right", rect = { 0.5, 0.5, 1, 1 } },
+}
 
-Hyper:bind({ "alt" }, "y", function() moveWindowToFraction(0, 0, 0.33, 1) end)
-Hyper:bind({ "alt" }, "u", function() moveWindowToFraction(0, 0.67, 1, 1) end)
-Hyper:bind({ "alt" }, "i", function() moveWindowToFraction(0, 0, 1, 0.33) end)
-Hyper:bind({ "alt" }, "o", function() moveWindowToFraction(0.67, 0, 1, 1) end)
+for _, layout in ipairs(fractionalLayouts) do
+  Hyper:bind(layout.modifiers, layout.key, function()
+    moveWindowToFraction(layout.rect[1], layout.rect[2], layout.rect[3], layout.rect[4])
+  end)
+end
 
-Hyper:bind({}, "y", function() resizeWindow(-20, 0) end)
-Hyper:bind({}, "u", function() resizeWindow(0, 20) end)
-Hyper:bind({}, "i", function() resizeWindow(0, -20) end)
-Hyper:bind({}, "o", function() resizeWindow(20, 0) end)
+-- Resizing (yuio keys)
+local resizeDirections = {
+  y = { -20, 0 },
+  u = { 0, 20 },
+  i = { 0, -20 },
+  o = { 20, 0 },
+}
+for key, delta in pairs(resizeDirections) do
+  Hyper:bind({}, key, function()
+    resizeWindow(delta[1], delta[2])
+  end)
+end
 
-Hyper:bind({ "ctrl" }, "h", function() moveWindow(-20, 0) end)
-Hyper:bind({ "ctrl" }, "j", function() moveWindow(0, 20) end)
-Hyper:bind({ "ctrl" }, "k", function() moveWindow(0, -20) end)
-Hyper:bind({ "ctrl" }, "l", function() moveWindow(20, 0) end)
+-- Moving (ctrl + hjkl)
+local moveDirections = {
+  h = { -20, 0 },
+  j = { 0, 20 },
+  k = { 0, -20 },
+  l = { 20, 0 },
+}
+for key, delta in pairs(moveDirections) do
+  Hyper:bind({ "ctrl" }, key, function()
+    moveWindow(delta[1], delta[2])
+  end)
+end

@@ -1,16 +1,24 @@
 local application = require("hs.application")
 
-Hyper:bind({}, "a", function() application.launchOrFocus("kitty") end)
-Hyper:bind({}, "c", function() application.launchOrFocus("Calendar") end)
-Hyper:bind({}, "d", function() application.launchOrFocus("Helium") end)
-Hyper:bind({}, "e", function() application.launchOrFocus("Mail") end)
-Hyper:bind({}, "f", function() application.launchOrFocus("Finder") end)
-Hyper:bind({}, "g", function() application.launchOrFocus("System Settings") end)
-Hyper:bind({}, "q", function() application.launchOrFocus("Signal") end)
-Hyper:bind({}, "r", function() application.launchOrFocus("Notes") end)
-Hyper:bind({}, "s", function() application.launchOrFocus("Safari") end)
-Hyper:bind({}, "t", function() application.launchOrFocus("Calculator") end)
-Hyper:bind({}, "v", function() application.launchOrFocus("Reminders") end)
-Hyper:bind({}, "w", function() application.launchOrFocus("WhatsApp") end)
-Hyper:bind({}, "x", function() application.launchOrFocus("App Store") end)
-Hyper:bind({}, "z", function() application.launchOrFocus("Activity Monitor") end)
+local standardApps = {
+  a = "kitty",
+  c = "Calendar",
+  d = "Helium",
+  e = "Mail",
+  f = "Finder",
+  g = "System Settings",
+  q = "Signal",
+  r = "Notes",
+  s = "Safari",
+  t = "Calculator",
+  v = "Reminders",
+  w = "WhatsApp",
+  x = "App Store",
+  z = "Activity Monitor",
+}
+
+for key, appName in pairs(standardApps) do
+  Hyper:bind({}, key, function()
+    application.launchOrFocus(appName)
+  end)
+end
