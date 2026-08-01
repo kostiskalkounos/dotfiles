@@ -38,7 +38,14 @@ nvim_create_autocmd("WinLeave", {
 nvim_create_autocmd("WinEnter", {
   group = g,
   callback = function()
-    nvim_set_option_value("cursorline", true, { win = 0 })
+    local winid = api.nvim_get_current_win()
+    if api.nvim_win_get_config(winid).relative == "" then
+      local bufnr = api.nvim_win_get_buf(winid)
+      local buftype = api.nvim_get_option_value("buftype", { buf = bufnr })
+      if buftype == "" then
+        nvim_set_option_value("cursorline", true, { win = 0 })
+      end
+    end
   end,
 })
 
