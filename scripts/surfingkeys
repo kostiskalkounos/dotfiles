@@ -1,0 +1,14 @@
+api.map('>_q', 'q');
+api.map('>_w', 'w');
+api.map('>_E', 'E');
+api.map('>_F', 'F');
+api.map('>_B', 'B');
+
+api.map('q', '>_E');
+api.map('e', '>_q');
+api.map('Q', '>_B');
+api.map('W', '>_F');
+api.map('E', '>_w');
+
+api.map('w', 'R');
+api.map('F', 'gf');
