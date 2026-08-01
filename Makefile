@@ -25,3 +25,7 @@ bat-cache :
 	else \
 		echo "bat theme cache up to date"; \
 	fi
+
+.PHONY : macos
+macos :
+	@./scripts/setup-macos

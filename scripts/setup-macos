@@ -1,0 +1,326 @@
+#!/usr/bin/env zsh
+
+set -e
+
+# Ask for administrator password upfront
+echo "Prompting for sudo password upfront..."
+sudo -v
+
+# Keep-alive: update existing `sudo` time stamp until script finishes
+while true; do sudo -n true || true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+KEEP_ALIVE_PID=$!
+trap 'kill $KEEP_ALIVE_PID 2>/dev/null' EXIT
+
+echo "Applying macOS configurations..."
+
+# ==========================================
+# 1. Homebrew & Packages
+# ==========================================
+echo "Configuring Homebrew & Packages..."
+
+# Initialize Homebrew environment if not already in PATH but exists on disk
+if ! command -v brew &>/dev/null; then
+  if [[ -f "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
+fi
+
+if ! command -v brew &>/dev/null; then
+  echo "Homebrew not found. Installing..."
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  if [[ -f "/opt/homebrew/bin/brew" ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
+else
+  echo "Homebrew is already installed."
+fi
+
+# Run brew bundle
+SCRIPT_DIR="${0:A:h}"
+BREWFILE_PATH="${SCRIPT_DIR}/Brewfile"
+
+if [[ -f "$BREWFILE_PATH" ]]; then
+  echo "Installing packages from $BREWFILE_PATH..."
+  brew bundle --file="$BREWFILE_PATH"
+else
+  echo "Error: Brewfile not found at $BREWFILE_PATH"
+  exit 1
+fi
+
+
+# ==========================================
+# 2. Keyboard, Mouse, Trackpad & Languages
+# ==========================================
+echo "Configuring Input, Keyboard, Trackpad & Languages..."
+
+# Speed up key repeat rate to maximum speeds
+defaults write -g KeyRepeat -int 1
+defaults write -g InitialKeyRepeat -int 10
+
+# Enable Full Keyboard Navigation (allows using Tab to focus controls in dialogs)
+defaults write -g AppleKeyboardUIMode -int 2
+
+# Disable input source popup
+defaults write kCFPreferencesAnyApplication TSMLanguageIndicatorEnabled -bool false
+
+# Set preferred languages (English, Greek/el-GR)
+defaults write -g AppleLanguages -array "en-US" "el-GR"
+
+# Set system locale/region (English US, Greece region)
+defaults write -g AppleLocale -string "en_US@rg=grzzzz"
+
+# Enable Tap to Click (tap instead of physically pressing down on the trackpad)
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+
+# Enable Natural Scrolling (scrolling content moves in the same direction as fingers)
+defaults write -g com.apple.swipescrolldirection -bool true
+
+# Set cursor tracking (speed) scale to 3 for both mouse and trackpad
+defaults write -g com.apple.mouse.scaling -float 3
+defaults write -g com.apple.trackpad.scaling -float 3
+
+# Enable two-finger secondary (right) click
+defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
+
+# Enable trackpad pinch to zoom, rotate, and smart zoom (double-tap)
+defaults write com.apple.AppleMultitouchTrackpad TrackpadPinch -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadPinch -bool true
+defaults write com.apple.AppleMultitouchTrackpad TrackpadRotate -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRotate -bool true
+defaults write com.apple.AppleMultitouchTrackpad TrackpadTwoFingerDoubleTapGesture -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFingerDoubleTapGesture -bool true
+
+# Enable swipe between pages (back/forward page transitions with scroll/swipe)
+defaults write -g AppleEnableSwipeNavigateWithScrolls -bool true
+defaults write -g AppleEnableMouseSwipeNavigateWithScrolls -bool true
+
+# Enable swipe from right edge for Notification Center
+defaults write com.apple.AppleMultitouchTrackpad TrackpadTwoFingerFromRightEdgeSwipeGesture -int 3
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadTwoFingerFromRightEdgeSwipeGesture -int 3
+
+# Disable three-finger drag and three-finger tap lookup (using Force Click instead)
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool false
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool false
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerTapGesture -int 0
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerTapGesture -int 0
+
+# Set trackpad swipe gestures (Mission Control / App Exposé / Swipe between Desktops)
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerHorizSwipeGesture -int 2
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerHorizSwipeGesture -int 2
+defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerHorizSwipeGesture -int 2
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerHorizSwipeGesture -int 2
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerVertSwipeGesture -int 2
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerVertSwipeGesture -int 2
+defaults write com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture -int 2
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadFourFingerVertSwipeGesture -int 2
+
+
+# ==========================================
+# 3. Global UI, Window Management & Zoom
+# ==========================================
+echo "Configuring Global UI and Window Management..."
+
+# Enable window dragging (Cmd+Ctrl+Click anywhere on the window to drag)
+defaults write -g NSWindowShouldDragOnGesture -bool true
+defaults write -g NSWindowShouldDragOnGestureFeedback -bool false
+
+# Double-click a window's title bar to "Fill" (Maximize) the window
+defaults write -g AppleActionOnDoubleClick -string "Fill"
+
+# Set scrollbar paging behavior (clicking scrollbar jumps directly to clicked spot)
+defaults write -g AppleScrollerPagingBehavior -int 1
+
+# Prefer tabs only when manually requested when opening documents
+defaults write -g AppleWindowTabbingMode -string "manual"
+
+# Disable shake mouse pointer to locate (prevents cursor from growing huge when shaken)
+defaults write -g CGDisableCursorLocationMagnification -bool true
+
+# Enable Zoom via scroll wheel while holding Option key
+# Modifier keys: 262144 (Control), 524288 (Option), 1048576 (Command)
+defaults write com.apple.universalaccess closeViewScrollWheelToggle -bool true
+defaults write com.apple.universalaccess closeViewScrollWheelModifiersInt -int 524288
+
+# Hide Hammerspoon menu bar icon to keep the menu bar clean
+defaults write org.hammerspoon.Hammerspoon MJShowMenuIconKey -bool false
+
+# Prevent macOS from throttling/sleeping Hammerspoon background execution
+defaults write org.hammerspoon.Hammerspoon NSAppSleepDisabled -bool YES
+
+
+# ==========================================
+# 4. Finder
+# ==========================================
+echo "Configuring Finder..."
+
+# Keep folders on top when sorting by name (both in Finder windows and on Desktop)
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+defaults write com.apple.finder _FXSortFoldersFirstOnDesktop -bool true
+
+# Show all filename extensions in Finder
+defaults write -g AppleShowAllExtensions -bool true
+
+# Disable warning when changing a file extension
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+# Use Icon View as the preferred layout in Finder
+defaults write com.apple.finder FXPreferredViewStyle -string "icnv"
+
+# Show path bar at the bottom of Finder windows
+defaults write com.apple.finder ShowPathbar -bool true
+
+# Hide status bar in Finder windows
+defaults write com.apple.finder ShowStatusBar -bool false
+
+# Show external hard drives on desktop
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+
+# Hide internal hard drives on desktop
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
+
+# Show removable media on desktop
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+
+# Set default Finder search scope to current folder (SCcf)
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+
+# Set default Finder window location to open in Downloads folder
+defaults write com.apple.finder NewWindowTarget -string "PfLo"
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Downloads/"
+
+# Avoid creating .DS_Store files on network or USB volumes
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+
+# ==========================================
+# 5. Dock & Mission Control
+# ==========================================
+echo "Configuring Dock & Mission Control..."
+
+# Autohide the Dock
+defaults write com.apple.dock autohide -bool true
+
+# Enable Dock magnification and set the max magnified size to 65
+defaults write com.apple.dock magnification -bool true
+defaults write com.apple.dock largesize -int 65
+
+# Minimize windows into their application's icon instead of a separate Dock icon
+defaults write com.apple.dock minimize-to-application -bool true
+
+# Do not automatically rearrange Spaces based on most recent use (keep desktop orders fixed)
+defaults write com.apple.dock mru-spaces -bool false
+
+# Speed up Mission Control animations
+defaults write com.apple.dock expose-animation-duration -float 0.1
+
+# Do not show recent applications in the Dock
+defaults write com.apple.dock "show-recents" -bool false
+
+# Set the Dock icon size to 47 pixels
+defaults write com.apple.dock tilesize -int 47
+
+# Enable App Exposé trackpad gesture
+defaults write com.apple.dock showAppExposeGestureEnabled -bool true
+
+
+# ==========================================
+# 6. Menu Bar & Clock
+# ==========================================
+echo "Configuring Menu Bar and Clock..."
+
+# Clock options: Show AM/PM, Day of Week, but no Date
+defaults write com.apple.menuextra.clock ShowAMPM -bool true
+defaults write com.apple.menuextra.clock ShowDayOfWeek -bool true
+defaults write com.apple.menuextra.clock ShowDate -bool false
+
+
+# ==========================================
+# 7. Safari & System Applications
+# ==========================================
+echo "Configuring Safari and other Applications..."
+
+# Safari: Disable opening "safe" files automatically after downloading
+defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
+
+# Safari: Enable Develop menu and Web Inspector
+defaults write com.apple.Safari IncludeDevelopMenu -bool true
+defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
+defaults write com.apple.Safari "WebKitPreferences.developerExtrasEnabled" -bool true
+
+# Safari: Show full website address in the Smart Search field
+defaults write com.apple.Safari ShowFullURLInSmartSearchField -bool true
+
+# Set default search engine to DuckDuckGo (global and Safari-specific)
+defaults write -g NSPreferredWebServices -dict-add NSWebServicesProviderWebSearch '{ NSDefaultDisplayName = DuckDuckGo; NSProviderIdentifier = "com.duckduckgo"; }'
+defaults write com.apple.Safari SearchProviderShortName -string "DuckDuckGo"
+defaults write com.apple.Safari PrivateSearchProviderShortName -string "DuckDuckGo"
+
+# Screen Capture: Save screenshots to Downloads folder
+defaults write com.apple.screencapture location -string "${HOME}/Downloads"
+
+# Activity Monitor: Show all processes by default
+defaults write com.apple.ActivityMonitor ShowCategory -int 100
+
+
+# ==========================================
+# 8. Privacy
+# ==========================================
+echo "Configuring System Privacy..."
+
+# Disable Apple personalized ads
+defaults write com.apple.AdLib allowApplePersonalizedAdvertising -bool false
+
+
+# ==========================================
+# 9. Shells & Environment
+# ==========================================
+echo "Setting up shells..."
+
+# Detect Homebrew-installed shells
+BREW_PREFIX=$(brew --prefix 2>/dev/null || true)
+ZSH_PATH="${BREW_PREFIX:+$BREW_PREFIX/bin/zsh}"
+BASH_PATH="${BREW_PREFIX:+$BREW_PREFIX/bin/bash}"
+[[ -f "$ZSH_PATH" ]] || ZSH_PATH=""
+[[ -f "$BASH_PATH" ]] || BASH_PATH=""
+
+# Add Homebrew Zsh to /etc/shells if not already present
+if [[ -n "$ZSH_PATH" ]] && ! grep -qxF "$ZSH_PATH" /etc/shells 2>/dev/null; then
+  echo "Adding Homebrew Zsh ($ZSH_PATH) to /etc/shells..."
+  echo "$ZSH_PATH" | sudo tee -a /etc/shells > /dev/null
+fi
+
+# Add Homebrew Bash to /etc/shells if not already present
+if [[ -n "$BASH_PATH" ]] && ! grep -qxF "$BASH_PATH" /etc/shells 2>/dev/null; then
+  echo "Adding Homebrew Bash ($BASH_PATH) to /etc/shells..."
+  echo "$BASH_PATH" | sudo tee -a /etc/shells > /dev/null
+fi
+
+# Read actual macOS Open Directory default shell
+CURRENT_DEFAULT_SHELL=$(dscl . -read "/Users/$USER" UserShell 2>/dev/null | awk '{print $2}') || true
+
+# Only change default shell if Homebrew Zsh exists and is not currently the default
+if [[ -n "$ZSH_PATH" ]] && [[ "$CURRENT_DEFAULT_SHELL" != "$ZSH_PATH" ]]; then
+  echo "Changing default shell to Homebrew Zsh ($ZSH_PATH)..."
+  sudo chsh -s "$ZSH_PATH" "$USER"
+elif [[ -n "$ZSH_PATH" ]]; then
+  echo "Default shell is already set to Homebrew Zsh."
+else
+  echo "Homebrew Zsh not found, keeping current default shell ($CURRENT_DEFAULT_SHELL)."
+fi
+
+
+# ==========================================
+# 10. Restart Services
+# ==========================================
+echo "Applying changes by restarting background services..."
+killall cfprefsd || true
+for app in "Finder" "Dock" "SystemUIServer"; do
+  killall "$app" &>/dev/null || true
+done
+
+echo "macOS configuration complete!"
+echo "Note: Some changes require a logout or reboot to take full effect."
