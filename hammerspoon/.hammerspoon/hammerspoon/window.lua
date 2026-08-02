@@ -170,13 +170,11 @@ Hyper:bind({}, "]", function()
 end)
 
 for i = 1, 3 do
-  Hyper:bind({ "cmd" }, tostring(i), function()
+  local numStr = tostring(i)
+  Hyper:bind({ "cmd" }, numStr, function()
     moveWindowToDisplay(i)
   end)
-end
-
-for i = 1, 3 do
-  Hyper:bind({}, tostring(i), function()
+  Hyper:bind({}, numStr, function()
     focusScreenByIndex(i)
   end)
 end
