@@ -1,5 +1,3 @@
-local unpack = table.unpack or unpack
-
 local function normalizeURL(url)
   if type(url) ~= "string" then
     return nil
@@ -31,9 +29,6 @@ end
 local currentThemeIsDark = isSystemDark()
 
 hs.console.darkMode(currentThemeIsDark)
-if hs.preferencesDarkMode then
-  hs.preferencesDarkMode(currentThemeIsDark)
-end
 
 local function syncWallpapers()
   local normalizedTarget = THEME_CONFIGS[currentThemeIsDark].wallpaper
@@ -51,9 +46,7 @@ local function syncWallpapers()
   end
 end
 
-hs.timer.doAfter(0, function()
-  syncWallpapers()
-end)
+hs.timer.doAfter(0, syncWallpapers)
 
 local activeTasks = {}
 local currentZshTask = nil
@@ -145,9 +138,6 @@ local function applyTheme(isDark)
 
   local cfg = THEME_CONFIGS[isDark]
   hs.console.darkMode(isDark)
-  if hs.preferencesDarkMode then
-    hs.preferencesDarkMode(isDark)
-  end
 
   syncWallpapers()
 
@@ -204,24 +194,10 @@ local function debounce(delay, fn)
     end
     t = hs.timer.doAfter(delay, function()
       t = nil
-      fn(unpack(args, 1, n))
+      fn(table.unpack(args, 1, n))
     end)
   end
 end
-
-activeTasks.spaceWatcher = hs.spaces.watcher.new(debounce(0.35, syncWallpapers))
-activeTasks.spaceWatcher:start()
-
-activeTasks.screenWatcher = hs.screen.watcher.new(debounce(2.0, syncWallpapers))
-activeTasks.screenWatcher:start()
-
-activeTasks.themeWatcher = hs.distributednotifications.new(
-  debounce(0.1, function()
-    applyTheme(isSystemDark())
-  end),
-  "AppleInterfaceThemeChangedNotification"
-)
-activeTasks.themeWatcher:start()
 
 activeTasks.caffeinateWatcher = hs.caffeinate.watcher.new(function(event)
   if event == hs.caffeinate.watcher.systemDidWake then
@@ -232,6 +208,20 @@ activeTasks.caffeinateWatcher = hs.caffeinate.watcher.new(function(event)
 end)
 activeTasks.caffeinateWatcher:start()
 
+activeTasks.screenWatcher = hs.screen.watcher.new(debounce(2.0, syncWallpapers))
+activeTasks.screenWatcher:start()
+
+activeTasks.spaceWatcher = hs.spaces.watcher.new(debounce(0.35, syncWallpapers))
+activeTasks.spaceWatcher:start()
+
+activeTasks.themeWatcher = hs.distributednotifications.new(
+  debounce(0.1, function()
+    applyTheme(isSystemDark())
+  end),
+  "AppleInterfaceThemeChangedNotification"
+)
+activeTasks.themeWatcher:start()
+
 local oldShutdown = hs.shutdownCallback
 hs.shutdownCallback = function()
   if oldShutdown then
@@ -240,20 +230,10 @@ hs.shutdownCallback = function()
 
   for k, v in pairs(activeTasks) do
     if type(k) == "userdata" then
-      pcall(function()
-        local method = k["terminate"]
-        if type(method) == "function" then
-          method(k)
-        end
-      end)
+      pcall(k["terminate"], k)
     end
     if type(v) == "userdata" then
-      pcall(function()
-        local method = v["stop"]
-        if type(method) == "function" then
-          method(v)
-        end
-      end)
+      pcall(v["stop"], v)
     end
   end
 end
