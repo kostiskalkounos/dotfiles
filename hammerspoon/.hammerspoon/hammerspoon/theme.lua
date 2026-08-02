@@ -1,5 +1,3 @@
-local logger = hs.logger.new("theme", "info")
-
 local unpack = table.unpack or unpack
 
 local function normalizeURL(url)
@@ -37,8 +35,8 @@ if hs.preferencesDarkMode then
   hs.preferencesDarkMode(currentThemeIsDark)
 end
 
-local function syncWallpapers(targetURL)
-  local normalizedTarget = normalizeURL(targetURL) or THEME_CONFIGS[currentThemeIsDark].wallpaper
+local function syncWallpapers()
+  local normalizedTarget = THEME_CONFIGS[currentThemeIsDark].wallpaper
 
   if not normalizedTarget then
     return
@@ -53,9 +51,13 @@ local function syncWallpapers(targetURL)
   end
 end
 
-syncWallpapers()
+hs.timer.doAfter(0, function()
+  syncWallpapers()
+end)
 
 local activeTasks = {}
+local currentZshTask = nil
+
 local cmdTemplate = [=[
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
@@ -135,6 +137,10 @@ local function applyTheme(isDark)
     return
   end
 
+  if currentZshTask and currentZshTask:isRunning() then
+    currentZshTask:terminate()
+  end
+
   currentThemeIsDark = isDark
 
   local cfg = THEME_CONFIGS[isDark]
@@ -142,6 +148,7 @@ local function applyTheme(isDark)
   if hs.preferencesDarkMode then
     hs.preferencesDarkMode(isDark)
   end
+
   syncWallpapers()
 
   local runOsascript = actualDark ~= isDark
@@ -160,13 +167,15 @@ local function applyTheme(isDark)
   })
 
   local zshTask
-  zshTask = hs.task.new("/bin/zsh", function(exitCode, _, stdErr)
+  zshTask = hs.task.new("/bin/zsh", function()
     activeTasks[zshTask] = nil
-    if exitCode ~= 0 then
-      logger.ef("Theme transition task failed with code %d: %s", exitCode, stdErr or "")
+
+    if currentZshTask == zshTask then
+      currentZshTask = nil
     end
   end, { "-c", cmd })
 
+  currentZshTask = zshTask
   activeTasks[zshTask] = true
 
   local ok, success = pcall(function()
@@ -174,8 +183,10 @@ local function applyTheme(isDark)
   end)
   if not (ok and success) then
     activeTasks[zshTask] = nil
+    if currentZshTask == zshTask then
+      currentZshTask = nil
+    end
     currentThemeIsDark = isSystemDark()
-    logger.ef("Failed to initiate theme transition shell process.")
   end
 end
 
@@ -198,26 +209,35 @@ local function debounce(delay, fn)
   end
 end
 
-activeTasks.spaceWatcher = hs.spaces.watcher.new(debounce(0.15, syncWallpapers))
+activeTasks.spaceWatcher = hs.spaces.watcher.new(debounce(0.35, syncWallpapers))
 activeTasks.spaceWatcher:start()
 
-activeTasks.screenWatcher = hs.screen.watcher.new(debounce(0.5, syncWallpapers))
+activeTasks.screenWatcher = hs.screen.watcher.new(debounce(2.0, syncWallpapers))
 activeTasks.screenWatcher:start()
 
-activeTasks.themeWatcher = hs.distributednotifications.new(function()
-  applyTheme(isSystemDark())
-end, "AppleInterfaceThemeChangedNotification")
+activeTasks.themeWatcher = hs.distributednotifications.new(
+  debounce(0.1, function()
+    applyTheme(isSystemDark())
+  end),
+  "AppleInterfaceThemeChangedNotification"
+)
 activeTasks.themeWatcher:start()
 
 activeTasks.caffeinateWatcher = hs.caffeinate.watcher.new(function(event)
   if event == hs.caffeinate.watcher.systemDidWake then
-    applyTheme(isSystemDark())
-    syncWallpapers()
+    hs.timer.doAfter(3.0, function()
+      applyTheme(isSystemDark())
+    end)
   end
 end)
 activeTasks.caffeinateWatcher:start()
 
+local oldShutdown = hs.shutdownCallback
 hs.shutdownCallback = function()
+  if oldShutdown then
+    pcall(oldShutdown)
+  end
+
   for k, v in pairs(activeTasks) do
     if type(k) == "userdata" then
       pcall(function()

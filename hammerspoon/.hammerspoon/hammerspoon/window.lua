@@ -4,6 +4,7 @@ local window = require("hs.window")
 
 local whitelist = {
   ["Brave Browser"] = true,
+  ["Helium"] = true,
   ["IntelliJ IDEA"] = true,
   ["Safari"] = true,
   ["kitty"] = true,
@@ -11,7 +12,6 @@ local whitelist = {
 
 local function withFocused(fn)
   local win = window.focusedWindow()
-
   if win then
     return fn(win)
   end
@@ -25,20 +25,25 @@ local function focusScreen(iScreen)
       break
     end
   end
-
   if windowToFocus then
     windowToFocus:focus()
   end
 end
 
+local function focusScreenByIndex(d)
+  local displays = screen.allScreens()
+  if not displays[d] then
+    return
+  end
+  focusScreen(displays[d])
+end
+
 local function moveWindowToDisplay(d)
   withFocused(function(win)
     local displays = screen.allScreens()
-
     if not displays[d] then
       return
     end
-
     win:moveToScreen(displays[d], false, true)
   end)
 end
@@ -75,7 +80,6 @@ end
 
 local function moveWindowToFraction(x1, y1, x2, y2, win)
   win = win or window.focusedWindow()
-
   if not win then
     return
   end
@@ -103,49 +107,50 @@ local function centerWindow()
   withFocused(function(win)
     local winFrame = win:frame()
     local screenFrame = win:screen():frame()
+
     local newX = screenFrame.x + (screenFrame.w - winFrame.w) / 2
     local newY = screenFrame.y + (screenFrame.h - winFrame.h) / 2
+
     win:setFrame(geometry.rect(newX, newY, winFrame.w, winFrame.h))
   end)
 end
 
 local function maximizeWindows(x1, y1, x2, y2)
-  local allWindows = window.visibleWindows()
+  local activeScreen = screen.mainScreen()
 
-  for _, win in ipairs(allWindows) do
+  for _, win in ipairs(window.visibleWindows()) do
     local app = win:application()
+    local appName = app and app:title()
 
-    if win:isStandard() and app and whitelist[app:title()] then
+    if appName and whitelist[appName] and win:isStandard() and win:screen() == activeScreen then
       if x1 and y1 and x2 and y2 then
         moveWindowToFraction(x1, y1, x2, y2, win)
       else
-        win:maximize()
+        win:maximize(0)
       end
     end
   end
 end
 
+local directionMethods = {
+  east = "focusWindowEast",
+  west = "focusWindowWest",
+  north = "focusWindowNorth",
+  south = "focusWindowSouth",
+}
+
 local function focusWindowInDirection(direction)
   withFocused(function(win)
-    local allWindows = window.visibleWindows()
-    local focusedScreen = win:screen()
     local candidateWindows = {}
 
-    for _, w in ipairs(allWindows) do
-      if w:screen() == focusedScreen then
-        local app = w:application()
-        if app and whitelist[app:title()] then
-          table.insert(candidateWindows, w)
-        end
+    for _, w in ipairs(win:otherWindowsSameScreen()) do
+      local app = w:application()
+      local appName = app and app:title()
+
+      if appName and whitelist[appName] then
+        table.insert(candidateWindows, w)
       end
     end
-
-    local directionMethods = {
-      east = "focusWindowEast",
-      west = "focusWindowWest",
-      north = "focusWindowNorth",
-      south = "focusWindowSouth",
-    }
 
     local method = directionMethods[direction]
     win[method](win, candidateWindows)
@@ -165,27 +170,31 @@ Hyper:bind({}, "]", function()
 end)
 
 for i = 1, 3 do
-  Hyper:bind({ "alt" }, tostring(i), function()
+  Hyper:bind({ "cmd" }, tostring(i), function()
     moveWindowToDisplay(i)
   end)
 end
 
-Hyper:bind({ "alt" }, "[", function()
+for i = 1, 3 do
+  Hyper:bind({}, tostring(i), function()
+    focusScreenByIndex(i)
+  end)
+end
+
+Hyper:bind({ "cmd" }, "[", function()
   withFocused(function(win)
     local screenBefore = win:screen()
     win:moveOneScreenWest(false, true)
-
     if win:screen() == screenBefore then
       win:moveOneScreenEast(false, true)
     end
   end)
 end)
 
-Hyper:bind({ "alt" }, "]", function()
+Hyper:bind({ "cmd" }, "]", function()
   withFocused(function(win)
     local screenBefore = win:screen()
     win:moveOneScreenEast(false, true)
-
     if win:screen() == screenBefore then
       win:moveOneScreenWest(false, true)
     end
