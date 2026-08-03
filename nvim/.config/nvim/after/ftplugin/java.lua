@@ -20,7 +20,7 @@ local function djb2(str)
 end
 
 local workspace_hash = djb2(root_dir)
-local workspace_dir = home .. "/.local/share/nvim/jdtls-workspace/" .. project_name .. "-" .. workspace_hash
+local workspace_dir = home .. "/.local/share/nvim/jdtls/" .. project_name .. "-" .. workspace_hash
 
 if not _G._jdtls_bundles then
   local bundles = {}

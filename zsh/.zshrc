@@ -292,12 +292,6 @@ TRAPUSR2() {
   fi
 }
 
-jt() {
-  unset -f jt
-  source "$HOME/Dotfiles/scripts/jt"
-  jt "$@"
-}
-
 j() {
   unset JAVA_HOME
   if [[ -n "$1" ]]; then
@@ -317,6 +311,12 @@ j() {
     export JAVA_HOME=$(/usr/libexec/java_home)
   fi
   java -version
+}
+
+jt() {
+  unset -f jt
+  source "$HOME/Dotfiles/scripts/jt"
+  jt "$@"
 }
 
 __CURRENT_GIT_BRANCH=""
