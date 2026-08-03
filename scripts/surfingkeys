@@ -1,14 +1,22 @@
 api.map('>_q', 'q');
 api.map('>_w', 'w');
+api.map('>_t', 't');
+
 api.map('>_E', 'E');
-api.map('>_F', 'F');
 api.map('>_B', 'B');
+api.map('>_R', 'R');
+api.map('>_T', 'T');
+api.map('>_F', 'F');
+api.map('>_gf', 'gf');
 
 api.map('q', '>_E');
 api.map('e', '>_q');
+api.map('t', '>_T');
+
 api.map('Q', '>_B');
 api.map('W', '>_F');
 api.map('E', '>_w');
+api.map('T', '>_t');
 
-api.map('w', 'R');
-api.map('F', 'gf');
+api.map('w', '>_R');
+api.map('F', '>_gf');
