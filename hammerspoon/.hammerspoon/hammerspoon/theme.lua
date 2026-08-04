@@ -120,12 +120,6 @@ pgrep tmux >/dev/null && {
     cp -f $HOME/.config/kitty/{{THEME_LOWER}}-theme.auto.conf $HOME/.config/kitty/current-theme.conf && pkill -USR1 -x kitty
   } &
 
-  {
-    for f in "$HOME/.local/state/nvim"/*.log(N); do
-      [ -f "$f" ] && : > "$f"
-    done
-  } &
-
   wait
 } >/dev/null 2>&1 < /dev/null
 ]=]
