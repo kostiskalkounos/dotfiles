@@ -2,6 +2,13 @@ local geometry = require("hs.geometry")
 local screen = require("hs.screen")
 local window = require("hs.window")
 
+local allScreens = screen.allScreens
+local desktop = window.desktop
+local focusedWindow = window.focusedWindow
+local mainScreen = screen.mainScreen
+local orderedWindows = window.orderedWindows
+local visibleWindows = window.visibleWindows
+
 local whitelist = {
   ["Brave Browser"] = true,
   ["Helium"] = true,
@@ -11,15 +18,15 @@ local whitelist = {
 }
 
 local function withFocused(fn)
-  local win = window.focusedWindow()
+  local win = focusedWindow()
   if win then
     return fn(win)
   end
 end
 
 local function focusScreen(iScreen)
-  local windowToFocus = window.desktop()
-  for _, win in ipairs(window.orderedWindows()) do
+  local windowToFocus = desktop()
+  for _, win in ipairs(orderedWindows()) do
     if win:screen() == iScreen then
       windowToFocus = win
       break
@@ -31,55 +38,43 @@ local function focusScreen(iScreen)
 end
 
 local function focusScreenByIndex(d)
-  local displays = screen.allScreens()
+  local displays = allScreens()
   if not displays[d] then
     return
   end
   focusScreen(displays[d])
 end
 
-local function moveWindowToDisplay(d)
-  withFocused(function(win)
-    local displays = screen.allScreens()
-    if not displays[d] then
-      return
-    end
-    win:moveToScreen(displays[d], false, true)
-  end)
+local function moveWindowScreenWestWithWrap(win)
+  local screenBefore = win:screen()
+  win:moveOneScreenWest(false, true)
+  if win:screen() == screenBefore then
+    win:moveOneScreenEast(false, true)
+  end
 end
 
-local function resizeWindow(deltaX, deltaY)
-  withFocused(function(win)
-    local frame = win:frame()
-    frame.w = frame.w + deltaX
-    frame.h = frame.h + deltaY
-
-    win:setFrame(frame)
-  end)
+local function moveWindowScreenEastWithWrap(win)
+  local screenBefore = win:screen()
+  win:moveOneScreenEast(false, true)
+  if win:screen() == screenBefore then
+    win:moveOneScreenWest(false, true)
+  end
 end
 
-local function moveWindow(deltaX, deltaY)
-  withFocused(function(win)
-    local frame = win:frame()
-    frame.x = frame.x + deltaX
-    frame.y = frame.y + deltaY
+local function moveWindowToFixedSize(width, height, win)
+  win = win or focusedWindow()
+  if not win then
+    return
+  end
+  local frame = win:screen():frame()
+  local x = (frame.w - width) / 2 + frame.x
+  local y = (frame.h - height) / 2 + frame.y
 
-    win:setFrame(frame)
-  end)
-end
-
-local function moveWindowToFixedSize(width, height)
-  withFocused(function(win)
-    local frame = win:screen():frame()
-    local x = (frame.w - width) / 2 + frame.x
-    local y = (frame.h - height) / 2 + frame.y
-
-    win:setFrame({ x = x, y = y, w = width, h = height })
-  end)
+  win:setFrame({ x = x, y = y, w = width, h = height })
 end
 
 local function moveWindowToFraction(x1, y1, x2, y2, win)
-  win = win or window.focusedWindow()
+  win = win or focusedWindow()
   if not win then
     return
   end
@@ -103,30 +98,44 @@ local function moveWindowToFraction(x1, y1, x2, y2, win)
   win:setFrame(newFrame)
 end
 
-local function centerWindow()
-  withFocused(function(win)
-    local winFrame = win:frame()
-    local screenFrame = win:screen():frame()
-
-    local newX = screenFrame.x + (screenFrame.w - winFrame.w) / 2
-    local newY = screenFrame.y + (screenFrame.h - winFrame.h) / 2
-
-    win:setFrame(geometry.rect(newX, newY, winFrame.w, winFrame.h))
-  end)
+local function centerWindow(win)
+  win:centerOnScreen(nil, true)
 end
 
-local function maximizeWindows(x1, y1, x2, y2)
-  local activeScreen = screen.mainScreen()
+local function makeResizer(deltaX, deltaY)
+  return function(win)
+    local frame = win:frame()
+    frame.w = frame.w + deltaX
+    frame.h = frame.h + deltaY
 
-  for _, win in ipairs(window.visibleWindows()) do
-    local app = win:application()
-    local appName = app and app:title()
+    win:setFrame(frame)
+  end
+end
 
-    if appName and whitelist[appName] and win:isStandard() and win:screen() == activeScreen then
-      if x1 and y1 and x2 and y2 then
-        moveWindowToFraction(x1, y1, x2, y2, win)
-      else
-        win:maximize(0)
+local function makeMover(deltaX, deltaY)
+  return function(win)
+    local frame = win:frame()
+    frame.x = frame.x + deltaX
+    frame.y = frame.y + deltaY
+
+    win:setFrame(frame)
+  end
+end
+
+local function makeMaximizer(x1, y1, x2, y2)
+  return function()
+    local activeScreen = mainScreen()
+
+    for _, win in ipairs(visibleWindows()) do
+      local app = win:application()
+      local appName = app and app:title()
+
+      if appName and whitelist[appName] and win:isStandard() and win:screen() == activeScreen then
+        if x1 and y1 and x2 and y2 then
+          moveWindowToFraction(x1, y1, x2, y2, win)
+        else
+          win:maximize()
+        end
       end
     end
   end
@@ -139,8 +148,12 @@ local directionMethods = {
   south = "focusWindowSouth",
 }
 
-local function focusWindowInDirection(direction)
-  withFocused(function(win)
+local function makeDirectionFocuser(direction)
+  return function()
+    local win = focusedWindow()
+    if not win then
+      return
+    end
     local candidateWindows = {}
 
     for _, w in ipairs(win:otherWindowsSameScreen()) do
@@ -154,93 +167,95 @@ local function focusWindowInDirection(direction)
 
     local method = directionMethods[direction]
     win[method](win, candidateWindows)
-  end)
+  end
+end
+
+local function focusPreviousScreen(win)
+  focusScreen(win:screen():previous())
+end
+
+local function focusNextScreen(win)
+  focusScreen(win:screen():next())
+end
+
+local function makeDisplayMover(d)
+  return function()
+    local win = focusedWindow()
+    if not win then
+      return
+    end
+    local displays = allScreens()
+    if not displays[d] then
+      return
+    end
+    win:moveToScreen(displays[d], false, true)
+  end
+end
+
+local function makeScreenFocuser(d)
+  return function()
+    focusScreenByIndex(d)
+  end
+end
+
+local function maximizeToUnit(win)
+  win:moveToUnit("[0,0,100,100]")
+end
+
+local function makeFractionMover(x1, y1, x2, y2)
+  return function()
+    moveWindowToFraction(x1, y1, x2, y2)
+  end
+end
+
+local function makeFixedSizeMover(width, height)
+  return function()
+    moveWindowToFixedSize(width, height)
+  end
 end
 
 Hyper:bind({}, "[", function()
-  withFocused(function(win)
-    focusScreen(win:screen():previous())
-  end)
+  withFocused(focusPreviousScreen)
 end)
 
 Hyper:bind({}, "]", function()
-  withFocused(function(win)
-    focusScreen(win:screen():next())
-  end)
+  withFocused(focusNextScreen)
 end)
 
-for i = 1, 3 do
-  local numStr = tostring(i)
-  Hyper:bind({ "cmd" }, numStr, function()
-    moveWindowToDisplay(i)
-  end)
-  Hyper:bind({}, numStr, function()
-    focusScreenByIndex(i)
-  end)
-end
+Hyper:bind({ "alt" }, "[", function()
+  withFocused(moveWindowScreenWestWithWrap)
+end)
+Hyper:bind({ "alt" }, "]", function()
+  withFocused(moveWindowScreenEastWithWrap)
+end)
 
 Hyper:bind({ "cmd" }, "[", function()
-  withFocused(function(win)
-    local screenBefore = win:screen()
-    win:moveOneScreenWest(false, true)
-    if win:screen() == screenBefore then
-      win:moveOneScreenEast(false, true)
-    end
-  end)
+  withFocused(moveWindowScreenWestWithWrap)
 end)
-
 Hyper:bind({ "cmd" }, "]", function()
-  withFocused(function(win)
-    local screenBefore = win:screen()
-    win:moveOneScreenEast(false, true)
-    if win:screen() == screenBefore then
-      win:moveOneScreenWest(false, true)
-    end
-  end)
+  withFocused(moveWindowScreenEastWithWrap)
 end)
 
-Hyper:bind({}, ";", function()
-  moveWindowToFraction(0, 0, 1, 1)
-end)
+Hyper:bind({}, ";", makeFractionMover(0, 0, 1, 1))
 Hyper:bind({}, "'", function()
-  withFocused(function(win)
-    win:moveToUnit("[0,0,100,100]")
-  end)
+  withFocused(maximizeToUnit)
 end)
 
-Hyper:bind({}, "h", function()
-  focusWindowInDirection("west")
-end)
-Hyper:bind({}, "j", function()
-  focusWindowInDirection("south")
-end)
-Hyper:bind({}, "k", function()
-  focusWindowInDirection("north")
-end)
-Hyper:bind({}, "l", function()
-  focusWindowInDirection("east")
-end)
+Hyper:bind({}, "h", makeDirectionFocuser("west"))
+Hyper:bind({}, "j", makeDirectionFocuser("south"))
+Hyper:bind({}, "k", makeDirectionFocuser("north"))
+Hyper:bind({}, "l", makeDirectionFocuser("east"))
 
 Hyper:bind({ "cmd" }, "p", function()
-  centerWindow()
+  withFocused(centerWindow)
 end)
-Hyper:bind({}, "p", function()
-  moveWindowToFixedSize(1300, 810)
-end)
+Hyper:bind({}, "p", makeFixedSizeMover(1300, 810))
 
-Hyper:bind({ "alt" }, "p", function()
-  moveWindowToFraction(0.33, 0, 0.67, 1)
-end)
-Hyper:bind({ "ctrl" }, "p", function()
-  moveWindowToFraction(0, 0.33, 1, 0.67)
-end)
+Hyper:bind({ "alt" }, "p", makeFractionMover(0.33, 0, 0.67, 1))
+Hyper:bind({ "ctrl" }, "p", makeFractionMover(0, 0.33, 1, 0.67))
 
-Hyper:bind({ "cmd" }, "'", function()
-  maximizeWindows()
-end)
-Hyper:bind({ "cmd" }, ";", function()
-  maximizeWindows(0, 0, 1, 1)
-end)
+Hyper:bind({ "cmd" }, "'", makeMaximizer())
+Hyper:bind({ "cmd" }, ";", makeMaximizer(0, 0, 1, 1))
 
 local fractionalLayouts = {
   -- Half Screen (cmd + hjkl)
@@ -269,9 +284,11 @@ local fractionalLayouts = {
 }
 
 for _, layout in ipairs(fractionalLayouts) do
-  Hyper:bind(layout.modifiers, layout.key, function()
-    moveWindowToFraction(layout.rect[1], layout.rect[2], layout.rect[3], layout.rect[4])
-  end)
+  Hyper:bind(
+    layout.modifiers,
+    layout.key,
+    makeFractionMover(layout.rect[1], layout.rect[2], layout.rect[3], layout.rect[4])
+  )
 end
 
 -- Resizing (yuio keys)
@@ -282,8 +299,9 @@ local resizeDirections = {
   o = { 20, 0 },
 }
 for key, delta in pairs(resizeDirections) do
+  local resizer = makeResizer(delta[1], delta[2])
   Hyper:bind({}, key, function()
-    resizeWindow(delta[1], delta[2])
+    withFocused(resizer)
   end)
 end
 
@@ -295,7 +313,14 @@ local moveDirections = {
   l = { 20, 0 },
 }
 for key, delta in pairs(moveDirections) do
+  local mover = makeMover(delta[1], delta[2])
   Hyper:bind({ "ctrl" }, key, function()
-    moveWindow(delta[1], delta[2])
+    withFocused(mover)
   end)
+end
+
+for i = 1, 3 do
+  local numStr = tostring(i)
+  Hyper:bind({ "cmd" }, numStr, makeDisplayMover(i))
+  Hyper:bind({}, numStr, makeScreenFocuser(i))
 end

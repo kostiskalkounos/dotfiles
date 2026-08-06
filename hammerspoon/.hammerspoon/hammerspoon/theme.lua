@@ -1,3 +1,14 @@
+local caffeinate = hs.caffeinate
+local configdir = hs.configdir
+local console = hs.console
+local distributednotifications = hs.distributednotifications
+local fs = hs.fs
+local host = hs.host
+local screen = hs.screen
+local spaces = hs.spaces
+local task = hs.task
+local timer = hs.timer
+
 local function normalizeURL(url)
   if type(url) ~= "string" then
     return nil
@@ -11,24 +22,24 @@ local THEME_CONFIGS = {
     signal = "USR1",
     plutil = "Default",
     btop = "tokyo-storm",
-    wallpaper = normalizeURL(hs.fs.urlFromPath(hs.configdir .. "/wallpapers/catalina.jpg")),
+    wallpaper = normalizeURL(fs.urlFromPath(configdir .. "/wallpapers/catalina.jpg")),
   },
   [false] = {
     name = "Light",
     signal = "USR2",
     plutil = "Default Light",
     btop = "kanagawa-lotus",
-    wallpaper = normalizeURL(hs.fs.urlFromPath(hs.configdir .. "/wallpapers/forest.jpg")),
+    wallpaper = normalizeURL(fs.urlFromPath(configdir .. "/wallpapers/forest.jpg")),
   },
 }
 
 local function isSystemDark()
-  return hs.host.interfaceStyle() == "Dark"
+  return host.interfaceStyle() == "Dark"
 end
 
 local currentThemeIsDark = isSystemDark()
 
-hs.console.darkMode(currentThemeIsDark)
+console.darkMode(currentThemeIsDark)
 
 local function syncWallpapers()
   local normalizedTarget = THEME_CONFIGS[currentThemeIsDark].wallpaper
@@ -37,7 +48,7 @@ local function syncWallpapers()
     return
   end
 
-  for _, s in ipairs(hs.screen.allScreens()) do
+  for _, s in ipairs(screen.allScreens()) do
     pcall(function()
       if normalizeURL(s:desktopImageURL()) ~= normalizedTarget then
         s:desktopImageURL(normalizedTarget)
@@ -46,10 +57,7 @@ local function syncWallpapers()
   end
 end
 
-hs.timer.doAfter(0, syncWallpapers)
-
-local activeTasks = {}
-local currentZshTask = nil
+timer.doAfter(0, syncWallpapers)
 
 local cmdTemplate = [=[
 export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
@@ -124,6 +132,9 @@ pgrep tmux >/dev/null && {
 } >/dev/null 2>&1 < /dev/null
 ]=]
 
+local activeTasks = {}
+local currentZshTask = nil
+
 local function applyTheme(isDark)
   local actualDark = isSystemDark()
   if currentThemeIsDark == isDark and actualDark == isDark then
@@ -137,7 +148,7 @@ local function applyTheme(isDark)
   currentThemeIsDark = isDark
 
   local cfg = THEME_CONFIGS[isDark]
-  hs.console.darkMode(isDark)
+  console.darkMode(isDark)
 
   syncWallpapers()
 
@@ -157,7 +168,7 @@ local function applyTheme(isDark)
   })
 
   local zshTask
-  zshTask = hs.task.new("/bin/zsh", function()
+  zshTask = task.new("/bin/zsh", function()
     activeTasks[zshTask] = nil
 
     if currentZshTask == zshTask then
@@ -192,29 +203,33 @@ local function debounce(delay, fn)
     if t then
       t:stop()
     end
-    t = hs.timer.doAfter(delay, function()
+    t = timer.doAfter(delay, function()
       t = nil
       fn(table.unpack(args, 1, n))
     end)
   end
 end
 
-activeTasks.caffeinateWatcher = hs.caffeinate.watcher.new(function(event)
-  if event == hs.caffeinate.watcher.systemDidWake then
-    hs.timer.doAfter(3.0, function()
+activeTasks.caffeinateWatcher = caffeinate.watcher.new(function(event)
+  if event == caffeinate.watcher.systemDidWake then
+    if activeTasks.wakeTimer then
+      activeTasks.wakeTimer:stop()
+    end
+    activeTasks.wakeTimer = timer.doAfter(3.0, function()
+      activeTasks.wakeTimer = nil
       applyTheme(isSystemDark())
     end)
   end
 end)
 activeTasks.caffeinateWatcher:start()
 
-activeTasks.screenWatcher = hs.screen.watcher.new(debounce(2.0, syncWallpapers))
+activeTasks.screenWatcher = screen.watcher.new(debounce(2.0, syncWallpapers))
 activeTasks.screenWatcher:start()
 
-activeTasks.spaceWatcher = hs.spaces.watcher.new(debounce(0.35, syncWallpapers))
+activeTasks.spaceWatcher = spaces.watcher.new(debounce(0.35, syncWallpapers))
 activeTasks.spaceWatcher:start()
 
-activeTasks.themeWatcher = hs.distributednotifications.new(
+activeTasks.themeWatcher = distributednotifications.new(
   debounce(0.1, function()
     applyTheme(isSystemDark())
   end),

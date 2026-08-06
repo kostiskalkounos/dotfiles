@@ -35,11 +35,15 @@ local appBindings = {
   },
 }
 
+local function makeAppLauncher(target)
+  return function()
+    launchOrFocus(target)
+  end
+end
+
 for _, binding in ipairs(appBindings) do
   local mods = binding.mods or {}
   for key, target in pairs(binding.apps) do
-    Hyper:bind(mods, key, function()
-      launchOrFocus(target)
-    end)
+    Hyper:bind(mods, key, makeAppLauncher(target))
   end
 end
