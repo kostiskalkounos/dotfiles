@@ -318,35 +318,77 @@ jt() {
   jt "$@"
 }
 
+__CACHED_GITDIR=""
+__CACHED_PWD=""
 __CURRENT_GIT_BRANCH=""
+
+zmodload -F zsh/stat b:zstat 2>/dev/null
+typeset -g -i __HAS_ZSTAT=$(( $+builtins[zstat] ))
 
 _update_git_branch() {
   local gitdir=""
-  local dir="${PWD:A}"
+  local -i resolved=0
 
-  while [[ "$dir" != "/" && ! -e "$dir/.git" ]]; do
-    dir="${dir:h}"
-  done
-  if [[ "$dir" != "/" ]]; then
-    gitdir="$dir/.git"
-  elif [[ -e "/.git" ]]; then
-    gitdir="/.git"
+  if [[ "$PWD" == "$__CACHED_PWD" ]]; then
+    gitdir="$__CACHED_GITDIR"
+    if [[ -z "$gitdir" && -e ".git" ]]; then
+      gitdir=".git"
+    else
+      resolved=1
+    fi
+  else
+    local dir="${PWD:A}"
+
+    local initial_device
+    if (( __HAS_ZSTAT )); then
+      local -a stats
+      zstat -A stats +device "$dir" 2>/dev/null
+      initial_device=$stats[1]
+    fi
+
+    local parent_device
+    local -a pstats
+    local parent_dir
+    while [[ "$dir" != "/" && ! -e "$dir/.git" ]]; do
+      parent_dir="${dir:h}"
+
+      if (( __HAS_ZSTAT )); then
+        pstats=()
+        zstat -A pstats +device "$parent_dir" 2>/dev/null
+        parent_device=$pstats[1]
+        if [[ -n "$parent_device" && "$parent_device" != "$initial_device" ]]; then
+          break
+        fi
+      fi
+
+      dir="$parent_dir"
+    done
+    if [[ "$dir" != "/" && -e "$dir/.git" ]]; then
+      gitdir="$dir/.git"
+    elif [[ -e "/.git" ]]; then
+      gitdir="/.git"
+    fi
   fi
 
-  if [[ -n "$gitdir" && -f "$gitdir" ]]; then
-    local line
-    line=$(<"$gitdir") 2>/dev/null
-    if [[ "$line" = gitdir:\ * ]]; then
-      local rel_gitdir="${line#gitdir: }"
-      if [[ "$rel_gitdir" = /* ]]; then
-        gitdir="$rel_gitdir"
-      else
-        gitdir="${gitdir:h}/$rel_gitdir"
+  if (( ! resolved )); then
+    if [[ -n "$gitdir" && -f "$gitdir" ]]; then
+      local line
+      line=$(<"$gitdir") 2>/dev/null
+      if [[ "$line" = gitdir:\ * ]]; then
+        local rel_gitdir="${line#gitdir: }"
+        if [[ "$rel_gitdir" = /* ]]; then
+          gitdir="$rel_gitdir"
+        else
+          gitdir="${gitdir:h}/$rel_gitdir"
+        fi
+      fi
+      if [[ ! -d "$gitdir" ]]; then
+        gitdir=""
       fi
     fi
-    if [[ ! -d "$gitdir" ]]; then
-      gitdir=""
-    fi
+
+    __CACHED_GITDIR="$gitdir"
+    __CACHED_PWD="$PWD"
   fi
 
   if [[ -z "$gitdir" ]]; then
@@ -357,48 +399,81 @@ _update_git_branch() {
 
   local head_content
   head_content=$(<"$gitdir/HEAD") 2>/dev/null
+  if [[ -z "$head_content" ]]; then
+    __CURRENT_GIT_BRANCH=""
+    psvar[1]=""
+    return
+  fi
   local branch=""
 
-  local rebase_dir=""
-  if [[ -e "$gitdir/rebase-merge" ]]; then
-    rebase_dir="$gitdir/rebase-merge"
-  elif [[ -e "$gitdir/rebase-apply" ]]; then
-    rebase_dir="$gitdir/rebase-apply"
-  fi
+  local -a states
+  states=( "$gitdir"/(rebase-merge|rebase-apply|MERGE_HEAD|CHERRY_PICK_HEAD|REVERT_HEAD|BISECT_LOG)(N:t) )
 
-  if [[ -n "$rebase_dir" ]]; then
-    local op="rebase"
-    if [[ "$rebase_dir" = */rebase-apply && -e "$rebase_dir/applying" ]]; then
-      op="am"
+  if (( $#states )); then
+    local rebase_dir=""
+    local op=""
+    local step=""
+    local total=""
+
+    if (( ${states[(I)rebase-merge]} )); then
+      rebase_dir="$gitdir/rebase-merge"
+      if [[ -f "$rebase_dir/interactive" ]]; then
+        op="REBASE-i"
+      else
+        op="REBASE-m"
+      fi
+      step=$(<"$rebase_dir/msgnum") 2>/dev/null
+      total=$(<"$rebase_dir/end") 2>/dev/null
+    elif (( ${states[(I)rebase-apply]} )); then
+      rebase_dir="$gitdir/rebase-apply"
+      if [[ -f "$rebase_dir/rebasing" ]]; then
+        op="REBASE"
+      elif [[ -f "$rebase_dir/applying" ]]; then
+        op="AM"
+      else
+        op="AM/REBASE"
+      fi
+      step=$(<"$rebase_dir/next") 2>/dev/null
+      total=$(<"$rebase_dir/last") 2>/dev/null
     fi
 
-    local head_name
-    head_name=$(<"$rebase_dir/head-name") 2>/dev/null
-    if [[ "$head_name" = refs/heads/* ]]; then
-      branch="${op}|${head_name#refs/heads/}"
-    else
-      if [[ "$head_content" = ref:\ refs/heads/* ]]; then
-        branch="${op}|${head_content#ref: refs/heads/}"
-      elif [[ -n "$head_content" ]]; then
-        branch="${op}|${head_content:0:7}"
+    if [[ -n "$rebase_dir" ]]; then
+      local head_name
+      head_name=$(<"$rebase_dir/head-name") 2>/dev/null
+      if [[ "$head_name" = refs/heads/* ]]; then
+        branch="${head_name#refs/heads/}"
       fi
     fi
-  else
+  fi
+
+  if [[ -z "$branch" ]]; then
     if [[ "$head_content" = ref:\ refs/heads/* ]]; then
       branch="${head_content#ref: refs/heads/}"
+    elif [[ "$head_content" = ref:\ * ]]; then
+      branch="${head_content#ref: }"
     elif [[ -n "$head_content" ]]; then
-      branch="${head_content:0:7}"
+      branch="$head_content"
     fi
   fi
 
-  if [[ -e "$gitdir/MERGE_HEAD" ]]; then
-    branch="${branch}|MERGING"
-  elif [[ -e "$gitdir/CHERRY_PICK_HEAD" ]]; then
-    branch="${branch}|CHERRY-PICKING"
-  elif [[ -e "$gitdir/REVERT_HEAD" ]]; then
-    branch="${branch}|REVERTING"
-  elif [[ -e "$gitdir/BISECT_LOG" ]]; then
-    branch="${branch}|BISECTING"
+  if (( $#states )); then
+    if [[ -n "$op" ]]; then
+      if [[ -n "$step" && -n "$total" ]]; then
+        branch="${branch}|${op} ${step}/${total}"
+      else
+        branch="${branch}|${op}"
+      fi
+    fi
+
+    if (( ${states[(I)MERGE_HEAD]} )); then
+      branch="${branch}|MERGING"
+    elif (( ${states[(I)CHERRY_PICK_HEAD]} )); then
+      branch="${branch}|CHERRY-PICKING"
+    elif (( ${states[(I)REVERT_HEAD]} )); then
+      branch="${branch}|REVERTING"
+    elif (( ${states[(I)BISECT_LOG]} )); then
+      branch="${branch}|BISECTING"
+    fi
   fi
 
   branch="${branch%$'\r'}"
