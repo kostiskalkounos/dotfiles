@@ -1,6 +1,6 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  event = "UIEnter",
+  lazy = false,
   build = ":TSUpdate",
   config = function()
     local ts = require("nvim-treesitter")
