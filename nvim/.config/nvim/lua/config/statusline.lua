@@ -1,7 +1,6 @@
 local api = vim.api
 local fn = vim.fn
 local b = vim.b
-local g = vim.g
 local o = vim.o
 
 local nvim_buf_get_name = api.nvim_buf_get_name
@@ -15,15 +14,18 @@ local nvim_get_hl = api.nvim_get_hl
 local nvim_get_option_value = api.nvim_get_option_value
 local nvim_set_hl = api.nvim_set_hl
 local nvim_win_get_buf = api.nvim_win_get_buf
+local nvim_win_get_width = api.nvim_win_get_width
 local nvim_win_is_valid = api.nvim_win_is_valid
 local win_gettype = fn.win_gettype
 
 local EMPTY = ""
 local SPACE = " "
 local TAB = "          "
-local SEPARATOR = "%="
 
-local FILENAME = "%F%<"
+local SEPARATOR = "%="
+local TRUNCATE = "%<"
+local WIDTH_THRESHOLD = 120
+
 local FLAGS = "%( %m%r%)"
 local LOCATION = "%10l:%-9c"
 local PROGRESS = "%3p%%"
@@ -49,25 +51,47 @@ local SEV_WARN = 2
 local SEV_INFO = 3
 local SEV_HINT = 4
 
-local ACTIVE_FIRST = HL_ACTIVE .. SPACE .. FILENAME
 local ACTIVE_SECOND = SPACE .. FLAGS .. SPACE
 local ACTIVE_THIRD = LOCATION .. PROGRESS .. SPACE
 
-local INACTIVE_FIRST = HL_INACTIVE .. SPACE .. FILENAME
 local INACTIVE_SECOND = SPACE .. FLAGS
 
 local function rebuild_active_string(c)
   if c.is_special then
     return
   end
-  c.active = ACTIVE_FIRST .. c.icon_active .. ACTIVE_SECOND .. c.git .. SEPARATOR .. c.diag .. c.branch .. ACTIVE_THIRD
+
+  c.active = HL_ACTIVE
+    .. SPACE
+    .. c.filename
+    .. TRUNCATE
+    .. c.icon_active
+    .. ACTIVE_SECOND
+    .. c.git
+    .. SEPARATOR
+    .. c.diag
+    .. c.branch
+    .. ACTIVE_THIRD
+
+  c.active_tail = HL_ACTIVE
+    .. SPACE
+    .. c.filename_tail
+    .. TRUNCATE
+    .. c.icon_active
+    .. ACTIVE_SECOND
+    .. c.git
+    .. SEPARATOR
+    .. c.diag
+    .. c.branch
+    .. SPACE
 end
 
 local function rebuild_inactive_string(c)
   if c.is_special then
     return
   end
-  c.inactive = INACTIVE_FIRST .. c.icon_inactive .. INACTIVE_SECOND
+  c.inactive = HL_INACTIVE .. SPACE .. c.filename .. "%<" .. c.icon_inactive .. INACTIVE_SECOND
+  c.inactive_tail = HL_INACTIVE .. SPACE .. c.filename_tail .. "%<" .. c.icon_inactive .. INACTIVE_SECOND
 end
 
 local function create_empty_cache()
@@ -80,6 +104,10 @@ local function create_empty_cache()
     is_special = false,
     active = EMPTY,
     inactive = EMPTY,
+    active_tail = EMPTY,
+    inactive_tail = EMPTY,
+    filename = EMPTY,
+    filename_tail = EMPTY,
     initialized = false,
   }
 end
@@ -95,6 +123,7 @@ local is_global_stl = o.laststatus == 3
 local is_insert_mode = false
 local mini_icons_module = nil
 local redraw_pending = false
+local win_width_cache = {}
 
 local function redrawstatus()
   if not redraw_pending then
@@ -137,12 +166,17 @@ local function update_icon_cache(bufnr, c, defer_rebuild, force)
 
   if bufname == EMPTY then
     c.icon_active, c.icon_inactive = EMPTY, EMPTY
+    c.filename = EMPTY
+    c.filename_tail = EMPTY
     if not defer_rebuild then
       rebuild_active_string(c)
       rebuild_inactive_string(c)
     end
     return
   end
+
+  c.filename = fn.fnamemodify(bufname, ":~:.")
+  c.filename_tail = fn.fnamemodify(bufname, ":t")
 
   if not mini_icons_module then
     mini_icons_module = package.loaded["mini.icons"]
@@ -390,6 +424,17 @@ nvim_create_autocmd("ColorScheme", {
   end,
 })
 
+nvim_create_autocmd("DirChanged", {
+  group = augroup,
+  callback = function()
+    for _, c in pairs(cache) do
+      c.initialized = false
+      c.bufname = nil
+    end
+    redrawstatus()
+  end,
+})
+
 nvim_create_autocmd("DiagnosticChanged", {
   group = augroup,
   callback = function(args)
@@ -445,6 +490,14 @@ nvim_create_autocmd("OptionSet", {
   end,
 })
 
+nvim_create_autocmd({ "VimResized", "WinResized", "WinClosed" }, {
+  group = augroup,
+  callback = function()
+    win_width_cache = {}
+    redrawstatus()
+  end,
+})
+
 nvim_create_autocmd("User", {
   group = augroup,
   pattern = "GitSignsUpdate",
@@ -473,14 +526,16 @@ nvim_create_autocmd("User", {
 global_statusline = function()
   local bufnr = nvim_get_current_buf()
   local c = cache[bufnr]
-  if c and c.initialized then
+  if not c or not c.initialized then
+    c = get_or_create_cache(bufnr, c)
+  end
+  if c.is_special then
     return c.active
   end
-  return get_or_create_cache(bufnr, c).active
+  return o.columns < WIDTH_THRESHOLD and c.active_tail or c.active
 end
 
-local_statusline = function()
-  local winid = g.statusline_winid
+local_statusline = function(winid)
   if not winid or winid == 0 then
     winid = current_win_cache
     if not nvim_win_is_valid(winid) then
@@ -489,24 +544,37 @@ local_statusline = function()
     end
   end
 
+  local width = win_width_cache[winid]
+  if not width then
+    width = nvim_win_get_width(winid)
+    win_width_cache[winid] = width
+  end
+  local is_small = width < WIDTH_THRESHOLD
+
   if winid == current_win_cache then
     local bufnr = nvim_get_current_buf()
     local c = cache[bufnr]
-    if c and c.initialized then
+    if not c or not c.initialized then
+      c = get_or_create_cache(bufnr, c)
+    end
+    if c.is_special then
       return c.active
     end
-    return get_or_create_cache(bufnr, c).active
+    return is_small and c.active_tail or c.active
   end
 
   local bufnr = nvim_win_get_buf(winid)
   local c = cache[bufnr]
-  if c and c.initialized then
+  if not c or not c.initialized then
+    c = get_or_create_cache(bufnr, c)
+  end
+  if c.is_special then
     return c.inactive
   end
-  return get_or_create_cache(bufnr, c).inactive
+  return is_small and c.inactive_tail or c.inactive
 end
 
 _G.OptimizedStatusline = is_global_stl and global_statusline or local_statusline
 
 refresh_hl_cache()
-o.statusline = "%!v:lua.OptimizedStatusline()"
+o.statusline = "%!v:lua.OptimizedStatusline(get(g:, 'statusline_winid', 0))"
