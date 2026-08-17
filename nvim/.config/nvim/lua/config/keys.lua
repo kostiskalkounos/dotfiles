@@ -89,6 +89,7 @@ set("n", "<leader>e", "vip:sort u<cr>", default)
 set("v", "<leader>E", ":sort iu<cr>", default)
 set("v", "<leader>e", ":sort u<cr>", default)
 
+set("n", "<leader>B", "<cmd>Outline<cr>", unique)
 set("n", "<leader>F", "<cmd>OpenInGHFileLines<cr>", unique)
 
 set("n", "-", function() require("oil").open() end, unique)
