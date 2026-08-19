@@ -194,15 +194,30 @@ return {
         dapui.elements.watches.add()
       end, default)
 
+      local function maven_project_name()
+        local pom = vim.fs.find("pom.xml", { path = fn.expand("%:p:h"), upward = true })[1]
+        if not pom then
+          return nil
+        end
+        local xml = table.concat(fn.readfile(pom), "\n")
+        if xml:match("<packaging>%s*pom%s*</packaging>") then
+          return nil
+        end
+        local name = xml:gsub("<parent>.-</parent>", ""):match("<artifactId>%s*([%w%.%-_${}]+)%s*</artifactId>")
+        return name
+      end
+
       dap.configurations.java = {
         {
           name = "Debug Launch",
+          projectName = maven_project_name,
           type = "java",
           request = "launch",
           vmArgs = "-Xmx4g ",
         },
         {
           name = "Debug Attach (port)",
+          projectName = maven_project_name,
           type = "java",
           request = "attach",
           hostName = "127.0.0.1",
@@ -213,6 +228,7 @@ return {
         },
         {
           name = "Debug Attach (8000)",
+          projectName = maven_project_name,
           type = "java",
           request = "attach",
           hostName = "127.0.0.1",
@@ -220,6 +236,7 @@ return {
         },
         {
           name = "Debug Attach (8001)",
+          projectName = maven_project_name,
           type = "java",
           request = "attach",
           hostName = "127.0.0.1",
@@ -227,6 +244,7 @@ return {
         },
         {
           name = "Debug Attach (8002)",
+          projectName = maven_project_name,
           type = "java",
           request = "attach",
           hostName = "127.0.0.1",
